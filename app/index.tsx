@@ -1,6 +1,7 @@
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import * as Location from 'expo-location';
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import { Button, Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 
@@ -17,6 +18,7 @@ const startingRegion = {
 export default function HomeScreen() {
     const [route, setRoute] = useState(null);
     const [coordinates, setCoordinates] = useState([]);
+    const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
 
     const windowHeight = Dimensions.get('window').height;
 
@@ -29,6 +31,7 @@ export default function HomeScreen() {
     }, []);
 
     const handleSelectLocation = (latitude, longitude) => {
+        if(!latitude || !longitude) return;
         mapRef.current?.animateToRegion(
             {
                 latitude,
@@ -46,6 +49,16 @@ export default function HomeScreen() {
         markersRef.current[`${latitude}-${longitude}`]?.showCallout();
     }
 
+    const watchUserLocation = async () => {
+        Location.watchPositionAsync({
+            accuracy: Location.Accuracy.High,
+            timeInterval: 3000,   // every 3 seconds
+            distanceInterval: 5,  // or every 5 meters
+        }, (newLocation) => {
+            setUserLocation(newLocation);
+        })
+    }
+
     useEffect(() => {
         setRoute(route62);
         setCoordinates(
@@ -57,9 +70,39 @@ export default function HomeScreen() {
             })
         );
 
+        async function getCurrentLocation() {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                console.log('Permission to access location was denied');
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            console.log(location);
+            setUserLocation(location);
+        }
+        getCurrentLocation();
+
+        // track location
+        watchUserLocation();
     }, []);
+
+    useEffect(() => {
+        console.log(userLocation);
+    }, [userLocation])
     return (
         <GestureHandlerRootView style={styles.container}>
+            <View style={{
+                position: "absolute",
+                top: 50,
+                right: 10,
+                zIndex: 10
+            }}>
+                <Button
+                    title='View Current Location'
+                    onPress={() => handleSelectLocation(userLocation?.coords.latitude, userLocation?.coords.longitude)}
+                />
+            </View>
             <MapView
                 ref={mapRef}
                 style={styles.map}
@@ -78,6 +121,17 @@ export default function HomeScreen() {
                         />
                     )
                 })}
+
+                {userLocation && (
+                    <Marker
+                        coordinate={{
+                            latitude: userLocation.coords.latitude,
+                            longitude: userLocation.coords.longitude
+                        }}
+                    >
+                        <View style={styles.userMarker}></View>
+                    </Marker>
+                )}
 
                 <Polyline
                     coordinates={coordinates}
@@ -119,7 +173,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        position: "relative"
     },
     map: {
         width: '100%',
@@ -138,5 +193,13 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'semibold',
         textAlign: 'center'
+    },
+    userMarker: {
+        width: 16,
+        height: 16,
+        backgroundColor: '#007AFF',
+        borderColor: '#FFFFFF',
+        borderWidth: 2,
+        borderRadius: 8
     }
 })
