@@ -1,0 +1,193 @@
+{
+  "bus_stops": {
+    "1031": {
+      "id": "1031",
+      "name": "Dagon University",
+      "name_mm": "ဒဂုံတက္ကသိုလ်",
+      "latitude": 16.91747,
+      "longitude": 96.21382
+    },
+    "1036": {
+      "id": "1036",
+      "name": "Dagon University Gate",
+      "name_mm": "ဒဂုံတက္ကသိုလ်ဂိတ်",
+      "latitude": 16.91562,
+      "longitude": 96.21023
+    },
+    "5": {
+      "id": "5",
+      "name": "Thanlyin Junction",
+      "name_mm": "သန်လျင်လမ်းဆုံ",
+      "latitude": 16.91422,
+      "longitude": 96.211
+    },
+    "1030": {
+      "id": "1030",
+      "name": "Myaing Thar Yar",
+      "name_mm": "မြိုင်သာရာ",
+      "latitude": 16.90967,
+      "longitude": 96.21352
+    },
+    "2404": {
+      "id": "2404",
+      "name": "Thanlyin Road",
+      "name_mm": "သန်လျင်လမ်း",
+      "latitude": 16.90663,
+      "longitude": 96.20822
+    },
+    "2363": {
+      "id": "2363",
+      "name": "Aye Yeik Tha",
+      "name_mm": "အေးရိပ်သာ",
+      "latitude": 16.90465,
+      "longitude": 96.20433
+    },
+    "878": {
+      "id": "878",
+      "name": "Shwe Pyi Thar",
+      "name_mm": "ရွှေပြည်သာ",
+      "latitude": 16.89858,
+      "longitude": 96.19257
+    },
+    "1018": {
+      "id": "1018",
+      "name": "Industrial Zone",
+      "name_mm": "စက်မှုဇုန်",
+      "latitude": 16.89183,
+      "longitude": 96.19627
+    },
+    "936": {
+      "id": "936",
+      "name": "Htauk Kyant",
+      "name_mm": "ထောက်ကြံ့",
+      "latitude": 16.87979,
+      "longitude": 96.20297
+    },
+    "926": {
+      "id": "926",
+      "name": "Mingaladon",
+      "name_mm": "မင်္ဂလာဒုံ",
+      "latitude": 16.86407,
+      "longitude": 96.2108
+    },
+    "880": {
+      "id": "880",
+      "name": "Airport Road",
+      "name_mm": "လေဆိပ်လမ်း",
+      "latitude": 16.86125,
+      "longitude": 96.21395
+    },
+    "928": {
+      "id": "928",
+      "name": "Yankin",
+      "name_mm": "ရန်ကင်း",
+      "latitude": 16.85693,
+      "longitude": 96.21167
+    },
+    "1004": {
+      "id": "1004",
+      "name": "Kamayut",
+      "name_mm": "ကမာရွတ်",
+      "latitude": 16.84752,
+      "longitude": 96.20912
+    },
+    "1006": {
+      "id": "1006",
+      "name": "Hlaing",
+      "name_mm": "လှိုင်",
+      "latitude": 16.83879,
+      "longitude": 96.20119
+    },
+    "1007": {
+      "id": "1007",
+      "name": "University Avenue",
+      "name_mm": "တက္ကသိုလ်လမ်း",
+      "latitude": 16.83032,
+      "longitude": 96.19255
+    },
+    "674": {
+      "id": "674",
+      "name": "Inya Lake",
+      "name_mm": "အင်းယားကန်",
+      "latitude": 16.82439,
+      "longitude": 96.18499
+    },
+    "628": {
+      "id": "628",
+      "name": "Pyay Road",
+      "name_mm": "ပြည်လမ်း",
+      "latitude": 16.82037,
+      "longitude": 96.17222
+    },
+    "634": {
+      "id": "634",
+      "name": "Insein Road",
+      "name_mm": "အင်းစိန်လမ်း",
+      "latitude": 16.81164,
+      "longitude": 96.16926
+    },
+    "597": {
+      "id": "597",
+      "name": "Ahlone",
+      "name_mm": "အလုံ",
+      "latitude": 16.80896,
+      "longitude": 96.15832
+    },
+    "609": {
+      "id": "609",
+      "name": "Lanmadaw",
+      "name_mm": "လမ်းမတော်",
+      "latitude": 16.80639,
+      "longitude": 96.15561
+    },
+    "367": {
+      "id": "367",
+      "name": "Pabedan",
+      "name_mm": "ပန်းပဲတန်း",
+      "latitude": 16.80509,
+      "longitude": 96.14317
+    },
+    "361": {
+      "id": "361",
+      "name": "Kyauktada",
+      "name_mm": "ကျောက်တံတား",
+      "latitude": 16.80376,
+      "longitude": 96.14128
+    },
+    "345": {
+      "id": "345",
+      "name": "Sule Pagoda",
+      "name_mm": "ဆူးလေဘုရား",
+      "latitude": 16.80381,
+      "longitude": 96.13132
+    },
+    "232": {
+      "id": "232",
+      "name": "Botahtaung",
+      "name_mm": "ဗိုလ်တထောင်",
+      "latitude": 16.80388,
+      "longitude": 96.12234
+    },
+    "235": {
+      "id": "235",
+      "name": "Strand Road",
+      "name_mm": "စထရန်းလမ်း",
+      "latitude": 16.80641,
+      "longitude": 96.12224
+    },
+    "277": {
+      "id": "277",
+      "name": "Pansodan",
+      "name_mm": "ပန်းဆိုးဒန်း",
+      "latitude": 16.81184,
+      "longitude": 96.12195
+    },
+    "301": {
+      "id": "301",
+      "name": "Merchant Street",
+      "name_mm": "ကုန်သည်လမ်း",
+      "latitude": 16.81623,
+      "longitude": 96.12195
+    }
+  }
+}
