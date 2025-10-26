@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 // react native
 import { Dimensions, StyleSheet } from "react-native";
 
+// expo router
+import { router } from "expo-router";
+
 // gestureHandler
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -51,9 +54,15 @@ export default function HomeScreen() {
     isActive ? hideRoute(route_id) : showRoute(route_id);
   };
 
+  const onPressDetailRoute = (route_id : number | string) => {
+    router.push(`/route/${route_id}`);
+
+  }
+
   useEffect(() => {
     console.log(displayedRoutes.length);
   }, [displayedRoutes]);
+  
   return (
     <GestureHandlerRootView style={styles.container}>
       <AppMapView width={width} height={height}>
@@ -83,6 +92,7 @@ export default function HomeScreen() {
               routeNo={item.route_id}
               routeName={item.name}
               onPress={onPressRoute}
+              onDetailPress={onPressDetailRoute}
               isActive={isActiveRoute(item.route_id)}
               color={`#${item.color}`}
             />

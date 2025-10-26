@@ -9,7 +9,7 @@ type RouteItemProps = {
   routeNo: number | string;
   routeName: string;
   onPress?: (isActive: boolean, route_id: number | string) => void;
-  onDetailPress?: () => void;
+  onDetailPress?: (route_id: number | string) => void;
   isActive?: boolean;
   color: string
 };
@@ -18,7 +18,7 @@ export default function RouteItem({
   routeNo,
   routeName,
   onPress = (routeNo) => console.log(routeNo),
-  onDetailPress,
+  onDetailPress = (routeNo) => console.log(routeNo),
   isActive = false,
   color
 }: RouteItemProps) {
@@ -47,7 +47,9 @@ export default function RouteItem({
           <CustomText title={routeName} />
         </View>
         <View style={styles.detailButtonContainer}>
-          <FontAwesome5 name="list-alt" size={30} color="black" />
+          <Pressable onPress={() => onDetailPress(routeNo)}>
+            <FontAwesome5 name="list-alt" size={30} color="black" />
+          </Pressable>
         </View>
       </View>
     </Pressable>

@@ -11,7 +11,7 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" options={{ title: "Home" }} />
           <Stack.Screen
-            name="routeDetail"
+            name="route/[id]"
             options={{ title: "Route Detail" }}
           />
         </Stack>
