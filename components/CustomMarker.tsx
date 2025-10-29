@@ -1,5 +1,5 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { forwardRef } from "react";
+import { StyleSheet } from "react-native";
 import { MapMarkerProps, Marker } from "react-native-maps";
 
 type CoordinateType = {
@@ -12,24 +12,19 @@ type CustomMarkerProps = {
   children?: React.ReactNode;
 } & MapMarkerProps;
 
-export default function CustomMarker({
+export default forwardRef(({
   children,
   coordinate,
   ...overrideProps
-}: CustomMarkerProps) {
+}: CustomMarkerProps) => {
   return (
     <Marker
       {...overrideProps}
       coordinate={coordinate}
-    >
-      {children || (
-        <View style={styles.outer}>
-          <View style={styles.inner} />
-        </View>
-      )}
-    </Marker>
+    />
   );
-}
+})
+
 
 const styles = StyleSheet.create({
   outer: {

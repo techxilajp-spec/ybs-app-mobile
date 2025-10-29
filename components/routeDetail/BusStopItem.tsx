@@ -3,10 +3,11 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 type BusStopItemProps = {
   name: string;
   name_mm: string;
+  onPress?: () => void
 };
-export default function BusStopItem({ name, name_mm }: BusStopItemProps) {
+export default function BusStopItem({ name, name_mm, onPress = () => console.log("clicked") }: BusStopItemProps) {
   return (
-    <Pressable onPress={() => console.log("Show Stop")}>
+    <Pressable onPress={onPress}>
       <View style={styles.itemContainer}>
         <View style={styles.busStopInfo}>
           <Text style={styles.busStopName}>{name}</Text>

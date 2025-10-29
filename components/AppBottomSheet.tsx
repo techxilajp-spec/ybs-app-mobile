@@ -7,7 +7,7 @@ import { StyleSheet } from "react-native";
 
 type AppBottomSheetProps = {
   children: React.ReactNode;
-  snapPoints?: string[];
+  snapPoints?: (string | number)[];
   scrollable?: boolean;
 } & BottomSheetProps;
 

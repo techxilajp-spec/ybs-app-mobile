@@ -12,8 +12,8 @@ import {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MapView, { MapMarker, Marker, Polyline } from "react-native-maps";
 
-import busStopsData from "@/data/bus-stops.json";
 import route62 from "@/data/routes/route62.json";
+import busStopsData from "@/data/ynh_bus-stops.json";
 
 type BusStop = {
   id: string;

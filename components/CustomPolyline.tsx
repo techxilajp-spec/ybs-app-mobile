@@ -18,7 +18,7 @@ export default function CustomPolyline({ coordinates, color = defaultColor }: Cu
       <Polyline
         coordinates={coordinates}
         strokeColor={color}
-        strokeWidth={5}
+        strokeWidth={4}
         zIndex={1}
         lineCap="round"
         lineJoin="round"
