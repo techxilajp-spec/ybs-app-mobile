@@ -1,4 +1,4 @@
-import { User } from "@/modals/user";
+import { User } from "@/src/models/user";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 

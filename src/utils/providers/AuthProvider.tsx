@@ -1,7 +1,7 @@
 "use client";
 
-import { useAuthProvider } from "@/hooks/auth/useAuthProvider";
-import { User } from "@/modals/user";
+import { useAuthProvider } from "@/src/hooks/auth/useAuthProvider";
+import { User } from "@/src/models/user";
 import {
   router,
   useRootNavigationState,

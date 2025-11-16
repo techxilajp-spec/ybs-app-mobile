@@ -1,4 +1,4 @@
-import { AUTH_KEY } from "@/hooks/auth/useAuthProvider";
+import { AUTH_KEY } from "@/src/hooks/auth/useAuthProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
