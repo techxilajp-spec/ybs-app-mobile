@@ -1,13 +1,15 @@
 import { Drawer } from "expo-router/drawer";
 
+// components
+import AppDrawerContent from "@/src/components/AppDrawerContent";
+
 export default function DrawerLayout() {
   return (
-    <Drawer>
+    <Drawer drawerContent={AppDrawerContent}>
       <Drawer.Screen
         name="index"
         options={{
-          drawerLabel: "Home",
-          title: "Home Title",
+          headerShown: false
         }}
       />
     </Drawer>
