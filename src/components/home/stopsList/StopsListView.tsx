@@ -1,11 +1,11 @@
 import { StyleSheet, View } from "react-native";
 
-import AppText from "../AppText";
+import AppText from "@/src/components/AppText";
 
-export default function RouteListView() {
+export default function StopsListView() {
     return (
         <View style={styles.container}>
-            <AppText>Route List View</AppText>
+            <AppText>Stop List View</AppText>
         </View>
     )
 }
@@ -13,6 +13,7 @@ export default function RouteListView() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'yellow'
+        borderWidth: 1,
+        borderColor: '#EEEEEE'
     }
 })
