@@ -8,6 +8,8 @@ import { StatusBar } from 'expo-status-bar';
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
 type AppScreenLayoutProps = {
   children: React.ReactNode;
   backgroundColor?: string; // optional background color
@@ -20,14 +22,14 @@ export default function AppScreenLayout({
   contentStyle
 }: AppScreenLayoutProps) {
   return (
-    <>
+    <GestureHandlerRootView style={{flex: 1}}>
       <StatusBar translucent={true} />
       <SafeAreaView
         style={[styles.container, { backgroundColor }, contentStyle]}
       >
         {children}
       </SafeAreaView>
-    </>
+    </GestureHandlerRootView>
   );
 }
 
