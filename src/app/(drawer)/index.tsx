@@ -9,21 +9,51 @@ import RouteListView from "@/src/components/home/routeList/RouteListView";
 import RouteSearchView from "@/src/components/home/routeSearch/RouteSearchView";
 import StopsListView from "@/src/components/home/stopsList/StopsListView";
 
-const TABS = ["Bus လမ်းကြောင်းများ", "မှတ်တိုင်များ", "ယာဉ်လိုင်းများ"];
-const VIEWS = [RouteSearchView, StopsListView, RouteListView];
+// constants
+import { Colors } from "@/src/constants/color";
+
+const TAB_CONFIG = [
+  {
+    label: "Bus လမ်းကြောင်းများ",
+    component: RouteSearchView,
+    getProps: () => ({
+    }),
+  },
+  {
+    label: "မှတ်တိုင်များ",
+    component: StopsListView,
+    getProps: () => ({
+    }),
+  },
+  {
+    label: "ယာဉ်လိုင်းများ",
+    component: RouteListView,
+    getProps: () => ({
+    }),
+  },
+];
 
 export default function HomeScreen() {
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const ActiveView = VIEWS[activeIndex];
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const { component: ActiveView, getProps } = TAB_CONFIG[activeIndex];
 
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFF">
       <Header />
 
       <NavigationTabs
-        tabs={TABS}
+        tabs={TAB_CONFIG.map(t => t.label)}
         activeIndex={activeIndex}
+        activeStates={{
+          backgroundColor: Colors.primary,
+          color: '#FFF',
+          borderColor: Colors.primary
+        }}
+        inactiveStates={{
+          backgroundColor: Colors.secondary,
+          color: '#2F2F2F',
+          borderColor: '#EEEEEE'
+        }}
         navigationTabStyle={{
           marginTop: 30,
           marginBottom: 18,
@@ -31,7 +61,7 @@ export default function HomeScreen() {
         onNavigationTabPress={setActiveIndex}
       />
 
-      <ActiveView />
+      <ActiveView  {...getProps()} />
     </AppScreenLayout>
   );
 }

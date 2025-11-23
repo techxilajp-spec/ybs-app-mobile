@@ -10,11 +10,20 @@ import {
 import AppText from "@/src/components/AppText";
 
 // constants
-import { Colors } from "@/src/constants/color";
 
 type NavigationTabsProps = {
   tabs: string[];
   activeIndex: number;
+  activeStates: {
+    backgroundColor: string;
+    color: string;
+    borderColor: string;
+  };
+  inactiveStates: {
+    backgroundColor: string;
+    color: string;
+    borderColor: string;
+  };
   navigationTabStyle?: StyleProp<ViewStyle>;
   onNavigationTabPress: (index: number) => void;
 };
@@ -22,21 +31,37 @@ type NavigationTabsProps = {
 type NavigationTabProps = {
   title: string;
   active: boolean;
+  activeColors: {
+    backgroundColor: string;
+    color: string;
+    borderColor: string;
+  };
+  inactiveColors: {
+    backgroundColor: string;
+    color: string;
+    borderColor: string;
+  };
   onPress: () => void;
 };
 
-function NavigationTab({ title, active, onPress }: NavigationTabProps) {
+function NavigationTab({ 
+    title, 
+    active, 
+    activeColors,
+    inactiveColors,
+    onPress 
+  }: NavigationTabProps) {
   const tabStyle = active
     ? {
-        backgroundColor: Colors.primary,
-        borderColor: Colors.primary,
+        backgroundColor: activeColors.backgroundColor,
+        borderColor: activeColors.borderColor,
       }
     : {
-        backgroundColor: Colors.secondary,
-        borderColor: "#EEE",
+        backgroundColor:inactiveColors.backgroundColor,
+        borderColor: inactiveColors.borderColor,
       };
 
-  const tabTextColor = active ? "#FFF" : "#2F2F2F";
+  const tabTextColor = active ? activeColors.color : inactiveColors.color;
 
   return (
     <Pressable style={[styles.tab, tabStyle]} onPress={onPress}>
@@ -50,6 +75,8 @@ function NavigationTab({ title, active, onPress }: NavigationTabProps) {
 export default function NavigationTabs({
   tabs,
   activeIndex,
+  activeStates,
+  inactiveStates,
   navigationTabStyle = {},
   onNavigationTabPress,
 }: NavigationTabsProps) {
@@ -65,6 +92,8 @@ export default function NavigationTabs({
           key={title}
           title={title}
           active={activeIndex === index}
+          activeColors={activeStates}
+          inactiveColors={inactiveStates}
           onPress={() => onNavigationTabPress(index)}
         />
       ))}

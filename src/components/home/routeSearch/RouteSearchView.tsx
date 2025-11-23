@@ -1,19 +1,47 @@
 import { Image, StyleSheet, View } from "react-native";
 
+import { useState } from "react";
+
 // custom component
 import AppButton from "@/src/components/AppButton";
+import DirectionModal from "@/src/components/home/routeSearch/DirectionModal";
 import DirectionSelector from "@/src/components/home/routeSearch/DirectionSelector";
 
 export default function RouteSearchView() {
+  const [showDirectionModal, setShowDirectionModal] = useState<{ visible: boolean, mode: "start" | "end" | null}>({
+    visible: false,
+    mode: null
+  })
+
+  const openDirectionModal = (mode : "start" | "end") => {
+    setShowDirectionModal({
+      visible: true,
+      mode
+    })
+  }
+
+  const closeDirectionModal = () => {
+    setShowDirectionModal({
+      visible: false,
+      mode: null
+    })
+  }
+
   return (
     <View style={styles.container}>
+      <DirectionModal 
+        visible={showDirectionModal.visible}
+        mode={showDirectionModal.mode}
+        onClose={closeDirectionModal}
+      />
+
       <View style={styles.selectorContainer}>
         {/* start point */}
         <DirectionSelector
           icon={<View style={styles.circleIcon}></View>}
           title="မှ"
           description="လက်ရှိတည်နေရာ"
-          onPress={() => console.log("clicked")}
+          onPress={() => openDirectionModal("start")}
           showIndicator={true}
           style={{ marginBottom: 8 }}
         />
@@ -28,7 +56,7 @@ export default function RouteSearchView() {
           }
           title="သို"
           description="သွားရောက်လိုသည့်နေရာ"
-          onPress={() => console.log("clicked")}
+          onPress={() => openDirectionModal("end")}
         />
       </View>
       <AppButton 

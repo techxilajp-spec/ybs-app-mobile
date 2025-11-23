@@ -1,5 +1,0 @@
-Function that returns React element to render as the content of the drawer
-
-The default component for the drawer is scrollable and only contains links for the routes in the RouteConfig.
-You can easily override the default component to add a header, footer, or other content to the drawer
-The default content component is exported as DrawerContent
