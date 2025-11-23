@@ -11,6 +11,7 @@ import StopsListView from "@/src/components/home/stopsList/StopsListView";
 
 // constants
 import { Colors } from "@/src/constants/color";
+import { StatusBar } from "expo-status-bar";
 
 const TAB_CONFIG = [
   {
@@ -39,6 +40,7 @@ export default function HomeScreen() {
 
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFF">
+      <StatusBar style="dark" />
       <Header />
 
       <NavigationTabs
