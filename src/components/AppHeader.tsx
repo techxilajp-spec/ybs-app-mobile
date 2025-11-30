@@ -2,6 +2,9 @@ import { Image, Pressable, StyleSheet, View } from "react-native";
 
 import { router } from "expo-router";
 
+// constants
+import { Colors } from "@/src/constants/color";
+
 // custom components
 import AppText from "@/src/components/AppText";
 
@@ -13,7 +16,6 @@ export default function AppHeader({
     title
 } : AppHeaderProps) {
     const goBackToHomeScreen = () => {
-        console.log("back");
         router.back();
     }
     return (
@@ -41,8 +43,8 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     title: {
-        fontWeight: "bold",
-        color: '#1F2937',
+        fontWeight: "semibold",
+        color: Colors.text.primary,
         textAlign: 'center'
     },
     backIcon: {

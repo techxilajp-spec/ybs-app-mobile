@@ -7,7 +7,7 @@ export default function DrawerLayout() {
   return (
     <Drawer drawerContent={AppDrawerContent}>
       <Drawer.Screen
-        name="index"
+        name="(home)"
         options={{
           headerShown: false
         }}

@@ -58,6 +58,7 @@ export default function RouteCard({
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: '#ffffff',
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,

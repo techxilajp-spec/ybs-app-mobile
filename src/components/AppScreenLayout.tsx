@@ -24,6 +24,7 @@ export default function AppScreenLayout({
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <StatusBar translucent={true} />
+      {/* <StatusBar style="dark" /> */}
       <SafeAreaView
         style={[styles.container, { backgroundColor }, contentStyle]}
       >

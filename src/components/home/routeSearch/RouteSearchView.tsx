@@ -2,6 +2,9 @@ import { Image, StyleSheet, View } from "react-native";
 
 import { useState } from "react";
 
+// expo router
+import { router } from "expo-router";
+
 // custom component
 import AppButton from "@/src/components/AppButton";
 import DirectionModal from "@/src/components/home/routeSearch/DirectionModal";
@@ -25,6 +28,10 @@ export default function RouteSearchView() {
       visible: false,
       mode: null
     })
+  }
+
+  const searchRoutes = () => {
+    router.push("/routeSearchResults");
   }
 
   return (
@@ -61,7 +68,7 @@ export default function RouteSearchView() {
       </View>
       <AppButton 
         title="Bus ကားလမ်းကြောင်းကြည့်မယ်"
-        onPress={() => console.log("searching route")}
+        onPress={searchRoutes}
       />
     </View>
   );
