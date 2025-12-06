@@ -12,8 +12,8 @@ import { useEffect, useState } from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 // custom components
+import NavigationTabs from "@/src/components/AppNavigationTabs";
 import FilterView from "@/src/components/home/FilterView";
-import NavigationTabs from "@/src/components/home/NavigationTabs";
 import ListView from "@/src/components/home/routeSearch/directionModal/ListView";
 
 import { SafeAreaView } from "react-native-safe-area-context";

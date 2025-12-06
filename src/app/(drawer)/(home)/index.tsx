@@ -2,10 +2,10 @@ import { useState } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
 
 // custom component
+import NavigationTabs from "@/src/components/AppNavigationTabs";
 import AppScreenLayout from "@/src/components/AppScreenLayout";
 import AdvertisementModal from "@/src/components/home/AdvertisementModal";
 import Header from "@/src/components/home/Header";
-import NavigationTabs from "@/src/components/home/NavigationTabs";
 import RouteListView from "@/src/components/home/routeList/RouteListView";
 import RouteSearchView from "@/src/components/home/routeSearch/RouteSearchView";
 import StopsListView from "@/src/components/home/stopsList/StopsListView";

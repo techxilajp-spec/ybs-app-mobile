@@ -1,0 +1,12 @@
+latitudeDelta
+=> represent how much latitude (vertical distance) is visible on the screen
+=> Smaller Value = more zoom in
+=> Larger Value = more zoom out
+
+| latitudeDelta | Zoom                       |
+| ------------- | -------------------------- |
+| `0.002`       | Very close (street level)  |
+| `0.01`        | Close (neighborhood level) |
+| `0.05`        | Medium zoom                |
+| `0.2`         | City level                 |
+| `1.0`         | Country level              |

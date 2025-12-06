@@ -4,8 +4,8 @@ import { StyleSheet } from "react-native";
 
 // components
 import AppHeader from "@/src/components/AppHeader";
+import NavigationTabs from "@/src/components/AppNavigationTabs";
 import AppScreenLayout from "@/src/components/AppScreenLayout";
-import NavigationTabs from "@/src/components/home/NavigationTabs";
 import AvailableLinesView from "@/src/components/routeSearchResult/AvailableLinesView";
 import AvailableRoutesView from "@/src/components/routeSearchResult/AvailableRoutesView";
 

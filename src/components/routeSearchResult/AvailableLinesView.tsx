@@ -1,7 +1,7 @@
 import { FlatList, StyleSheet, View } from 'react-native';
 
 // custom component
-import RouteCard from "@/src/components/home/routeList/RouteCard";
+import RouteCard from "@/src/components/RouteCard";
 
 const DUMMY_ROUTES = [
     {

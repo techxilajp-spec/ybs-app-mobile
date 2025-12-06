@@ -31,7 +31,6 @@ export default function Header() {
             <View>
                 <AppText 
                     size={20} 
-                    weight="bold"
                     style={{ 
                         textAlign: 'center',
                         marginBottom: 3
@@ -39,8 +38,7 @@ export default function Header() {
                 >Bus Pin</AppText>
                 <AppText
                     size={18}
-                    weight="bold"
-                    style={{ textAlign: 'center'}}
+                    style={styles.subTitle}
                 >ဘတ်စကားစီးဖို့အကောင်းဆုံးအကူ</AppText>
             </View>
         </View>
@@ -67,4 +65,8 @@ const styles = StyleSheet.create({
        height: 50 ,
        marginBottom: 18
     },
+    subTitle: {
+        textAlign: "center",
+        fontFamily: "MiSansMyanmar-Demibold"
+    }
 })

@@ -15,6 +15,12 @@ export default function HomeScreenLayout() {
                     headerShown: false
                 }}
             />
+            <Stack.Screen 
+                name="routeDetail"
+                options={{
+                    headerShown: false
+                }}
+            />
         </Stack>
     )
 }

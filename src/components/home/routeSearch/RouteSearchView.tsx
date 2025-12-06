@@ -41,7 +41,6 @@ export default function RouteSearchView() {
         mode={showDirectionModal.mode}
         onClose={closeDirectionModal}
       />
-
       <View style={styles.selectorContainer}>
         {/* start point */}
         <DirectionSelector

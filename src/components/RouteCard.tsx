@@ -1,7 +1,7 @@
 import { Image, Pressable, StyleSheet, View } from "react-native";
 
 // custom component
-import AppText from "../../AppText";
+import AppText from "@/src/components/AppText";
 
 type RouteCardProps = {
   routeNo: string | number;

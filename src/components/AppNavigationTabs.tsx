@@ -28,7 +28,7 @@ type NavigationTabsProps = {
   onNavigationTabPress: (index: number) => void;
 };
 
-type NavigationTabProps = {
+type AppNavigationTabProps = {
   title: string;
   active: boolean;
   activeColors: {
@@ -50,7 +50,7 @@ function NavigationTab({
     activeColors,
     inactiveColors,
     onPress 
-  }: NavigationTabProps) {
+  }: AppNavigationTabProps) {
   const tabStyle = active
     ? {
         backgroundColor: activeColors.backgroundColor,
@@ -72,7 +72,7 @@ function NavigationTab({
   );
 }
 
-export default function NavigationTabs({
+export default function AppNavigationTabs({
   tabs,
   activeIndex,
   activeStates,

@@ -5,7 +5,7 @@ import { Colors } from "@/src/constants/color";
 
 // customComponent
 import AppText from "@/src/components/AppText";
-import StopCard from "@/src/components/home/stopsList/StopCard";
+import StopCard from "@/src/components/StopCard";
 
 type ListViewProps = {
   data: any[];

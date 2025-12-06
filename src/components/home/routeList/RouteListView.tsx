@@ -1,8 +1,9 @@
 import { FlatList, StyleSheet, View } from "react-native";
 
+import { router } from "expo-router";
 
 // custom component
-import RouteCard from "@/src/components/home/routeList/RouteCard";
+import RouteCard from "@/src/components/RouteCard";
 import RouteListFilter from "./RouteListFilter";
 
 const DUMMY_ROUTES = [
@@ -36,9 +37,12 @@ const DUMMY_ROUTES = [
     description: "ပါရမီ(ညောင်ပင်) - ဘေလီ - သံသုမာလမ်း - လိုင်စင်ရုံး - ရတနာလမ်း - ကျိုက္ကဆံဘုရား - ကျောက်ကုန်း - မိုးကောင်းလမ်း - ရန်ကင်းလမ်း - ရန်ရှင်းလမ်း - စက်မှုကွေ့ - လမ်းနီ(မြန်မာပလာဇာ) - လှည်းတန်း - ဆင်မလိုက် -ကြည့်မြင်တိုင်ကမ်းနားလမ်း - ညဈေး - သခင်မြပန်းခြံ",
     color: "#F4D159"
   }
-]
+];
 
 export default function RouteListView() {
+  const onPressRouteCard = () => {
+    router.push("/(drawer)/(home)/routeDetail");
+  }
   return (
     <View style={styles.container}>
       <RouteListFilter />
@@ -51,7 +55,7 @@ export default function RouteListView() {
             routeTitle={item.title} 
             routeDescription={item.description} 
             color={item.color}
-            onPress={() => console.log("hello")}
+            onPress={onPressRouteCard}
           />
         )}
         keyExtractor={item => item.title}

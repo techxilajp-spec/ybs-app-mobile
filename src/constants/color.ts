@@ -9,5 +9,9 @@ export const Colors = {
         secondary: '#4B5563',
         tertiary: '#475467',
         disabled: '#CFCFCF'
+    },
+    border: {
+        secondary: '#EAECF0',
+        disabled: '#D0D5DD'
     }
 }
