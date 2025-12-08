@@ -5,6 +5,9 @@ import { useState } from "react";
 // expo router
 import { router } from "expo-router";
 
+// constants
+import { Colors } from "@/src/constants/color";
+
 // custom component
 import AppButton from "@/src/components/AppButton";
 import DirectionModal from "@/src/components/home/routeSearch/DirectionModal";
@@ -68,6 +71,7 @@ export default function RouteSearchView() {
       <AppButton 
         title="Bus ကားလမ်းကြောင်းကြည့်မယ်"
         onPress={searchRoutes}
+        textStyle={styles.buttonText}
       />
     </View>
   );
@@ -79,7 +83,7 @@ const styles = StyleSheet.create({
   },
   selectorContainer: {
     borderWidth: 1,
-    borderColor: "#D0D5DD",
+    borderColor: Colors.border.disabled,
     borderRadius: 20,
     paddingVertical: 20,
     paddingHorizontal: 15,
@@ -101,4 +105,7 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
   },
+  buttonText: {
+    fontFamily: "MiSansMyanmar-Medium"
+  }
 });

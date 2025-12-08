@@ -44,30 +44,35 @@ type AppNavigationTabProps = {
   onPress: () => void;
 };
 
-function NavigationTab({ 
-    title, 
-    active, 
-    activeColors,
-    inactiveColors,
-    onPress 
-  }: AppNavigationTabProps) {
+function NavigationTab({
+  title,
+  active,
+  activeColors,
+  inactiveColors,
+  onPress,
+}: AppNavigationTabProps) {
   const tabStyle = active
     ? {
         backgroundColor: activeColors.backgroundColor,
         borderColor: activeColors.borderColor,
       }
     : {
-        backgroundColor:inactiveColors.backgroundColor,
+        backgroundColor: inactiveColors.backgroundColor,
         borderColor: inactiveColors.borderColor,
       };
 
-  const tabTextColor = active ? activeColors.color : inactiveColors.color;
+  const tabTextStyle = active
+    ? {
+        color: activeColors.color,
+        fontFamily: "MiSansMyanmar-Semibold",
+      }
+    : {
+        color: inactiveColors.color,
+      };
 
   return (
     <Pressable style={[styles.tab, tabStyle]} onPress={onPress}>
-      <AppText style={[styles.tabTitle, { color: tabTextColor }]}>
-        {title}
-      </AppText>
+      <AppText style={[styles.tabTitle, tabTextStyle]}>{title}</AppText>
     </Pressable>
   );
 }
@@ -107,13 +112,13 @@ const styles = StyleSheet.create({
   },
   tab: {
     paddingVertical: 10,
-    paddingHorizontal: 25,
+    paddingHorizontal: 20,
     borderRadius: 30,
-    marginRight: 8,
+    marginRight: 5,
     borderWidth: 1,
   },
   tabTitle: {
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: "MiSansMyanmar-Medium",
   },
 });

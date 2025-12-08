@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   header: {
-    padding: 30,
+    padding: 35,
     backgroundColor: Colors.primary,
     flexDirection: 'row',
     alignItems: 'center'
@@ -70,9 +70,9 @@ const styles = StyleSheet.create({
     marginRight: 30
   },
   drawerItemLabel: {
+    fontFamily: "MiSansMyanmar-Demibold",
     color: '#2F2F2F',
     fontSize: 18,
-    fontWeight: "semibold"
   }
 })
 

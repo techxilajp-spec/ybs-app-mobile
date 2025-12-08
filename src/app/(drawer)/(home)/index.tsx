@@ -65,7 +65,7 @@ export default function HomeScreen() {
             }}
             inactiveStates={{
               backgroundColor: Colors.secondary,
-              color: "#2F2F2F",
+              color: Colors.text.primary,
               borderColor: "#EEEEEE",
             }}
             navigationTabStyle={{

@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     title: {
-        fontWeight: "semibold",
+        fontFamily: "MiSansMyanmar-Demibold",
         color: Colors.text.primary,
         textAlign: 'center'
     },

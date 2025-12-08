@@ -9,6 +9,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   // 1. Load fonts
   const [fontsLoaded] = useFonts({
+    "MiSansMyanmar-Normal": require("@/assets/fonts/MiSansMyanmar/ttf/MiSansMyanmar-Normal.ttf"),
     "MiSansMyanmar-Regular": require("@/assets/fonts/MiSansMyanmar/ttf/MiSansMyanmar-Regular.ttf"),
     "MiSansMyanmar-Medium": require("@/assets/fonts/MiSansMyanmar/ttf/MiSansMyanmar-Medium.ttf"),
     "MiSansMyanmar-Demibold": require("@/assets/fonts/MiSansMyanmar/ttf/MiSansMyanmar-Demibold.ttf"),

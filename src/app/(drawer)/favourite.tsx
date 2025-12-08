@@ -59,6 +59,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   navigation: {
-    marginTop: 40
+    marginTop: 5
   }
 });

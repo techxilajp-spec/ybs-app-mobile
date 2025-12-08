@@ -69,10 +69,12 @@ const styles = StyleSheet.create({
   title: {
     color: "#8F959D",
     marginBottom: 8,
+    fontFamily: "MiSansMyanmar-Regular"
   },
   description: {
+    flex: 1,
     color: "#1F2937",
-    flex: 1
+    fontFamily: "MiSansMyanmar-Regular"
   },
   selector: {
     padding: 12,

@@ -3,6 +3,9 @@ import { Image, Pressable, StyleSheet, View } from "react-native";
 // custom component
 import AppText from "@/src/components/AppText";
 
+// constants
+import { Colors } from "../constants/color";
+
 type RouteCardProps = {
   routeNo: string | number;
   routeTitle: string;
@@ -62,7 +65,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#D0D5DD",
+    borderColor: Colors.border.disabled,
 
     flexDirection: "row",
     alignItems: "center",
@@ -103,11 +106,12 @@ const styles = StyleSheet.create({
     paddingRight: 40,
   },
   routeTitle: {
-    color: "#1F2937",
-    fontWeight: 800,
+    fontFamily: "MiSansMyanmar-Semibold",
+    color: Colors.text.primary,
     marginBottom: 5,
   },
   routeDescription: {
-    color: "#4B5563",
+    color: Colors.text.secondary,
+    fontFamily: "MiSansMyanmar-Regular"
   },
 });

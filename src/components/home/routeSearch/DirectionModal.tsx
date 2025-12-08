@@ -20,7 +20,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 type DirectionModalProps = {
   visible: boolean;
-  mode: "start" | "end";
+  mode: "start" | "end" | null;
   onClose: () => void;
 };
 
@@ -226,8 +226,9 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   input: {
-    backgroundColor: "#F2F4F7",
     flex: 1,
+    fontFamily: "MiSansMyanmar-Regular",
+    backgroundColor: "#F2F4F7",
     paddingLeft: 10,
   },
   filterButton: {

@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   },
   title_mm: {
     color: Colors.text.primary,
-    fontWeight: "semibold",
+    fontFamily: "MiSansMyanmar-Semibold",
     marginBottom: 8
   },
   title_en: {

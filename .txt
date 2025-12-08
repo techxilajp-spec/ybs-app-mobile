@@ -1,4 +1,5 @@
 latitudeDelta
+=============
 => represent how much latitude (vertical distance) is visible on the screen
 => Smaller Value = more zoom in
 => Larger Value = more zoom out
@@ -10,3 +11,23 @@ latitudeDelta
 | `0.05`        | Medium zoom                |
 | `0.2`         | City level                 |
 | `1.0`         | Country level              |
+
+LayoutAnimation
+===============
+Automatically animates views to their new positions
+When the next layout happens
+
+To use this api,call it before updating the state hook in
+functional components
+
+In order to work with on android, you need to set this
+import {
+  Platform,
+  UIManager,
+} from 'react-native';
+
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
