@@ -1,12 +1,14 @@
 import { StyleSheet, View } from "react-native";
 
 // constants
+import { Colors } from "@/src/constants/color";
 
 // custom component
 import AppText from "@/src/components/AppText";
 import AccordionList from "@/src/components/filterPanel/AccordionList";
 import Header from "@/src/components/filterPanel/Header";
 import SearchInput from "@/src/components/filterPanel/SearchInput";
+import AppButton from "../AppButton";
 
 export const yangonAreasBurmese = [
   {
@@ -65,11 +67,25 @@ export default function FilterView({ onClose }: FilterViewProps) {
     <View style={styles.container}>
       <Header onBack={onClose} />
       <SearchInput style={styles.searchInput} />
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <AppText size={16} style={styles.title}>
           မြို့နယ်များ
         </AppText>
         <AccordionList list={yangonAreasBurmese} style={styles.accorionList} />
+        <View style={styles.buttonContainer}>
+          <AppButton
+            title="စစ်ထုတ်ရန်"
+            style={styles.filterButton}
+            textStyle={styles.filterText}
+            onPress={() => {}}
+          />
+          <AppButton
+            title="ပယ်ဖျက်ရန်"
+            style={styles.cancelButton}
+            textStyle={styles.cancelText}
+            onPress={() => {}}
+          />
+        </View>
       </View>
     </View>
   );
@@ -87,6 +103,22 @@ const styles = StyleSheet.create({
     fontFamily: "MiSansMyanmar-Semibold",
   },
   accorionList: {
-    marginTop: 22
-  }
+    marginTop: 22,
+  },
+  buttonContainer: {
+    paddingVertical: 20,
+  },
+  filterButton: {
+    marginBottom: 10,
+  },
+  filterText: {
+    fontFamily: "MiSansMyanmar-Medium"
+  },
+  cancelButton: {
+    backgroundColor: "#FAEEED",
+  },
+  cancelText: {
+    color: Colors.primary,
+    fontFamily: "MiSansMyanmar-Medium"
+  },
 });

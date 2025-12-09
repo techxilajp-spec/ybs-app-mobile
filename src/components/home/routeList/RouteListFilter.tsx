@@ -1,6 +1,12 @@
 import { Image, Pressable, StyleSheet, TextInput, View } from "react-native";
 
-export default function RouteListFilter() {
+type RouteListFilterProps = {
+  onPressFilterButton: () => void
+}
+
+export default function RouteListFilter({
+  onPressFilterButton
+}: RouteListFilterProps) {
   return (
     <View style={styles.filterContainer}>
       <View style={styles.inputContainer}>
@@ -16,7 +22,7 @@ export default function RouteListFilter() {
           placeholderTextColor="#667085"
         />
       </View>
-      <Pressable style={styles.filterButton}>
+      <Pressable style={styles.filterButton} onPress={onPressFilterButton}>
         <Image
           style={styles.filterIcon}
           source={require("@/assets/icons/filter.png")}

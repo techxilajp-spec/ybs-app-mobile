@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Animated, Pressable, StyleSheet, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated, Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
 
 // custom components
 import AppText from "@/src/components/AppText";
@@ -18,29 +18,32 @@ type Option = {
 type AccordionProps = {
   title: string;
   options: Option[];
+  expanded: boolean;
+  onExpand: () => void;
 };
 
-export default function Accordion({ title, options }: AccordionProps) {
-  const [expanded, setExpanded] = useState<boolean>(false);
+export default function Accordion({
+  title,
+  options,
+  expanded,
+  onExpand,
+}: AccordionProps) {
   const animatedHeight = useRef(new Animated.Value(0)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
 
-  const toggleExpand = () => {
-    const newState = !expanded;
-    setExpanded(newState);
-
+  useEffect(() => {
     Animated.timing(animatedHeight, {
-      toValue: newState ? 62.333 * options.length : 0,
+      toValue: expanded ? 62.333 * options.length : 0,
       duration: 350,
-      useNativeDriver: false,
+      useNativeDriver: false, // FIXED
     }).start();
 
     Animated.timing(rotateAnim, {
-      toValue: newState ? 1 : 0,
+      toValue: expanded ? 1 : 0,
       duration: 250,
       useNativeDriver: true,
     }).start();
-  };
+  }, [expanded]);
 
   const rotate = rotateAnim.interpolate({
     inputRange: [0, 1],
@@ -51,7 +54,7 @@ export default function Accordion({ title, options }: AccordionProps) {
     <View>
       <Pressable
         style={[styles.header, { borderBottomWidth: expanded ? 1 : 0 }]}
-        onPress={toggleExpand}
+        onPress={onExpand}
       >
         <View style={styles.headerLeftSection}>
           <Entypo
@@ -71,12 +74,12 @@ export default function Accordion({ title, options }: AccordionProps) {
       <Animated.View
         style={[styles.optionsContainer, { height: animatedHeight }]}
       >
-        {options.map((option, index) => (
-          <View key={option.id} style={styles.optionItem}>
+        {options.map((option) => (
+          <TouchableOpacity key={option.id} style={styles.optionItem}>
             <AppText size={16} style={styles.optionName}>
               {option.name}
             </AppText>
-          </View>
+          </TouchableOpacity>
         ))}
       </Animated.View>
     </View>
