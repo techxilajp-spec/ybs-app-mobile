@@ -101,7 +101,7 @@ export default function DirectionModal({
 
   const hileFilters = () => {
     setIsFilterVisible(false);
-  }
+  };
 
   useEffect(() => {
     if (isValidSearchText) {

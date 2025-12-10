@@ -19,7 +19,6 @@ export default function AppText({
   ...rest
 }: AppTextProps) {
   const color = "#1A1A1A";
-
   return (
     <Text
       {...rest}

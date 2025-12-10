@@ -44,15 +44,15 @@ const DUMMY_ROUTES = [
 ];
 
 export default function RouteListView() {
-  const [filterModalVisible, setFilterModalVisible] = useState<boolean>(true);
-  
+  const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
+
   const closeFilterModal = () => {
     setFilterModalVisible(false);
-  }
+  };
 
   const openFilterModal = () => {
     setFilterModalVisible(true);
-  }
+  };
 
   const onPressRouteCard = () => {
     router.push("/(drawer)/(home)/routeDetail");

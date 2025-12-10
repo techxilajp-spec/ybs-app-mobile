@@ -14,32 +14,35 @@ import DirectionModal from "@/src/components/home/routeSearch/DirectionModal";
 import DirectionSelector from "@/src/components/home/routeSearch/DirectionSelector";
 
 export default function RouteSearchView() {
-  const [showDirectionModal, setShowDirectionModal] = useState<{ visible: boolean, mode: "start" | "end" | null}>({
+  const [showDirectionModal, setShowDirectionModal] = useState<{
+    visible: boolean;
+    mode: "start" | "end" | null;
+  }>({
     visible: false,
-    mode: null
-  })
+    mode: null,
+  });
 
-  const openDirectionModal = (mode : "start" | "end") => {
+  const openDirectionModal = (mode: "start" | "end") => {
     setShowDirectionModal({
       visible: true,
-      mode
-    })
-  }
+      mode,
+    });
+  };
 
   const closeDirectionModal = () => {
     setShowDirectionModal({
       visible: false,
-      mode: null
-    })
-  }
+      mode: null,
+    });
+  };
 
   const searchRoutes = () => {
     router.push("/routeSearchResults");
-  }
+  };
 
   return (
     <View style={styles.container}>
-      <DirectionModal 
+      <DirectionModal
         visible={showDirectionModal.visible}
         mode={showDirectionModal.mode}
         onClose={closeDirectionModal}
@@ -68,7 +71,7 @@ export default function RouteSearchView() {
           onPress={() => openDirectionModal("end")}
         />
       </View>
-      <AppButton 
+      <AppButton
         title="Bus ကားလမ်းကြောင်းကြည့်မယ်"
         onPress={searchRoutes}
         textStyle={styles.buttonText}
@@ -87,7 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 20,
     paddingHorizontal: 15,
-    marginBottom: 15
+    marginBottom: 15,
   },
   startDirectionSelector: {
     marginBottom: 12,
@@ -106,6 +109,6 @@ const styles = StyleSheet.create({
     height: 22,
   },
   buttonText: {
-    fontFamily: "MiSansMyanmar-Medium"
-  }
+    fontFamily: "MiSansMyanmar-Medium",
+  },
 });

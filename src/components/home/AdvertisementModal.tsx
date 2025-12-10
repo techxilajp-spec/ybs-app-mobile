@@ -20,11 +20,8 @@ export default function AdvertisementModal({
 
   useEffect(() => {
     if (!visible) return;
-
     setSkipCounter(5);
-
     const interval = setInterval(() => {
-      console.log("interval is working");
       setSkipCounter((prev) => {
         if (prev <= 1) {
           clearInterval(interval);

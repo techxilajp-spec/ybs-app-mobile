@@ -9,8 +9,6 @@ import {
 // custom components
 import AppText from "@/src/components/AppText";
 
-// constants
-
 type NavigationTabsProps = {
   tabs: string[];
   activeIndex: number;

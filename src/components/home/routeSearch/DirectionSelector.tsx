@@ -1,9 +1,16 @@
 import React from "react";
 
-import { Image, Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import {
+  Image,
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from "react-native";
 
 // custom component
-import AppText from "../../AppText";
+import AppText from "@/src/components/AppText";
 
 export type DirectionSelectorProps = {
   icon: React.ReactNode;
@@ -11,7 +18,7 @@ export type DirectionSelectorProps = {
   description: string;
   showIndicator?: boolean;
   onPress: () => void;
-  style?: StyleProp<ViewStyle>;    
+  style?: StyleProp<ViewStyle>;
 };
 
 export default function DirectionSelector({
@@ -20,14 +27,14 @@ export default function DirectionSelector({
   description,
   showIndicator = false,
   onPress,
-  style
+  style,
 }: DirectionSelectorProps) {
   return (
     <Pressable style={[styles.container, style]} onPress={onPress}>
       <View
         style={{
           position: "relative",
-          width: 35
+          width: 35,
         }}
       >
         <View style={styles.iconContainer}>{icon}</View>
@@ -47,8 +54,8 @@ export default function DirectionSelector({
           <AppText size={14} style={styles.description}>
             {description}
           </AppText>
-          <Image 
-            source={require('@/assets/icons/right_arrow.png')}
+          <Image
+            source={require("@/assets/icons/right_arrow.png")}
             style={styles.rightArrowIcon}
           />
         </View>
@@ -69,12 +76,12 @@ const styles = StyleSheet.create({
   title: {
     color: "#8F959D",
     marginBottom: 8,
-    fontFamily: "MiSansMyanmar-Regular"
+    fontFamily: "MiSansMyanmar-Regular",
   },
   description: {
     flex: 1,
     color: "#1F2937",
-    fontFamily: "MiSansMyanmar-Regular"
+    fontFamily: "MiSansMyanmar-Regular",
   },
   selector: {
     padding: 12,
@@ -82,7 +89,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   startIcon: {
     width: 14,
@@ -93,17 +100,17 @@ const styles = StyleSheet.create({
   },
   indicator: {
     marginTop: 40,
-    paddingLeft: 8
+    paddingLeft: 8,
   },
   dotIcon: {
     width: 5,
     height: 5,
     backgroundColor: "#DADCE0",
     borderRadius: 2.5,
-    marginBottom: 3
+    marginBottom: 3,
   },
   rightArrowIcon: {
     width: 20,
-    height: 20
-  }
+    height: 20,
+  },
 });
