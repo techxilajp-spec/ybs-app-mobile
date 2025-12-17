@@ -34,6 +34,8 @@ export default function RouteListFilter({
 
 const styles = StyleSheet.create({
   filterContainer: {
+    backgroundColor: "#FFF",
+
     padding: 10,
     borderRadius: 16,
     borderWidth: 1,

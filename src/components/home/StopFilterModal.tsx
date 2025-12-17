@@ -1,26 +1,31 @@
+// react native
 import {
-  Image,
-  Modal,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
+    Image,
+    Modal,
+    Pressable,
+    StyleSheet,
+    TextInput,
+    View,
 } from "react-native";
 
+// react
 import { useEffect, useState } from "react";
 
+// expo icons
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 // custom components
 import NavigationTabs from "@/src/components/AppNavigationTabs";
 import FilterView from "@/src/components/home/FilterView";
-import ListView from "@/src/components/home/routeSearch/directionModal/ListView";
+import ListView from "@/src/components/home/stopFilterModal/ListView";
 
+// safe area
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type DirectionModalProps = {
+type StopFilterModalProps = {
   visible: boolean;
-  mode: "start" | "end" | null;
+  title: string;
+  showCurrentLocation?: boolean;
   onClose: () => void;
 };
 
@@ -83,11 +88,12 @@ const DummyDatas = {
   ],
 };
 
-export default function DirectionModal({
+export default function StopFilterModal({
   visible,
-  mode,
+  showCurrentLocation = false,
+  title,
   onClose,
-}: DirectionModalProps) {
+}: StopFilterModalProps) {
   const [searchText, setSearchText] = useState<string>("");
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [stopsList, setStopsList] = useState<any[]>([]);
@@ -144,9 +150,7 @@ export default function DirectionModal({
                   value={searchText}
                   onChangeText={setSearchText}
                   style={styles.input}
-                  placeholder={
-                    mode === "start" ? "စထွက်မည့်နေရာ" : "သွားရောက်လိုသည့်နေရာ"
-                  }
+                  placeholder={title}
                   placeholderTextColor="#667085"
                 />
               </View>

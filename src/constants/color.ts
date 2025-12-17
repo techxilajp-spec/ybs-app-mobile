@@ -6,6 +6,7 @@ export const Colors = {
         secondary: '#4B5563',
         tertiary: '#475467',
         disabled: '#CFCFCF',
+        quaternary: '#667085',
         placeholder: {
             subtitle: '#D0D5DD'
         }

@@ -18,7 +18,7 @@ type AppScreenLayoutProps = {
 
 export default function AppScreenLayout({
   children,
-  backgroundColor = "#FFFFFF",
+  backgroundColor = "",
   contentStyle
 }: AppScreenLayoutProps) {
   return (

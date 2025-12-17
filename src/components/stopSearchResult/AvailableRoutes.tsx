@@ -1,14 +1,15 @@
 // react native
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, View, ViewStyle } from "react-native";
 
-//expo router
+// expo router
 import { router } from "expo-router";
 
-// custom component
+// custom components
+import AppText from "@/src/components/AppText";
 import RouteCard from "@/src/components/RouteCard";
-import FilterModal from "@/src/components/home/routeList/FilterModal";
-import RouteListFilter from "@/src/components/home/routeList/RouteListFilter";
-import { useState } from "react";
+
+// constants
+import { Colors } from "@/src/constants/color";
 
 const DUMMY_ROUTES = [
   {
@@ -45,47 +46,42 @@ const DUMMY_ROUTES = [
   },
 ];
 
-export default function RouteListView() {
-  const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
+type AvailableRoutesProps = {
+  style?: ViewStyle;
+};
 
-  const closeFilterModal = () => {
-    setFilterModalVisible(false);
-  };
-
-  const openFilterModal = () => {
-    setFilterModalVisible(true);
-  };
-
+export default function AvailableRoutes({ style }: AvailableRoutesProps) {
   const onPressRouteCard = () => {
-    router.push("/(drawer)/(home)/routeDetail");
+    router.push("/routeDetail");
   };
   return (
-    <>
-      <View style={styles.container}>
-        <RouteListFilter onPressFilterButton={openFilterModal} />
-        <FlatList
-          style={{ marginTop: 20 }}
-          data={DUMMY_ROUTES}
-          renderItem={({ item }) => (
-            <RouteCard
-              routeNo={item.no}
-              routeTitle={item.title}
-              routeDescription={item.description}
-              color={item.color}
-              onPress={onPressRouteCard}
-            />
-          )}
-          keyExtractor={(item) => item.title}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
-      <FilterModal visible={filterModalVisible} onClose={closeFilterModal} />
-    </>
+    <View style={[styles.container, style]}>
+      <AppText style={styles.title}>ရောက်ရှိသောယာဉ်လိုင်းများ</AppText>
+      <FlatList
+        style={{ marginTop: 20 }}
+        data={DUMMY_ROUTES}
+        renderItem={({ item }) => (
+          <RouteCard
+            routeNo={item.no}
+            routeTitle={item.title}
+            routeDescription={item.description}
+            color={item.color}
+            onPress={onPressRouteCard}
+          />
+        )}
+        keyExtractor={(item) => item.title}
+        showsVerticalScrollIndicator={false}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  title: {
+    color: Colors.text.primary,
+    fontFamily: "MiSansMyanmar-Semibold",
   },
 });

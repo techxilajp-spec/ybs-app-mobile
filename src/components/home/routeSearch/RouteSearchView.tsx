@@ -10,7 +10,7 @@ import { Colors } from "@/src/constants/color";
 
 // custom component
 import AppButton from "@/src/components/AppButton";
-import DirectionModal from "@/src/components/home/routeSearch/DirectionModal";
+import StopFilterModal from "@/src/components/home/StopFilterModal";
 import DirectionSelector from "@/src/components/home/routeSearch/DirectionSelector";
 
 export default function RouteSearchView() {
@@ -42,9 +42,9 @@ export default function RouteSearchView() {
 
   return (
     <View style={styles.container}>
-      <DirectionModal
+      <StopFilterModal
         visible={showDirectionModal.visible}
-        mode={showDirectionModal.mode}
+        title={showDirectionModal.mode === "start" ? "စထွက်မည့်နေရာ" : "သွားရောက်လိုသည့်နေရာ"}
         onClose={closeDirectionModal}
       />
       <View style={styles.selectorContainer}>
@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   selectorContainer: {
+    backgroundColor: "#FFF",
     borderWidth: 1,
     borderColor: Colors.border.disabled,
     borderRadius: 20,

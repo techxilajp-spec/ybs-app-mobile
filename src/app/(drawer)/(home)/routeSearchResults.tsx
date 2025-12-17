@@ -1,8 +1,10 @@
-import { useState } from "react";
-
+// react native
 import { StyleSheet } from "react-native";
 
-// components
+// react
+import { useState } from "react";
+
+// custom components
 import AppHeader from "@/src/components/AppHeader";
 import NavigationTabs from "@/src/components/AppNavigationTabs";
 import AppScreenLayout from "@/src/components/AppScreenLayout";
@@ -27,7 +29,7 @@ export default function RouteSearchResultScreen() {
   const { component: ActiveView, getProps } = TAB_CONFIG[activeIndex];
 
   return (
-    <AppScreenLayout contentStyle={styles.container}>
+    <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
       <AppHeader title="ရှာဖွေမှုရလဒ်" />
 
       <NavigationTabs

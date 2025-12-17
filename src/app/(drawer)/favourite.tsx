@@ -31,7 +31,7 @@ export default function FavouriteScreen() {
   const { component: ActiveView, getProps } = TAB_CONFIG[activeIndex];
 
   return (
-    <AppScreenLayout contentStyle={styles.container}>
+    <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
       <AppHeader title="ကြိုက်နှစ်သက်မှုများ" />
       <AppNavigationTabs
         tabs={TAB_CONFIG.map((t) => t.label)}

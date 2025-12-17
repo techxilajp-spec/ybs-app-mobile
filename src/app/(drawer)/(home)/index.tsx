@@ -36,11 +36,6 @@ export default function HomeScreen() {
   const [isAdvertisementVisible, setIsAdvertisementVisible] = useState<boolean>(true);
   const { component: ActiveView, getProps } = TAB_CONFIG[activeIndex];
 
-  const backgroudImageSource =
-    activeIndex === 0
-      ? require("@/assets/images/app_background.png")
-      : undefined;
-
   const hideAdvertisement = () => {
     setIsAdvertisementVisible(false);
   }
@@ -51,9 +46,9 @@ export default function HomeScreen() {
       <ImageBackground
         style={{ flex: 1 }}
         resizeMode="cover"
-        source={backgroudImageSource}
+        source={require("@/assets/images/app_background.png")}
       >
-        <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFF">
+        <AppScreenLayout contentStyle={styles.container}>
           <Header />
           <NavigationTabs
             tabs={TAB_CONFIG.map((t) => t.label)}

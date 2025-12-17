@@ -21,6 +21,12 @@ export default function HomeScreenLayout() {
                     headerShown: false
                 }}
             />
+            <Stack.Screen 
+                name="stopSearchResults"
+                options={{
+                    headerShown: false
+                }}
+            />
         </Stack>
     )
 }
