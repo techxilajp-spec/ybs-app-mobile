@@ -7,10 +7,11 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import AppText from "@/src/components/AppText";
 
 type NoticeMessageProps = {
-    style?: ViewStyle
+    style?: ViewStyle,
+    message: string
 }
 
-export default function NoticeMessage({ style } : NoticeMessageProps) {
+export default function NoticeMessage({ message, style } : NoticeMessageProps) {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.iconContainer}>
@@ -18,9 +19,7 @@ export default function NoticeMessage({ style } : NoticeMessageProps) {
       </View>
       <View style={styles.messageContainer}>
         <AppText size={14} style={styles.message}>
-          ရှာဖွေရာတွင်အတိုကောက်စာလုံးများက်ိအသုံးပြုပြီးရှာဖွေပါ..ဥပမာ
-          စာတိုက်မှတ်တိုင် ဆိုလျှင် “ စတ “ ၊
-          ဖြင့်ရှာကာပေါ်လာသောမှတ်တိုင်ကိုရွေးချယ်ပါ။
+          {message}
         </AppText>
       </View>
     </View>

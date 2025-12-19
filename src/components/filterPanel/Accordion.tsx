@@ -1,11 +1,18 @@
 import { useEffect, useRef } from "react";
-import { Animated, Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Animated,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 // custom components
 import AppText from "@/src/components/AppText";
 
 // expo vector icon
 import Entypo from "@expo/vector-icons/Entypo";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 // constants
 import { Colors } from "@/src/constants/color";
@@ -76,9 +83,12 @@ export default function Accordion({
       >
         {options.map((option) => (
           <TouchableOpacity key={option.id} style={styles.optionItem}>
-            <AppText size={16} style={styles.optionName}>
-              {option.name}
-            </AppText>
+            <FontAwesome name="square-o" size={20} color="#85939B" />
+            <View style={{ flex: 1 }}>
+              <AppText size={16} style={styles.optionName}>
+                {option.name}
+              </AppText>
+            </View>
           </TouchableOpacity>
         ))}
       </Animated.View>
@@ -89,7 +99,7 @@ export default function Accordion({
 const styles = StyleSheet.create({
   header: {
     paddingVertical: 16,
-    paddingHorizontal: 5,
+    paddingHorizontal: 8,
 
     flexDirection: "row",
     justifyContent: "space-between",
@@ -113,9 +123,13 @@ const styles = StyleSheet.create({
   },
   optionItem: {
     paddingVertical: 20,
-    paddingLeft: 33,
+    paddingHorizontal: 12,
+
+    flexDirection: "row",
+    gap: 8
   },
   optionName: {
-    fontFamily: "MiSansMyanmar-Normal",
+    fontFamily: "MiSansMyanmar-Regular",
+    color: Colors.text.secondary
   },
 });

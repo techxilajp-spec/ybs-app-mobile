@@ -16,6 +16,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import AppScreenLayout from "@/src/components/AppScreenLayout";
 import BusPin from "@/src/components/map/BusPin";
 import BusPolyLine from "@/src/components/map/BusPolyLine";
+import BusRouteDetailSheet from "@/src/components/map/BusRouteDetailSheet";
 import EdgePin from "@/src/components/map/EdgePin";
 import Button from "@/src/components/routeDetail/Button";
 
@@ -29,6 +30,43 @@ const yangonRegion = {
   latitudeDelta: 0.05,
   longitudeDelta: 0.05,
 };
+
+const Routes = [
+  {
+    routeNo: 14,
+    routeTitle: "ပါရမီ(ညောင်ပင်) - သခင်မြပန်းခြံ",
+    stops: [
+      {
+        stopTitle: "သမ",
+        stopRoad: "အမှတ်(၂)လမ်းမ"
+      },
+      {
+        stopTitle: "ဦးခွေးပု",
+        stopRoad: "အမှတ်(၂)လမ်းမ"
+      },
+      {
+        stopTitle: "သပြေခြံ",
+        stopRoad: "အမှတ်(၂)လမ်းမ"
+      },
+      {
+        stopTitle: "ဒီဇင်ဘာအလယ်ပေါက်",
+        stopRoad: "အမှတ်(၂)လမ်းမ"
+      },
+      {
+        stopTitle: "စီးပွားရေးတက္ကသိုလ်",
+        stopRoad: "အမှတ်(၂)လမ်းမ"
+      },
+      {
+        stopTitle: "ကြိုဆိုရေး",
+        stopRoad: "အမှတ်(၂)လမ်းမ"
+      },
+      {
+        stopTitle: "ဆည်မြောင်း",
+        stopRoad: "အမှတ်(၂)လမ်းမ"
+      }
+    ]
+  }
+]
 
 export default function RouteDetail() {
   const [route, setRoute] = useState(route62);
@@ -69,6 +107,7 @@ export default function RouteDetail() {
           icon={<Feather name="heart" size={20} color="#101828" />}
           onPress={onAddFavourite}
         />
+        <BusRouteDetailSheet routes={Routes} />
       </View>
     </AppScreenLayout>
   );
