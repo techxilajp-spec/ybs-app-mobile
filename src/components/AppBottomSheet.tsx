@@ -26,6 +26,7 @@ export default function AppBottomSheet({
       enablePanDownToClose={false}
       backgroundStyle={styles.background}
       handleIndicatorStyle={styles.handle}
+      enableContentPanningGesture={true}
       {...overrideProps}
     >
       {children}

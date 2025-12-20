@@ -1,10 +1,7 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 // react
 import { useState } from "react";
-
-// bottom sheet
-import { BottomSheetView } from "@gorhom/bottom-sheet";
 
 // custom components
 import AppBottomSheet from "@/src/components/AppBottomSheet";
@@ -41,41 +38,44 @@ export default function BusRouteDetailSheet({
   const hasInstructions = !!instructions?.length;
   const tabConfig = hasInstructions ? TAB_CONFIGS : TAB_CONFIGS.slice(1);
 
+  const isInstructionTab = tabConfig[activeIndex].key === TAB_CONFIGS[0].key;
+
+  const headerContent = (
+    <View style={styles.headerContainer}>
+      <NoticeMessage message="မှတ်တိုင်များကိုမြင်နိုင်ရန်မြေပုံကိုအနီးကပ်ဆွဲပါ" />
+      <AppNavigationTabs
+        tabs={tabConfig.map((t) => t.label)}
+        activeIndex={activeIndex}
+        activeStates={{
+          backgroundColor: "#F9F9F9",
+          color: "#1F2937",
+          borderColor: "#EEEEEE",
+        }}
+        inactiveStates={{
+          backgroundColor: "#FFF",
+          color: "#2F2F2F",
+          borderColor: "#EEEEEE",
+        }}
+        onNavigationTabPress={setActiveIndex}
+        navigationTabStyle={styles.navigationTab}
+      />
+    </View>
+  );
+
   return (
-    <AppBottomSheet snapPoints={["20%", "40%"]} scrollable={true}>
-      <BottomSheetView style={styles.bottomSheetContainer}>
-        <NoticeMessage message="မှတ်တိုင်များကိုမြင်နိုင်ရန်မြေပုံကိုအနီးကပ်ဆွဲပါ" />
-        <AppNavigationTabs
-          tabs={tabConfig.map((t) => t.label)}
-          activeIndex={activeIndex}
-          activeStates={{
-            backgroundColor: "#F9F9F9",
-            color: "#1F2937",
-            borderColor: "#EEEEEE",
-          }}
-          inactiveStates={{
-            backgroundColor: "#FFF",
-            color: "#2F2F2F",
-            borderColor: "#EEEEEE",
-          }}
-          onNavigationTabPress={setActiveIndex}
-          navigationTabStyle={styles.navigationTab}
-        />
-        {tabConfig[activeIndex].key === TAB_CONFIGS[0].key ? (
-          <InstructionListView />
-        ) : (
-          <RouteListView routes={routes} />
-        )}
-      </BottomSheetView>
+    <AppBottomSheet snapPoints={["20%", "40%"]}>
+      {isInstructionTab ? (
+        <InstructionListView />
+      ) : (
+        <RouteListView routes={routes} header={headerContent} />
+      )}
     </AppBottomSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  bottomSheetContainer: {
-    flex: 1,
+  headerContainer: {
     paddingHorizontal: 15,
-    paddingBottom: 22,
   },
   navigationTab: {
     marginTop: 10,

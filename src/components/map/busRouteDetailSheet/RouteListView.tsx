@@ -25,42 +25,54 @@ type Route = {
 
 type RouteListViewProps = {
   routes: Route[];
+  header?: React.ReactNode;
 };
 
-export default function RouteListView({ routes }: RouteListViewProps) {
+export default function RouteListView({ routes, header }: RouteListViewProps) {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const selectedRoute = routes[activeIndex];
   const tabs = routes.map((route) => `Bus ${route.routeNo}`);
 
   return (
-    <View style={styles.container}>
-      <AppText size={16} style={styles.title}>
-        စီးရမည့် ကား၏ မှတ်တိုင်များ
-      </AppText>
-      <RouteTab tabs={tabs} activeIndex={activeIndex} style={styles.routeTab} />
-      <RouteTitle
-        routeNo={selectedRoute.routeNo.toString()}
-        title={selectedRoute.routeTitle}
-        style={styles.routeTitle}
-      />
+    <View>
+      {header}
+      <View style={styles.headerContainer}>
+        <AppText size={16} style={styles.title}>
+          စီးရမည့် ကား၏ မှတ်တိုင်များ
+        </AppText>
+        <RouteTab
+          tabs={tabs}
+          activeIndex={activeIndex}
+          // onTabChange={setActiveIndex}
+          style={styles.routeTab}
+        />
+        <RouteTitle
+          routeNo={selectedRoute.routeNo.toString()}
+          title={selectedRoute.routeTitle}
+          style={styles.routeTitle}
+        />
+      </View>
       <BottomSheetFlatList
         data={selectedRoute.stops}
         renderItem={({ item }: { item: Stop }) => (
           <BusStop title={item.stopTitle} road={item.stopRoad} />
         )}
-        keyExtractor={(item: Stop) => item.stopTitle}
-        style={{
-          flex: 1,
-          borderWidth: 1,
-        }}
+        keyExtractor={(item: Stop, index: number) =>
+          `${item.stopTitle}-${index}`
+        }
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.contentContainer}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  headerContainer: {
+    paddingHorizontal: 15,
+  },
+  contentContainer: {
+    paddingBottom: 300,
   },
   title: {
     fontFamily: "MiSansMyanmar-Demibold",

@@ -38,35 +38,63 @@ const Routes = [
     stops: [
       {
         stopTitle: "သမ",
-        stopRoad: "အမှတ်(၂)လမ်းမ"
+        stopRoad: "အမှတ်(၂)လမ်းမ",
       },
       {
         stopTitle: "ဦးခွေးပု",
-        stopRoad: "အမှတ်(၂)လမ်းမ"
+        stopRoad: "အမှတ်(၂)လမ်းမ",
       },
       {
         stopTitle: "သပြေခြံ",
-        stopRoad: "အမှတ်(၂)လမ်းမ"
+        stopRoad: "အမှတ်(၂)လမ်းမ",
       },
       {
         stopTitle: "ဒီဇင်ဘာအလယ်ပေါက်",
-        stopRoad: "အမှတ်(၂)လမ်းမ"
+        stopRoad: "အမှတ်(၂)လမ်းမ",
       },
       {
         stopTitle: "စီးပွားရေးတက္ကသိုလ်",
-        stopRoad: "အမှတ်(၂)လမ်းမ"
+        stopRoad: "အမှတ်(၂)လမ်းမ",
       },
       {
         stopTitle: "ကြိုဆိုရေး",
-        stopRoad: "အမှတ်(၂)လမ်းမ"
+        stopRoad: "အမှတ်(၂)လမ်းမ",
       },
       {
         stopTitle: "ဆည်မြောင်း",
-        stopRoad: "အမှတ်(၂)လမ်းမ"
-      }
-    ]
-  }
-]
+        stopRoad: "အမှတ်(၂)လမ်းမ",
+      },
+      {
+        stopTitle: "သမ",
+        stopRoad: "အမှတ်(၂)လမ်းမ",
+      },
+      {
+        stopTitle: "ဦးခွေးပု",
+        stopRoad: "အမှတ်(၂)လမ်းမ",
+      },
+      {
+        stopTitle: "သပြေခြံ",
+        stopRoad: "အမှတ်(၂)လမ်းမ",
+      },
+      {
+        stopTitle: "ဒီဇင်ဘာအလယ်ပေါက်",
+        stopRoad: "အမှတ်(၂)လမ်းမ",
+      },
+      {
+        stopTitle: "စီးပွားရေးတက္ကသိုလ်",
+        stopRoad: "အမှတ်(၂)လမ်းမ",
+      },
+      {
+        stopTitle: "ကြိုဆိုရေး",
+        stopRoad: "အမှတ်(၂)လမ်းမ",
+      },
+      {
+        stopTitle: "ဆည်မြောင်း",
+        stopRoad: "အမှတ်(၂)လမ်းမ",
+      },
+    ],
+  },
+];
 
 export default function RouteDetail() {
   const [route, setRoute] = useState(route62);
@@ -94,7 +122,11 @@ export default function RouteDetail() {
           <BusPolyLine coordinates={routeCoordinates} />
           {routeCoordinates.map((coordinate, index) => {
             const isEdge = index === 0 || index === routeCoordinates.length - 1;
-            return isEdge ? <EdgePin key={index} coordinate={coordinate} title="" /> : <BusPin key={index} coordinate={coordinate} title="" />
+            return isEdge ? (
+              <EdgePin key={index} coordinate={coordinate} title="" />
+            ) : (
+              <BusPin key={index} coordinate={coordinate} title="" />
+            );
           })}
         </MapView>
         <Button
