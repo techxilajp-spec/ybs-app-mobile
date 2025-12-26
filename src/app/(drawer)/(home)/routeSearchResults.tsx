@@ -11,6 +11,8 @@ import AppScreenLayout from "@/src/components/AppScreenLayout";
 import AvailableLinesView from "@/src/components/routeSearchResult/AvailableLinesView";
 import AvailableRoutesView from "@/src/components/routeSearchResult/AvailableRoutesView";
 
+// stores
+
 const TAB_CONFIG = [
   {
     label: "လမ်းကြောင်း",

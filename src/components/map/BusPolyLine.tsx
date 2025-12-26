@@ -1,20 +1,20 @@
-import { Colors } from "@/src/constants/color";
 import { Polyline } from "react-native-maps";
 
-type LatLng = {
+type Coordinate = {
   latitude: number;
   longitude: number;
 };
 
 type BusPolyLineProps = {
-  coordinates: LatLng[];
+  color: string;
+  coordinates: Coordinate[];
 };
 
-export default function BusPolyLine({ coordinates }: BusPolyLineProps) {
+export default function BusPolyLine({ color, coordinates }: BusPolyLineProps) {
   return (
     <Polyline
       coordinates={coordinates}
-      strokeColor={Colors.primary}
+      strokeColor={color}
       strokeWidth={6}
       lineCap="round"
       lineJoin="round"

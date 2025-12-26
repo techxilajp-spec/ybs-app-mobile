@@ -1,24 +1,31 @@
-// react native map + expos
-import { Marker } from "react-native-maps";
+import React, { ComponentRef, forwardRef } from "react";
+import { MapMarkerProps, Marker } from "react-native-maps";
 
-type LatLng = {
+type Coordinate = {
   latitude: number;
   longitude: number;
 };
 
 type BusPinProps = {
-  coordinate: LatLng;
+  coordinate: Coordinate;
   title: string;
-};
+  onPress?: () => void
+} & MapMarkerProps;
 
-export default function BusPin({ coordinate, title }: BusPinProps) {
-  return (
-    <Marker
-      coordinate={coordinate}
-      image={require("@/assets/icons/pin.png")}
-      tracksViewChanges={false}
-      title={title}
-    >
-    </Marker>
-  );
-}
+const BusPin = forwardRef<ComponentRef<typeof Marker>, BusPinProps>(
+  ({ coordinate, title, onPress = () => { console.log("marker pressed"); } }, ref) => {
+    return (
+      <Marker
+        ref={ref}
+        coordinate={coordinate}
+        image={require("@/assets/icons/pin.png")}
+        tracksViewChanges={false}
+        title={title}
+        onPress={onPress}
+        tappable={false}
+      />
+    );
+  }
+);
+
+export default BusPin;

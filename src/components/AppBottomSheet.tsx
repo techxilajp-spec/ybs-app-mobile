@@ -1,38 +1,30 @@
-// react native
+import BottomSheet, { BottomSheetProps } from "@gorhom/bottom-sheet";
+import React, { forwardRef } from "react";
 import { StyleSheet } from "react-native";
-
-// react
-import React from "react";
-
-// bottom sheet
-import BottomSheet, {
-  BottomSheetProps
-} from "@gorhom/bottom-sheet";
 
 type AppBottomSheetProps = {
   children: React.ReactNode;
   scrollable?: boolean;
 } & BottomSheetProps;
 
-export default function AppBottomSheet({
-  children,
-  scrollable = false,
-  ...overrideProps
-}: AppBottomSheetProps) {
-  console.log(overrideProps);
-  
-  return (
-    <BottomSheet
-      enablePanDownToClose={false}
-      backgroundStyle={styles.background}
-      handleIndicatorStyle={styles.handle}
-      enableContentPanningGesture={true}
-      {...overrideProps}
-    >
-      {children}
-    </BottomSheet>
-  );
-}
+const AppBottomSheet = forwardRef<any, AppBottomSheetProps>(
+  ({ children, scrollable = false, ...overrideProps }, ref) => {
+    return (
+      <BottomSheet
+        ref={ref}
+        enablePanDownToClose={false}
+        backgroundStyle={styles.background}
+        handleIndicatorStyle={styles.handle}
+        enableContentPanningGesture={true}
+        {...overrideProps}
+      >
+        {children}
+      </BottomSheet>
+    );
+  }
+);
+
+export default AppBottomSheet;
 
 const styles = StyleSheet.create({
   background: {

@@ -1,5 +1,10 @@
 // react native
-import { ScrollView, StyleSheet, View, ViewStyle } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  ViewStyle
+} from "react-native";
 
 // custom components
 import AppText from "@/src/components/AppText";
@@ -10,7 +15,8 @@ import { Colors } from "@/src/constants/color";
 type RouteTabProps = {
   tabs: string[];
   activeIndex: number;
-  style?: ViewStyle
+  onTabChange?: (index : number) => void;
+  style?: ViewStyle;
 };
 
 const ACTIVE_COLOR = Colors.primary;
@@ -18,7 +24,12 @@ const ACTIVE_TEXT_COLOR = "#FFFFFF";
 const INACTIVE_COLOR = "#F9FAFB";
 const INACTIVE_TEXT_COLOR = "#344054";
 
-export default function RouteTab({ tabs, activeIndex, style }: RouteTabProps) {
+export default function RouteTab({
+  tabs,
+  activeIndex,
+  onTabChange = (index) => {},
+  style,
+}: RouteTabProps) {
   return (
     <ScrollView
       horizontal
@@ -27,7 +38,7 @@ export default function RouteTab({ tabs, activeIndex, style }: RouteTabProps) {
       contentContainerStyle={{ flexGrow: 0 }}
     >
       {tabs.map((tab, index) => (
-        <View
+        <Pressable
           key={index}
           style={[
             styles.tab,
@@ -36,6 +47,7 @@ export default function RouteTab({ tabs, activeIndex, style }: RouteTabProps) {
                 activeIndex === index ? ACTIVE_COLOR : INACTIVE_COLOR,
             },
           ]}
+          onPress={() => onTabChange(index)}
         >
           <AppText
             size={12}
@@ -50,7 +62,7 @@ export default function RouteTab({ tabs, activeIndex, style }: RouteTabProps) {
           >
             {tab}
           </AppText>
-        </View>
+        </Pressable>
       ))}
     </ScrollView>
   );
@@ -58,7 +70,7 @@ export default function RouteTab({ tabs, activeIndex, style }: RouteTabProps) {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 0
+    flexGrow: 0,
   },
   tab: {
     borderColor: "#EAECF0",

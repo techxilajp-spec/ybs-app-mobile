@@ -1,22 +1,21 @@
-import { Dimensions, StyleSheet, View } from "react-native";
-
 // react
 import { useEffect, useRef, useState } from "react";
+
+// react native
+import { Dimensions, StyleSheet, View } from "react-native";
+
+// expo map
+import MapView, { LatLng, MapMarker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 
 // expo router
 import { router } from "expo-router";
 
-// react-native-map
-import MapView, {
-  LatLng,
-  MapMarker,
-  PROVIDER_GOOGLE,
-  Region,
-} from "react-native-maps";
-
 // icons
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
+
+// expo router
+import { useLocalSearchParams } from "expo-router";
 
 // custom components
 import AppScreenLayout from "@/src/components/AppScreenLayout";
@@ -26,14 +25,11 @@ import BusRouteDetailBottomSheet from "@/src/components/map/BusRouteDetailBottom
 import EdgePin from "@/src/components/map/EdgePin";
 import Button from "@/src/components/routeDetail/Button";
 
-// data
-import route62 from "@/src/data/route62.json";
-import yangonRegion from "@/src/data/yangonRegion.json";
+// stores
+import { useRouteSearchResultsStore } from "@/src/stores/useRouteSearchResultsStore";
 
-const INITIAL_LATITUDE_DELTA = 0.3;
-const INITIAL_LONGITUDE_DELTA = 0.3;
-const latitudeDelta = 0.05;
-const longitudeDelta = 0.05;
+// data
+import yangonRegion from "@/src/data/yangonRegion.json";
 
 type Stop = {
   id: string;
@@ -42,47 +38,13 @@ type Stop = {
   coordinate: LatLng;
 };
 
-type Route = {
-  no: string;
-  name: string;
-  color: string;
-  coordinates: LatLng[];
-  stops: Stop[];
-};
+const INITIAL_LATITUDE_DELTA = 0.3;
+const INITIAL_LONGITUDE_DELTA = 0.3;
+const LATITUDE_DELTA = 0.05;
+const LONGITUDE_DELTA = 0.05;
 
-const fetchDataFromApi = (): Route => {
-  const stops: Stop[] = route62.shape.geometry.coordinates
-    .map(([longitude, latitude]) => ({
-      id: Math.random().toString(),
-      name: `${latitude}~${longitude}`,
-      road: Math.random().toString(),
-      coordinate: {
-        latitude,
-        longitude,
-      },
-    }))
-    // take every 5th stop
-    .filter((_, index) => index % 5 === 0);
-
-  const routeInfo: Route = {
-    no: route62.route_id,
-    name: route62.name,
-    color: route62.color,
-    coordinates: route62.shape.geometry.coordinates.map(
-      ([longitude, latitude]) => ({
-        latitude,
-        longitude,
-      })
-    ),
-    stops,
-  };
-
-  return routeInfo;
-};
-
-export default function RouteDetail() {
+export default function routeSearchDetail() {
   const [region, setRegion] = useState<Region>(yangonRegion);
-  const [route, setRoute] = useState<Route | null>(null);
   const [activeRouteIndex, setActiveRouteIndex] = useState<number>(0);
   const bottomSheetHeight = useRef<number>(100);
   const mapRef = useRef<InstanceType<typeof MapView> | null>(null);
@@ -90,17 +52,19 @@ export default function RouteDetail() {
 
   const { height: screenHeight } = Dimensions.get("screen");
   const bottomSheetMaxHeight = screenHeight * 0.65;
-  const bottomSheetSnapPoints = [100, bottomSheetMaxHeight]
+  const bottomSheetSnapPoints = [100, bottomSheetMaxHeight];
 
-  useEffect(() => {
-    const routeInfo = fetchDataFromApi();
-    setRoute(routeInfo);
-    setRegion({
-      ...yangonRegion,
-      latitudeDelta: INITIAL_LATITUDE_DELTA,
-      longitudeDelta: INITIAL_LONGITUDE_DELTA,
-    });
-  }, []);
+  const { id: routeId } = useLocalSearchParams<{ id: string }>();
+  const searchedResults = useRouteSearchResultsStore((s) => s.routes);
+  const searchedRoute = searchedResults.find(
+    (route) => route.id.toString() === routeId
+  );
+
+  const routeList = searchedRoute ? searchedRoute.routes : [];
+
+  const activeRoute = searchedRoute
+    ? searchedRoute.routes[activeRouteIndex]
+    : null;
 
   const onBackPress = () => {
     router.back();
@@ -110,7 +74,12 @@ export default function RouteDetail() {
     // TODO: implement favourite logic
   };
 
-  const handleSelectBusStop = (busStop: Stop) => {
+  const onChangeRouteDetailBottomSheetIndex = (index: number) => {
+    bottomSheetHeight.current = index == 0 ? bottomSheetSnapPoints[0] : bottomSheetMaxHeight;
+  };
+
+  const handleSelectBusStop = (busStop: Stop | null | undefined) => {
+    if(!busStop) return;
     // hide all stop callouts
     Object.values(markersRef.current).forEach((ref) => ref?.hideCallout());
 
@@ -119,36 +88,53 @@ export default function RouteDetail() {
 
     // Calculate vertical map offset caused by bottom sheet
     const verticalOffsetRatio = bottomSheetHeight.current / screenHeight;
-    const latitudeOffset = verticalOffsetRatio * latitudeDelta;
+    const latitudeOffset = verticalOffsetRatio * LATITUDE_DELTA;
 
     const targetRegion = {
       latitude: busStop.coordinate.latitude - latitudeOffset,
       longitude: busStop.coordinate.longitude,
-      latitudeDelta: latitudeDelta,
-      longitudeDelta: longitudeDelta,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
     };
 
     mapRef.current?.animateToRegion(targetRegion, 500);
-  };
-
-  const onChangeRouteDetailBottomSheetIndex = (index: number) => {
-    bottomSheetHeight.current = index == 0 ? bottomSheetSnapPoints[0] : bottomSheetMaxHeight;
   };
 
   const onPressBusPin = (busStop: Stop) => {
     markersRef?.current[busStop.id]?.showCallout();
     // Calculate vertical map offset caused by bottom sheet
     const verticalOffsetRatio = bottomSheetHeight.current / screenHeight;
-    const latitudeOffset = verticalOffsetRatio * latitudeDelta;
+    const latitudeOffset = verticalOffsetRatio * LATITUDE_DELTA;
 
     const targetRegion = {
       latitude: busStop.coordinate.latitude - latitudeOffset,
       longitude: busStop.coordinate.longitude,
-      latitudeDelta: latitudeDelta,
-      longitudeDelta: longitudeDelta,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
     };
 
     mapRef.current?.animateToRegion(targetRegion, 500);
+  }
+
+  const onChangeRoute = (index: number) => {
+    setActiveRouteIndex(index);
+    markersRef.current = {};
+  };
+
+  useEffect(() => {
+    setRegion({
+      ...yangonRegion,
+      latitudeDelta: INITIAL_LATITUDE_DELTA,
+      longitudeDelta: INITIAL_LONGITUDE_DELTA,
+    });
+  }, []);
+
+  useEffect(() => {
+    handleSelectBusStop(activeRoute?.stops[0]);
+  }, [activeRouteIndex])
+
+  if (!searchedRoute) {
+    return null;
   }
 
   return (
@@ -168,23 +154,24 @@ export default function RouteDetail() {
           loadingIndicatorColor="#666666"
           loadingBackgroundColor="#eeeeee"
         >
-          {route && (
+          {activeRoute && (
             <>
               <BusPolyLine
-                coordinates={route.coordinates}
-                color={route.color}
+                coordinates={activeRoute.coordinates}
+                color={activeRoute.color}
               />
-              {route.stops.map((stop, index) => {
-                const isEdge = index === 0 || index === route.stops.length - 1;
+              {activeRoute.stops.map((stop, index) => {
+                const isEdge =
+                  index === 0 || index === activeRoute.stops.length - 1;
                 const PinComponent = isEdge ? EdgePin : BusPin;
                 return (
                   <PinComponent
                     ref={(ref: MapMarker | null) => {
                       markersRef.current[stop.id] = ref;
                     }}
-                    key={`${stop.coordinate.latitude}-${stop.coordinate.longitude}`}
+                    key={`${stop.id}-${stop.coordinate.latitude}-${stop.coordinate.longitude}`}
                     coordinate={stop.coordinate}
-                    title={stop.name}
+                    title={`${index}-${stop.name}`}
                     onPress={() => onPressBusPin(stop)}
                   />
                 );
@@ -202,16 +189,15 @@ export default function RouteDetail() {
           icon={<Feather name="heart" size={20} color="#101828" />}
           onPress={onAddFavourite}
         />
-        {route && (
-          <BusRouteDetailBottomSheet
-            routes={[route]}
-            handleSelectBusStop={handleSelectBusStop}
-            maxHeight={bottomSheetMaxHeight}
-            snapPoints={bottomSheetSnapPoints}
-            onChangeIndex={onChangeRouteDetailBottomSheetIndex}
-            activeRouteIndex={activeRouteIndex}
-          />
-        )}
+        <BusRouteDetailBottomSheet
+          routes={routeList}
+          maxHeight={bottomSheetMaxHeight}
+          snapPoints={bottomSheetSnapPoints}
+          handleSelectBusStop={handleSelectBusStop}
+          activeRouteIndex={activeRouteIndex}
+          onChangeRouteIndex={onChangeRoute}
+          onChangeIndex={onChangeRouteDetailBottomSheetIndex}
+        />
       </View>
     </AppScreenLayout>
   );

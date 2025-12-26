@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View } from "react-native";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 
 // custom components
 import AppText from "@/src/components/AppText";
@@ -9,11 +9,12 @@ import { Colors } from "@/src/constants/color";
 type BusStopProps = {
   title: string;
   road: string;
+  onPress: () => void;
 };
 
-export default function BusStop({ title, road }: BusStopProps) {
+export default function BusStop({ title, road, onPress }: BusStopProps) {
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={onPress}>
       <Image
         source={require("@/assets/icons/bus.png")}
         style={styles.busIcon}
@@ -24,7 +25,7 @@ export default function BusStop({ title, road }: BusStopProps) {
         </AppText>
         <AppText size={12} style={styles.road}>{`Road: ${road}`}</AppText>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

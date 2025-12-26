@@ -1,26 +1,29 @@
-
-
-// react native map + expos
+import React, { ComponentRef, forwardRef } from "react";
 import { Marker } from "react-native-maps";
 
-type LatLng = {
+type Coordinate = {
   latitude: number;
   longitude: number;
 };
 
 type EdgePinProps = {
-  coordinate: LatLng;
+  coordinate: Coordinate;
   title: string;
+  onPress?: () => void;
 };
 
-export default function EdgePin({ coordinate, title }: EdgePinProps) {
-  return (
-    <Marker
-      coordinate={coordinate}
-      image={require("@/assets/icons/startPin.png")}
-      tracksViewChanges={false}
-      title={title}
-    >
-    </Marker>
-  );
-}
+const EdgePin = forwardRef<ComponentRef<typeof Marker>, EdgePinProps>(
+  ({ coordinate, title, onPress = () => { console.log("pressed edge pin"); } }, ref) => {
+    return (
+      <Marker
+        ref={ref}
+        coordinate={coordinate}
+        image={require("@/assets/icons/startPin.png")}
+        tracksViewChanges={false}
+        title={title}
+      />
+    );
+  }
+);
+
+export default EdgePin;

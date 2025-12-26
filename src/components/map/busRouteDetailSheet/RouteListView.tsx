@@ -1,7 +1,6 @@
 import { StyleSheet, View } from "react-native";
 
 // react
-import { useState } from "react";
 
 // bottom sheet
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
@@ -12,54 +11,71 @@ import BusStop from "@/src/components/map/busRouteDetailSheet/routeList/BusStop"
 import RouteTab from "@/src/components/map/busRouteDetailSheet/routeList/RouteTab";
 import RouteTitle from "@/src/components/map/busRouteDetailSheet/routeList/RouteTitle";
 
+type Coordinate = {
+  latitude: number;
+  longitude: number;
+};
+
 type Stop = {
-  stopTitle: string;
-  stopRoad: string;
+  id: string;
+  name: string;
+  road: string;
+  coordinate: Coordinate;
 };
 
 type Route = {
-  routeNo: number | string;
-  routeTitle: string;
+  no: string;
+  name: string;
+  color: string;
+  coordinates: Coordinate[];
   stops: Stop[];
 };
 
 type RouteListViewProps = {
   routes: Route[];
-  header?: React.ReactNode;
+  activeRouteIndex: number;
+  handleSelectBusStop: (busStop: Stop) => void;
+  onChangeRouteIndex?: (index: number) => void;
 };
 
-export default function RouteListView({ routes, header }: RouteListViewProps) {
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const selectedRoute = routes[activeIndex];
-  const tabs = routes.map((route) => `Bus ${route.routeNo}`);
+export default function RouteListView({
+  routes,
+  activeRouteIndex,
+  handleSelectBusStop,
+  onChangeRouteIndex = (index) => {},
+}: RouteListViewProps) {
+  const selectedRoute = routes[activeRouteIndex];
+  const tabs = routes.map((route) => `Bus ${route.no}`);
 
   return (
     <View>
-      {header}
+      {/* {header} */}
       <View style={styles.headerContainer}>
         <AppText size={16} style={styles.title}>
           စီးရမည့် ကား၏ မှတ်တိုင်များ
         </AppText>
         <RouteTab
           tabs={tabs}
-          activeIndex={activeIndex}
-          // onTabChange={setActiveIndex}
+          activeIndex={activeRouteIndex}
+          onTabChange={onChangeRouteIndex}
           style={styles.routeTab}
         />
         <RouteTitle
-          routeNo={selectedRoute.routeNo.toString()}
-          title={selectedRoute.routeTitle}
-          style={styles.routeTitle}
+          routeNo={selectedRoute.no}
+          title={selectedRoute.name}
+          style={styles.routeName}
         />
       </View>
       <BottomSheetFlatList
         data={selectedRoute.stops}
         renderItem={({ item }: { item: Stop }) => (
-          <BusStop title={item.stopTitle} road={item.stopRoad} />
+          <BusStop
+            title={item.name}
+            road={item.road}
+            onPress={() => handleSelectBusStop(item)}
+          />
         )}
-        keyExtractor={(item: Stop, index: number) =>
-          `${item.stopTitle}-${index}`
-        }
+        keyExtractor={(item: Stop, index: number) => `${item.name}-${index}`}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       />
@@ -82,7 +98,7 @@ const styles = StyleSheet.create({
   routeTab: {
     marginBottom: 20,
   },
-  routeTitle: {
+  routeName: {
     marginBottom: 24,
   },
 });
