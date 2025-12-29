@@ -1,11 +1,11 @@
 // react native
 import {
-    Image,
-    Modal,
-    Pressable,
-    StyleSheet,
-    TextInput,
-    View,
+  Image,
+  Modal,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
 } from "react-native";
 
 // react
@@ -16,11 +16,19 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 // custom components
 import NavigationTabs from "@/src/components/AppNavigationTabs";
+import AppText from "@/src/components/AppText";
 import FilterView from "@/src/components/home/FilterView";
 import ListView from "@/src/components/home/stopFilterModal/ListView";
+import OptionTab from "@/src/components/home/stopFilterModal/OptionTab";
 
 // safe area
 import { SafeAreaView } from "react-native-safe-area-context";
+
+// type
+import { Accordian, Option } from "@/src/types/accordian";
+
+// data
+import yangonAreasBurmese from "@/src/data/yangon_areas.json";
 
 type StopFilterModalProps = {
   visible: boolean;
@@ -94,6 +102,10 @@ export default function StopFilterModal({
   title,
   onClose,
 }: StopFilterModalProps) {
+  const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
+  const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
+    []
+  );
   const [searchText, setSearchText] = useState<string>("");
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [stopsList, setStopsList] = useState<any[]>([]);
@@ -109,7 +121,18 @@ export default function StopFilterModal({
     setIsFilterVisible(false);
   };
 
+  const onOptionListSelect = (selectedOptionList: Option[]) => {
+    setSelectedFilterOptions(selectedOptionList);
+  };
+
+  const removeOption = (optionId: string) => {
+    setSelectedFilterOptions((options: Option[]) => {
+      return options.filter((option: Option) => option.id !== optionId);
+    });
+  };
+
   useEffect(() => {
+    setAreaFilters(yangonAreasBurmese);
     if (isValidSearchText) {
       setStopsList(DummyDatas.searchResult);
       return;
@@ -131,7 +154,12 @@ export default function StopFilterModal({
     >
       <SafeAreaView style={styles.container}>
         {isFilterVisible ? (
-          <FilterView onClose={hileFilters} />
+          <FilterView
+            onClose={hileFilters}
+            data={areaFilters}
+            selectedOptions={selectedFilterOptions}
+            onOptionListSelect={onOptionListSelect}
+          />
         ) : (
           <>
             <View style={styles.header}>
@@ -155,13 +183,32 @@ export default function StopFilterModal({
                 />
               </View>
               <Pressable style={styles.filterButton} onPress={showFilters}>
+                {selectedFilterOptions.length > 0 && (
+                  <View style={styles.filterCountBadge}>
+                    <AppText size={12} style={styles.filterCountBadgeText}>
+                      {selectedFilterOptions.length}
+                    </AppText>
+                  </View>
+                )}
                 <Image
                   style={styles.filterIcon}
                   source={require("@/assets/icons/filter.png")}
                 />
               </Pressable>
             </View>
+
             <View style={{ flex: 1 }}>
+              {selectedFilterOptions.length > 0 && (
+                <View style={styles.optionTabContainer}>
+                  {selectedFilterOptions.map((option) => (
+                    <OptionTab
+                      key={option.id}
+                      title={option.name}
+                      remove={() => removeOption(option.id)}
+                    />
+                  ))}
+                </View>
+              )}
               {!isValidSearchText && (
                 <NavigationTabs
                   tabs={TABS}
@@ -236,6 +283,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   filterButton: {
+    position: "relative",
     backgroundColor: "#FFFFFF",
     padding: 12,
     borderRadius: 8,
@@ -245,5 +293,32 @@ const styles = StyleSheet.create({
   filterIcon: {
     width: 20,
     height: 20,
+  },
+  filterCountBadge: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+
+    width: 22,
+    height: 22,
+    backgroundColor: "#F4D159",
+    borderRadius: 11,
+
+    borderWidth: 1,
+    borderColor: "#000000",
+
+    transform: [{ translateX: 11 }, { translateY: -11 }],
+
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  filterCountBadgeText: {
+    fontFamily: "Roboto-Bold",
+  },
+  optionTabContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 32,
   },
 });

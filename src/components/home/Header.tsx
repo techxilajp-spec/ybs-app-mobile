@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   title: {
+    fontFamily: "Roboto-Bold",
     textAlign: "center",
     marginBottom: 3,
   },

@@ -17,16 +17,16 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 // constants
 import { Colors } from "@/src/constants/color";
 
-type Option = {
-  id: string;
-  name: string;
-};
+// type
+import { Option } from "@/src/types/accordian";
 
 type AccordionProps = {
   title: string;
   options: Option[];
   expanded: boolean;
   onExpand: () => void;
+  selectedOptionIds: string[];
+  onOptionSelect: (option: Option) => void;
 };
 
 export default function Accordion({
@@ -34,6 +34,8 @@ export default function Accordion({
   options,
   expanded,
   onExpand,
+  selectedOptionIds,
+  onOptionSelect,
 }: AccordionProps) {
   const animatedHeight = useRef(new Animated.Value(0)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
@@ -81,16 +83,27 @@ export default function Accordion({
       <Animated.View
         style={[styles.optionsContainer, { height: animatedHeight }]}
       >
-        {options.map((option) => (
-          <TouchableOpacity key={option.id} style={styles.optionItem}>
-            <FontAwesome name="square-o" size={20} color="#85939B" />
-            <View style={{ flex: 1 }}>
-              <AppText size={16} style={styles.optionName}>
-                {option.name}
-              </AppText>
-            </View>
-          </TouchableOpacity>
-        ))}
+        {options.map((option) => {
+          const isSelected = selectedOptionIds.includes(option.id);
+          return (
+            <TouchableOpacity
+              key={option.id}
+              style={styles.optionItem}
+              onPress={() => onOptionSelect(option)}
+            >
+              {isSelected ? (
+                <FontAwesome name="check-square" size={20} color="#008BA1" />
+              ) : (
+                <FontAwesome name="square-o" size={20} color="#85939B" />
+              )}
+              <View style={{ flex: 1 }}>
+                <AppText size={16} style={styles.optionName}>
+                  {option.name}
+                </AppText>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
       </Animated.View>
     </View>
   );
@@ -126,10 +139,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
 
     flexDirection: "row",
-    gap: 8
+    gap: 8,
   },
   optionName: {
     fontFamily: "MiSansMyanmar-Regular",
-    color: Colors.text.secondary
+    color: Colors.text.secondary,
   },
 });

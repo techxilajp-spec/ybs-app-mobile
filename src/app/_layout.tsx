@@ -14,6 +14,7 @@ export default function RootLayout() {
     "MiSansMyanmar-Demibold": require("@/assets/fonts/MiSansMyanmar/ttf/MiSansMyanmar-Demibold.ttf"),
     "MiSansMyanmar-Semibold": require("@/assets/fonts/MiSansMyanmar/ttf/MiSansMyanmar-Semibold.ttf"),
     "MiSansMyanmar-Bold": require("@/assets/fonts/MiSansMyanmar/ttf/MiSansMyanmar-Bold.ttf"),
+    "Roboto-Bold": require("@/assets/fonts/Roboto/static/Roboto-Bold.ttf")
   });
 
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);

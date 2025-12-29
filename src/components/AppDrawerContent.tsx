@@ -61,8 +61,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   headerTitle: {
+    fontFamily: "Roboto-Bold",
     color: '#FFF',
-    fontWeight: 'bold'
   },
   appLogo: {
     width: 51,
