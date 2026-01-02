@@ -12,6 +12,7 @@ import { Colors } from "@/src/constants/color";
 
 // custom component
 import AppButton from "@/src/components/AppButton";
+import AppSlider from "@/src/components/AppSlider";
 import StopFilterModal from "@/src/components/home/StopFilterModal";
 import DirectionSelector from "@/src/components/home/routeSearch/DirectionSelector";
 
@@ -19,7 +20,13 @@ import DirectionSelector from "@/src/components/home/routeSearch/DirectionSelect
 import { useRouteSearchResultsStore } from "@/src/stores/useRouteSearchResultsStore";
 
 // types
-import { BusInstruction, Route, RouteSearchResult, Stop, WalkInstruction } from "@/src/types/map";
+import {
+  BusInstruction,
+  Route,
+  RouteSearchResult,
+  Stop,
+  WalkInstruction,
+} from "@/src/types/map";
 
 // data
 import route32 from "@/src/data/route32.json";
@@ -204,6 +211,17 @@ export default function RouteSearchView() {
           onPress={searchRoutes}
           textStyle={styles.buttonText}
         />
+
+        <AppSlider
+          data={[
+            { id: "1", image: require("@/assets/images/tmp/ad_1.jpg") },
+            { id: "2", image: require("@/assets/images/tmp/ad_2.jpg") },
+            { id: "3", image: require("@/assets/images/tmp/ad_3.jpg") },
+          ]}
+          autoPlay
+          interval={2000}
+          style={styles.advertisementContainer}
+        />
       </View>
     </>
   );
@@ -241,4 +259,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: "MiSansMyanmar-Medium",
   },
+  advertisementContainer: {
+    marginTop: 30
+  }
 });

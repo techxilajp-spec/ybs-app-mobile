@@ -9,6 +9,7 @@ import { router } from "expo-router";
 
 // custom component
 import AppButton from "@/src/components/AppButton";
+import AppSlider from "@/src/components/AppSlider";
 import NoticeMessage from "@/src/components/home/NoticeMessage";
 import StopFilterModal from "@/src/components/home/StopFilterModal";
 import SearchInput from "@/src/components/home/stopsList/SearchInput";
@@ -51,6 +52,14 @@ export default function StopsListView() {
           message="ရှာဖွေရာတွင်အတိုကောက်စာလုံးများကိုအသုံးပြုပြီးရှာဖွေပါ.. ဥပမာ စာတိုက်မှတ်တိုင် ဆိုလျှင် “ စတ “ ၊ ဖြင့်ရှာကာပေါ်လာသောမှတ်တိုင်ကိုရွေးချယ်ပါ။"
         />
         <AppButton title="မှတ်တိုင်ရှာမယ်" onPress={searchBusStops} />
+        <AppSlider
+          data={[
+            { id: "3", image: require("@/assets/images/tmp/ad_3.jpg") },
+          ]}
+          autoPlay
+          interval={2000}
+          style={styles.advertisementContainer}
+        />
       </View>
     </>
   );
@@ -64,6 +73,9 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   noticeMessage: {
-    marginBottom: 40,
+    marginBottom: 20,
   },
+  advertisementContainer: {
+    marginTop: 40
+  }
 });
