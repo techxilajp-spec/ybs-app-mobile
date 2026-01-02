@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ImageBackground, ScrollView, StyleSheet } from "react-native";
+import { ImageBackground, StyleSheet } from "react-native";
 
 // custom component
 import NavigationTabs from "@/src/components/AppNavigationTabs";
@@ -50,29 +50,27 @@ export default function HomeScreen() {
         source={require("@/assets/images/app_background.png")}
       >
         <AppScreenLayout contentStyle={styles.container}>
-          <ScrollView style={{ flex: 1}}>
-            <Header />
-            <NavigationTabs
-              tabs={TAB_CONFIG.map((t) => t.label)}
-              activeIndex={activeIndex}
-              activeStates={{
-                backgroundColor: Colors.primary,
-                color: "#FFF",
-                borderColor: Colors.primary,
-              }}
-              inactiveStates={{
-                backgroundColor: Colors.secondary,
-                color: Colors.text.primary,
-                borderColor: "#EEEEEE",
-              }}
-              navigationTabStyle={{
-                marginTop: 30,
-                marginBottom: 18,
-              }}
-              onNavigationTabPress={setActiveIndex}
-            />
-            <ActiveView />
-          </ScrollView>
+          <Header />
+          <NavigationTabs
+            tabs={TAB_CONFIG.map((t) => t.label)}
+            activeIndex={activeIndex}
+            activeStates={{
+              backgroundColor: Colors.primary,
+              color: "#FFF",
+              borderColor: Colors.primary,
+            }}
+            inactiveStates={{
+              backgroundColor: Colors.secondary,
+              color: Colors.text.primary,
+              borderColor: "#EEEEEE",
+            }}
+            navigationTabStyle={{
+              marginTop: 30,
+              marginBottom: 18,
+            }}
+            onNavigationTabPress={setActiveIndex}
+          />
+          <ActiveView />
         </AppScreenLayout>
       </ImageBackground>
     </>
