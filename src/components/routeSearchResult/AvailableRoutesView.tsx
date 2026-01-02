@@ -1,6 +1,5 @@
 import { FlatList, StyleSheet, View } from "react-native";
 
-import { useEffect } from "react";
 
 // expo router
 import { router } from "expo-router";
@@ -8,14 +7,16 @@ import { router } from "expo-router";
 // custom component
 import RouteCard from "@/src/components/home/routeSearchResults/RouteCard";
 
-// stores
-import { useRouteSearchResultsStore } from "@/src/stores/useRouteSearchResultsStore";
+// types
+import { RouteSearchResult } from "@/src/types/map";
 
-export default function AvailableRoutesView() {
-  const routes = useRouteSearchResultsStore((s) => s.routes);
-  useEffect(() => {
-    console.log("available route mount again");
-  }, []);
+type AvailableRoutesViewProps = {
+  routes: RouteSearchResult[]
+}
+
+export default function AvailableRoutesView({
+  routes
+} : AvailableRoutesViewProps) {
   return (
     <View style={styles.container}>
       <FlatList

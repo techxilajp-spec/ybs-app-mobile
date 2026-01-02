@@ -1,6 +1,9 @@
 // react native
 import { FlatList, StyleSheet, View } from "react-native";
 
+// react
+import { useEffect, useState } from "react";
+
 //expo router
 import { router } from "expo-router";
 
@@ -8,78 +11,85 @@ import { router } from "expo-router";
 import RouteCard from "@/src/components/RouteCard";
 import FilterModal from "@/src/components/home/routeList/FilterModal";
 import RouteListFilter from "@/src/components/home/routeList/RouteListFilter";
-import { useState } from "react";
 
-const DUMMY_ROUTES = [
-  {
-    no: 1,
-    title: "လှည်းကူးဈေး - ဇဝန",
-    description:
-      "(လှည်းကူးတာဆုံ - ပေါက်ကုန်းရွာလယ် -အမှတ်(၂)လမ်း- ဆားတလင်းလမ်းဆုံ ... )",
-    color: "#2B6CB0",
-  },
-  {
-    no: 2,
-    title: "ယုဇန -အောင်မင်္ဂလာအဝေးပြေး",
-    description: "ပဲခူးမြစ်လမ်း - စက်မှုဇုန်၂ – လှော်ကားလမ်း - ၂၀ကုန်တိုက် )",
-    color: "#E53E3E",
-  },
-  {
-    no: 3,
-    title: "ယုဇန - ဗိုလ်ချုပ်အောင်ဆန်းလမ်း",
-    description: "ပဲခူးမြစ်လမ်း - စက်မှုဇုန်၂ – လှော်ကားလမ်း - ၂၀ကုန်တိုက် )",
-    color: "#E53E3E",
-  },
-  {
-    no: 4,
-    title: "ယုဇန - ဆူးလေ(မဟာဗန္ဓူလပန်းခြံ)",
-    description: "ပဲခူးမြစ်လမ်း - သိမ်ကျောင်း - ဧရာဝတီလမ်း - ရတနာလမ်း )",
-    color: "#E53E3E",
-  },
-  {
-    no: 5,
-    title: "ပါရမီ(ညောင်ပင်) - သခင်မြပန်းခြံ",
-    description:
-      "ပါရမီ(ညောင်ပင်) - ဘေလီ - သံသုမာလမ်း - လိုင်စင်ရုံး - ရတနာလမ်း - ကျိုက္ကဆံဘုရား - ကျောက်ကုန်း - မိုးကောင်းလမ်း - ရန်ကင်းလမ်း - ရန်ရှင်းလမ်း - စက်မှုကွေ့ - လမ်းနီ(မြန်မာပလာဇာ) - လှည်းတန်း - ဆင်မလိုက် -ကြည့်မြင်တိုင်ကမ်းနားလမ်း - ညဈေး - သခင်မြပန်းခြံ",
-    color: "#F4D159",
-  },
-];
+// type
+import { Route } from "@/src/types/bus";
+import { RouteFilters } from "@/src/types/filter";
+
+// data
+import { Filters } from "@/src/constants/filters";
+import routeData from "@/src/data/routes.json";
 
 export default function RouteListView() {
+  const { routes: routeFilterOptions } = Filters;
+  const [activeOption, setActiveOption] = useState<RouteFilters>(
+    routeFilterOptions[0]
+  );
+  const [routes, setRoutes] = useState<Route[]>([]);
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
 
+  /**
+   * Opens the filter modal
+   * to choose between YPS card–supported routes and all routes.
+   */
   const closeFilterModal = () => {
     setFilterModalVisible(false);
   };
 
+  /**
+   * Closes the filter modal
+   */
   const openFilterModal = () => {
     setFilterModalVisible(true);
   };
 
+  /**
+   * go to route detail page
+   */
   const onPressRouteCard = () => {
     router.push("/(drawer)/(home)/routeDetail");
   };
+
+  /**
+   * Sets the selected filter option as active by its id.
+   * @param id selected option id
+   */
+  const onSelectFilterOption = (id: string) => {
+    const selectedOption = routeFilterOptions.find((option) => option.id == id);
+    if (!selectedOption) return;
+    setActiveOption(selectedOption);
+  };
+
+  useEffect(() => {
+    setRoutes(routeData);
+  }, []);
   return (
     <>
       <View style={styles.container}>
         <RouteListFilter onPressFilterButton={openFilterModal} />
         <FlatList
           style={{ marginTop: 20 }}
-          data={DUMMY_ROUTES}
+          data={routes}
           renderItem={({ item }) => (
             <RouteCard
               routeNo={item.no}
-              routeTitle={item.title}
+              routeTitle={item.name}
               routeDescription={item.description}
               color={item.color}
               onPress={onPressRouteCard}
             />
           )}
-          keyExtractor={(item) => item.title}
+          keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
         />
       </View>
-      <FilterModal visible={filterModalVisible} onClose={closeFilterModal} />
+      <FilterModal
+        visible={filterModalVisible}
+        onClose={closeFilterModal}
+        options={routeFilterOptions}
+        activeOptionId={activeOption.id}
+        onSelectOption={onSelectFilterOption}
+      />
     </>
   );
 }

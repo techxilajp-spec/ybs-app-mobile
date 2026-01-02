@@ -1,26 +1,28 @@
 import { Modal, Pressable, StyleSheet, View } from "react-native";
 
+// react
+
 // custom component
 import OptionList from "@/src/components/home/routeList/FilterModal/OptionList";
-import { useState } from "react";
+
+// types
+import { RouteFilters } from "@/src/types/filter";
 
 type FilterModalProps = {
   visible: boolean;
   onClose: () => void;
+  activeOptionId: string;
+  options: RouteFilters[];
+  onSelectOption: (optionId: string) => void;
 };
 
-const routeFilterOptions = [
-  "ယာဉ်လိုင်းများအားလုံး ( Default )",
-  "YPS Service ရရှိသော ယာဉ်များ",
-];
-
-export default function FilterModal({ visible, onClose }: FilterModalProps) {
-  const [activeOptionIndex, setActiveOptionIndex] = useState<number>(0);
-
-  const selectOption = (index: number) => {
-    setActiveOptionIndex(index);
-  };
-
+export default function FilterModal({
+  visible,
+  onClose,
+  options,
+  activeOptionId,
+  onSelectOption,
+}: FilterModalProps) {
   return (
     <Modal
       visible={visible}
@@ -35,9 +37,9 @@ export default function FilterModal({ visible, onClose }: FilterModalProps) {
             <Pressable style={styles.barIcon} onPress={onClose}></Pressable>
           </View>
           <OptionList
-            options={routeFilterOptions}
-            activeIndex={activeOptionIndex}
-            onSelectOptions={selectOption}
+            options={options}
+            activeOptionId={activeOptionId}
+            onSelectOption={onSelectOption}
           />
         </View>
       </Pressable>

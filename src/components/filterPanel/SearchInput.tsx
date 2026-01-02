@@ -1,8 +1,6 @@
 import { Colors } from "@/src/constants/color";
 import { Image, StyleSheet, TextInput, View, ViewStyle } from "react-native";
 
-// constants
-
 type SearchInputProps = {
     style?: ViewStyle
 }

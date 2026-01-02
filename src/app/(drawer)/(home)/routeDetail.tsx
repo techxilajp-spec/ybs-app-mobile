@@ -1,3 +1,4 @@
+// react native
 import { Dimensions, StyleSheet, View } from "react-native";
 
 // react
@@ -8,7 +9,6 @@ import { router } from "expo-router";
 
 // react-native-map
 import MapView, {
-  LatLng,
   MapMarker,
   PROVIDER_GOOGLE,
   Region,
@@ -26,29 +26,14 @@ import BusRouteDetailBottomSheet from "@/src/components/map/BusRouteDetailBottom
 import EdgePin from "@/src/components/map/EdgePin";
 import Button from "@/src/components/routeDetail/Button";
 
+// constants
+import { MAP_DELTA, MAP_LOCATIONS } from "@/src/constants/map";
+
 // data
 import route62 from "@/src/data/route62.json";
-import yangonRegion from "@/src/data/yangonRegion.json";
 
-const INITIAL_LATITUDE_DELTA = 0.3;
-const INITIAL_LONGITUDE_DELTA = 0.3;
-const latitudeDelta = 0.05;
-const longitudeDelta = 0.05;
-
-type Stop = {
-  id: string;
-  name: string;
-  road: string;
-  coordinate: LatLng;
-};
-
-type Route = {
-  no: string;
-  name: string;
-  color: string;
-  coordinates: LatLng[];
-  stops: Stop[];
-};
+// types
+import { Route, Stop } from "@/src/types/map";
 
 const fetchDataFromApi = (): Route => {
   const stops: Stop[] = route62.shape.geometry.coordinates
@@ -65,8 +50,10 @@ const fetchDataFromApi = (): Route => {
     .filter((_, index) => index % 5 === 0);
 
   const routeInfo: Route = {
+    id: route62.route_id,
     no: route62.route_id,
     name: route62.name,
+    description: "",
     color: route62.color,
     coordinates: route62.shape.geometry.coordinates.map(
       ([longitude, latitude]) => ({
@@ -81,9 +68,12 @@ const fetchDataFromApi = (): Route => {
 };
 
 export default function RouteDetail() {
-  const [region, setRegion] = useState<Region>(yangonRegion);
+  const ACTIVE_ROUTE_INDEX = 0;
+  const { YANGON } = MAP_LOCATIONS;
+
+  const [region, setRegion] = useState<Region>(YANGON);
   const [route, setRoute] = useState<Route | null>(null);
-  const [activeRouteIndex, setActiveRouteIndex] = useState<number>(0);
+  
   const bottomSheetHeight = useRef<number>(100);
   const mapRef = useRef<InstanceType<typeof MapView> | null>(null);
   const markersRef = useRef<Record<string, MapMarker | null>>({});
@@ -96,12 +86,15 @@ export default function RouteDetail() {
     const routeInfo = fetchDataFromApi();
     setRoute(routeInfo);
     setRegion({
-      ...yangonRegion,
-      latitudeDelta: INITIAL_LATITUDE_DELTA,
-      longitudeDelta: INITIAL_LONGITUDE_DELTA,
+      ...YANGON,
+      latitudeDelta: MAP_DELTA.INITIAL.LATITUDE,
+      longitudeDelta: MAP_DELTA.INITIAL.LONGITUDE
     });
   }, []);
 
+  /**
+   * Navigates back to the previous screen
+   */
   const onBackPress = () => {
     router.back();
   };
@@ -110,45 +103,56 @@ export default function RouteDetail() {
     // TODO: implement favourite logic
   };
 
-  const handleSelectBusStop = (busStop: Stop) => {
-    // hide all stop callouts
-    Object.values(markersRef.current).forEach((ref) => ref?.hideCallout());
-
-    // show selected stop callout
-    markersRef.current[busStop.id]?.showCallout();
-
-    // Calculate vertical map offset caused by bottom sheet
-    const verticalOffsetRatio = bottomSheetHeight.current / screenHeight;
-    const latitudeOffset = verticalOffsetRatio * latitudeDelta;
-
-    const targetRegion = {
-      latitude: busStop.coordinate.latitude - latitudeOffset,
-      longitude: busStop.coordinate.longitude,
-      latitudeDelta: latitudeDelta,
-      longitudeDelta: longitudeDelta,
-    };
-
-    mapRef.current?.animateToRegion(targetRegion, 500);
-  };
-
+  /**
+   * Updates the bottom sheet height based on its current index.
+   * @param index 
+   */
   const onChangeRouteDetailBottomSheetIndex = (index: number) => {
     bottomSheetHeight.current = index == 0 ? bottomSheetSnapPoints[0] : bottomSheetMaxHeight;
   };
 
+  /**
+   * Animates the map to focus on a specific bus stop
+   * @param stop 
+   */
+  const animateToStop = (stop: Stop) => {
+    const offsetRatio = bottomSheetHeight.current / screenHeight;
+    const adjustedLatitude =
+      stop.coordinate.latitude -
+      offsetRatio * MAP_DELTA.DEFAULT.LATITUDE;
+
+    mapRef.current?.animateToRegion(
+      {
+        latitude: adjustedLatitude,
+        longitude: stop.coordinate.longitude,
+        latitudeDelta: MAP_DELTA.DEFAULT.LATITUDE,
+        longitudeDelta: MAP_DELTA.DEFAULT.LONGITUDE,
+      },
+      500
+    );
+  };
+
+  /**
+   * Selects a bus stop by showing its callout on the map
+   * @param busStop 
+   */
+  const handleSelectBusStop = (busStop: Stop) => {
+    // hide all stop callouts
+    Object.values(markersRef.current).forEach((ref) => ref?.hideCallout());
+    // show selected stop callout
+    markersRef.current[busStop.id]?.showCallout();
+    animateToStop(busStop);
+  };
+
+  /**
+   *  Handles tapping a bus stop pin by showing its callout
+   * and centering the map on the stop.
+   * 
+   * @param busStop 
+   */
   const onPressBusPin = (busStop: Stop) => {
     markersRef?.current[busStop.id]?.showCallout();
-    // Calculate vertical map offset caused by bottom sheet
-    const verticalOffsetRatio = bottomSheetHeight.current / screenHeight;
-    const latitudeOffset = verticalOffsetRatio * latitudeDelta;
-
-    const targetRegion = {
-      latitude: busStop.coordinate.latitude - latitudeOffset,
-      longitude: busStop.coordinate.longitude,
-      latitudeDelta: latitudeDelta,
-      longitudeDelta: longitudeDelta,
-    };
-
-    mapRef.current?.animateToRegion(targetRegion, 500);
+    animateToStop(busStop);
   }
 
   return (
@@ -158,7 +162,7 @@ export default function RouteDetail() {
           ref={mapRef}
           style={styles.mapContainer}
           region={region}
-          initialRegion={yangonRegion}
+          initialRegion={YANGON}
           provider={PROVIDER_GOOGLE}
           mapType="standard"
           showsCompass={false}
@@ -209,7 +213,7 @@ export default function RouteDetail() {
             maxHeight={bottomSheetMaxHeight}
             snapPoints={bottomSheetSnapPoints}
             onChangeIndex={onChangeRouteDetailBottomSheetIndex}
-            activeRouteIndex={activeRouteIndex}
+            activeRouteIndex={ACTIVE_ROUTE_INDEX}
           />
         )}
       </View>

@@ -1,12 +1,11 @@
+// react native
 import { Image, StyleSheet, View } from "react-native";
 
+// react
 import { useState } from "react";
 
 // expo router
 import { router } from "expo-router";
-
-// react native map
-import { LatLng } from "react-native-maps";
 
 // constants
 import { Colors } from "@/src/constants/color";
@@ -19,35 +18,14 @@ import DirectionSelector from "@/src/components/home/routeSearch/DirectionSelect
 // stores
 import { useRouteSearchResultsStore } from "@/src/stores/useRouteSearchResultsStore";
 
+// types
+import { BusInstruction, Route, RouteSearchResult, Stop, WalkInstruction } from "@/src/types/map";
+
 // data
 import route32 from "@/src/data/route32.json";
 import route62 from "@/src/data/route62.json";
 
-type Stop = {
-  id: string;
-  name: string;
-  road: string;
-  coordinate: LatLng;
-};
-
-type Route = {
-  no: string;
-  name: string;
-  color: string;
-  coordinates: LatLng[];
-  stops: Stop[];
-};
-
-type RouteSearchResult = {
-  id: number;
-  isFastest: boolean;
-  totalBusStop: number;
-  estimatedTime: number;
-  routes: Route[];
-  instructions: string[]
-}
-
-const fetchData = () : RouteSearchResult[] => {
+const fetchData = (): RouteSearchResult[] => {
   const stops62: Stop[] = route62.shape.geometry.coordinates
     .map(([longitude, latitude]) => ({
       id: Math.random().toString(),
@@ -75,9 +53,11 @@ const fetchData = () : RouteSearchResult[] => {
     .filter((_, index) => index % 5 === 0);
 
   const route62Info: Route = {
+    id: route62.route_id,
     no: route62.route_id,
     name: route62.name,
     color: route62.color,
+    description: "",
     coordinates: route62.shape.geometry.coordinates.map(
       ([longitude, latitude]) => ({
         latitude,
@@ -88,9 +68,11 @@ const fetchData = () : RouteSearchResult[] => {
   };
 
   const route32Info: Route = {
+    id: route32.route_id,
     no: route32.route_id,
     name: route32.name,
     color: route32.color,
+    description: "",
     coordinates: route32.shape.geometry.coordinates.map(
       ([longitude, latitude]) => ({
         latitude,
@@ -108,9 +90,28 @@ const fetchData = () : RouteSearchResult[] => {
       estimatedTime: 35,
       routes: [route62Info, route32Info],
       instructions: [
-        "ဆင်မင်းစျေး သိုသွားပါ။",
-        "သာကေတ (ရတနာအိမ်ရာ ) - အထက်ကြည့်မြင်တိုင် ကားကို ဆင်မင်းစျေးမှတ်တိုင်မှ ဆီဆိုင် မှတ်တိုင်ထိ စီးပါ။",
-        "ခရမ်း - ဗိုလ်တစ်ထောင်ဘုရား ကားကို ဆီဆိုင် မှတ်တိုင် မှ ဖိုက်စတား မှတ်တိုင်အထိ စီးပါ။",
+        {
+          type: "walk",
+          description: "Walk 200 meters to the bus stop",
+        } as WalkInstruction,
+        {
+          type: "bus",
+          busNo: "45B",
+          busTitle: "Downtown Express",
+          startStop: "Central Station",
+          endStop: "Main Street",
+        } as BusInstruction,
+        {
+          type: "walk",
+          description: "Walk 100 meters to your destination",
+        } as WalkInstruction,
+        {
+          type: "bus",
+          busNo: "12A",
+          busTitle: "City Loop",
+          startStop: "Main Street",
+          endStop: "Park Avenue",
+        } as BusInstruction,
       ],
     },
   ];
@@ -126,8 +127,13 @@ export default function RouteSearchView() {
     visible: false,
     mode: null,
   });
+
   const setRoutes = useRouteSearchResultsStore((s) => s.setRoutes);
 
+  /**
+   * Opens the direction selection modal for choosing a start or end destination.
+   * @param mode destination types (start or end)
+   */
   const openDirectionModal = (mode: "start" | "end") => {
     setShowDirectionModal({
       visible: true,
@@ -135,6 +141,9 @@ export default function RouteSearchView() {
     });
   };
 
+  /**
+   * Closes the direction selection modal
+   */
   const closeDirectionModal = () => {
     setShowDirectionModal({
       visible: false,
@@ -142,6 +151,11 @@ export default function RouteSearchView() {
     });
   };
 
+  /**
+   * Searches available routes between the selected start and end destinations and
+   * makes the results accessible across screens.
+   *
+   */
   const searchRoutes = () => {
     const searchResults = fetchData();
     setRoutes(searchResults);
@@ -149,7 +163,7 @@ export default function RouteSearchView() {
   };
 
   return (
-    <View style={styles.container}>
+    <>
       <StopFilterModal
         visible={showDirectionModal.visible}
         title={
@@ -159,36 +173,39 @@ export default function RouteSearchView() {
         }
         onClose={closeDirectionModal}
       />
-      <View style={styles.selectorContainer}>
-        {/* start point */}
-        <DirectionSelector
-          icon={<View style={styles.circleIcon}></View>}
-          title="မှ"
-          description="လက်ရှိတည်နေရာ"
-          onPress={() => openDirectionModal("start")}
-          showIndicator={true}
-          style={{ marginBottom: 8 }}
-        />
+      <View style={styles.container}>
+        <View style={styles.selectorContainer}>
+          {/* start point */}
+          <DirectionSelector
+            icon={<View style={styles.circleIcon}></View>}
+            title="မှ"
+            description="လက်ရှိတည်နေရာ"
+            value=""
+            onPress={() => openDirectionModal("start")}
+            showIndicator={true}
+            style={{ marginBottom: 8 }}
+          />
 
-        {/* end point */}
-        <DirectionSelector
-          icon={
-            <Image
-              source={require("@/assets/icons/bus.png")}
-              style={styles.busIcon}
-            />
-          }
-          title="သို"
-          description="သွားရောက်လိုသည့်နေရာ"
-          onPress={() => openDirectionModal("end")}
+          {/* end point */}
+          <DirectionSelector
+            icon={
+              <Image
+                source={require("@/assets/icons/bus.png")}
+                style={styles.busIcon}
+              />
+            }
+            title="သို"
+            description="သွားရောက်လိုသည့်နေရာ"
+            onPress={() => openDirectionModal("end")}
+          />
+        </View>
+        <AppButton
+          title="Bus ကားလမ်းကြောင်းကြည့်မယ်"
+          onPress={searchRoutes}
+          textStyle={styles.buttonText}
         />
       </View>
-      <AppButton
-        title="Bus ကားလမ်းကြောင်းကြည့်မယ်"
-        onPress={searchRoutes}
-        textStyle={styles.buttonText}
-      />
-    </View>
+    </>
   );
 }
 

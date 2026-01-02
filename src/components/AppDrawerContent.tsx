@@ -13,8 +13,6 @@ import {
 // custom component
 import AppText from "./AppText";
 
-// icons
-
 import { Colors } from "../constants/color";
 
 export default function AppDrawerContent(props: DrawerContentComponentProps) {

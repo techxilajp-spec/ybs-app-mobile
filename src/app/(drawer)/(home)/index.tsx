@@ -17,24 +17,21 @@ const TAB_CONFIG = [
   {
     label: "Bus လမ်းကြောင်းများ",
     component: RouteSearchView,
-    getProps: () => ({}),
   },
   {
     label: "မှတ်တိုင်များ",
     component: StopsListView,
-    getProps: () => ({}),
   },
   {
     label: "ယာဉ်လိုင်းများ",
     component: RouteListView,
-    getProps: () => ({}),
   },
 ];
 
 export default function HomeScreen() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isAdvertisementVisible, setIsAdvertisementVisible] = useState<boolean>(true);
-  const { component: ActiveView, getProps } = TAB_CONFIG[activeIndex];
+  const { component: ActiveView } = TAB_CONFIG[activeIndex];
 
   const hideAdvertisement = () => {
     setIsAdvertisementVisible(false);
@@ -69,7 +66,7 @@ export default function HomeScreen() {
             }}
             onNavigationTabPress={setActiveIndex}
           />
-          <ActiveView {...getProps()} />
+          <ActiveView />
         </AppScreenLayout>
       </ImageBackground>
     </>

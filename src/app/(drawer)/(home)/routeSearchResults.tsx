@@ -2,7 +2,7 @@
 import { StyleSheet } from "react-native";
 
 // react
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 // custom components
 import AppHeader from "@/src/components/AppHeader";
@@ -11,32 +11,50 @@ import AppScreenLayout from "@/src/components/AppScreenLayout";
 import AvailableLinesView from "@/src/components/routeSearchResult/AvailableLinesView";
 import AvailableRoutesView from "@/src/components/routeSearchResult/AvailableRoutesView";
 
-// stores
+// store
+import { useRouteSearchResultsStore } from "@/src/stores/useRouteSearchResultsStore";
 
-const TAB_CONFIG = [
-  {
-    label: "လမ်းကြောင်း",
-    component: AvailableRoutesView,
-    getProps: () => ({}),
-  },
-  {
-    label: "ရောက်သည့်ယာဉ်လိုင်းများ",
-    component: AvailableLinesView,
-    getProps: () => ({}),
-  },
+// types
+type TabKey = "routes" | "lines";
+
+// tab configuration
+const TABS: { key: TabKey; label: string }[] = [
+  { key: "routes", label: "လမ်းကြောင်း" },
+  { key: "lines", label: "ရောက်သည့်ယာဉ်လိုင်းများ" },
 ];
 
 export default function RouteSearchResultScreen() {
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const { component: ActiveView, getProps } = TAB_CONFIG[activeIndex];
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const activeTabKey = TABS[activeTabIndex].key;
+
+  // read store once; used only for passing data between screens
+  const routeData = useRouteSearchResultsStore.getState().routes;
+
+  /**
+   * Flatten all routes from search results into a single list
+   * for rendering available lines. Calculated once.
+   */
+  const flattenedRoutes = useMemo(() => {
+    console.log("calculated once");
+    return routeData.flatMap((item) =>
+      item.routes.map((route) => ({
+        id: route.id,
+        no: route.no,
+        name: route.name,
+        description: route.description,
+        color: route.color,
+      }))
+    );
+  }, []);
 
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
       <AppHeader title="ရှာဖွေမှုရလဒ်" />
 
       <NavigationTabs
-        tabs={TAB_CONFIG.map((t) => t.label)}
-        activeIndex={activeIndex}
+        tabs={TABS.map((t) => t.label)}
+        activeIndex={activeTabIndex}
+        onNavigationTabPress={setActiveTabIndex}
         activeStates={{
           backgroundColor: "#F9F9F9",
           color: "#1F2937",
@@ -48,10 +66,10 @@ export default function RouteSearchResultScreen() {
           borderColor: "#EEEEEE",
         }}
         navigationTabStyle={styles.navigation}
-        onNavigationTabPress={setActiveIndex}
       />
 
-      <ActiveView  {...getProps()} />
+      {activeTabKey === "routes" && <AvailableRoutesView routes={routeData} />}
+      {activeTabKey === "lines" && <AvailableLinesView lines={flattenedRoutes} />}
     </AppScreenLayout>
   );
 }

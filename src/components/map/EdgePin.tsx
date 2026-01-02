@@ -26,4 +26,6 @@ const EdgePin = forwardRef<ComponentRef<typeof Marker>, EdgePinProps>(
   }
 );
 
+EdgePin.displayName = "EdgePin";
+
 export default EdgePin;

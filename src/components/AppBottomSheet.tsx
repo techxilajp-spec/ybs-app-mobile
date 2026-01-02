@@ -24,6 +24,8 @@ const AppBottomSheet = forwardRef<any, AppBottomSheetProps>(
   }
 );
 
+AppBottomSheet.displayName = "AppBottomSheet";
+
 export default AppBottomSheet;
 
 const styles = StyleSheet.create({

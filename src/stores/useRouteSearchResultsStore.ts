@@ -1,29 +1,6 @@
-import { LatLng } from "react-native-maps";
 import { create } from "zustand";
 
-type Stop = {
-  id: string;
-  name: string;
-  road: string;
-  coordinate: LatLng;
-};
-
-type Route = {
-  no: string;
-  name: string;
-  color: string;
-  coordinates: LatLng[];
-  stops: Stop[];
-};
-
-type RouteSearchResult = {
-  id: number;
-  isFastest: boolean;
-  totalBusStop: number;
-  estimatedTime: number;
-  routes: Route[];
-  instructions: string[];
-};
+import { RouteSearchResult } from "../types/map";
 
 type RouteSearchResultsStore = {
   routes: RouteSearchResult[];

@@ -16,15 +16,12 @@ export default function RouteCard({
   return (
     <Pressable style={styles.container} onPress={onPressCard}>
       <Header isFastest={true} style={styles.header} />
-
       <Summary />
-
       <View style={styles.stepsWrapper}>
         <WalkStep
           description="ဆင်မင်းစျေး သိုသွားပါ။"
           style={styles.stepItem}
         />
-
         <BusStep
           busNo={89}
           busColor="#E53E3E"
@@ -33,7 +30,6 @@ export default function RouteCard({
           endStopTitle="ဆီဆိုင် မှတ်တိုင်"
           style={styles.stepItem}
         />
-
         <BusStep
           busNo={34}
           busColor="#815AD5"

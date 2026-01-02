@@ -5,7 +5,12 @@ import { useEffect, useRef, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 
 // expo map
-import MapView, { LatLng, MapMarker, PROVIDER_GOOGLE, Region } from "react-native-maps";
+import MapView, {
+  LatLng,
+  MapMarker,
+  PROVIDER_GOOGLE,
+  Region,
+} from "react-native-maps";
 
 // expo router
 import { router } from "expo-router";
@@ -28,8 +33,8 @@ import Button from "@/src/components/routeDetail/Button";
 // stores
 import { useRouteSearchResultsStore } from "@/src/stores/useRouteSearchResultsStore";
 
-// data
-import yangonRegion from "@/src/data/yangonRegion.json";
+// constants
+import { MAP_DELTA, MAP_LOCATIONS } from "@/src/constants/map";
 
 type Stop = {
   id: string;
@@ -38,14 +43,12 @@ type Stop = {
   coordinate: LatLng;
 };
 
-const INITIAL_LATITUDE_DELTA = 0.3;
-const INITIAL_LONGITUDE_DELTA = 0.3;
-const LATITUDE_DELTA = 0.05;
-const LONGITUDE_DELTA = 0.05;
+export default function RouteSearchDetail() {
+  const { YANGON } = MAP_LOCATIONS;
 
-export default function routeSearchDetail() {
-  const [region, setRegion] = useState<Region>(yangonRegion);
+  const [region, setRegion] = useState<Region>(YANGON);
   const [activeRouteIndex, setActiveRouteIndex] = useState<number>(0);
+
   const bottomSheetHeight = useRef<number>(100);
   const mapRef = useRef<InstanceType<typeof MapView> | null>(null);
   const markersRef = useRef<Record<string, MapMarker | null>>({});
@@ -66,6 +69,21 @@ export default function routeSearchDetail() {
     ? searchedRoute.routes[activeRouteIndex]
     : null;
 
+  useEffect(() => {
+    setRegion({
+      ...YANGON,
+      latitudeDelta: MAP_DELTA.INITIAL.LATITUDE,
+      longitudeDelta: MAP_DELTA.INITIAL.LONGITUDE,
+    });
+  }, []);
+
+  useEffect(() => {
+    handleSelectBusStop(activeRoute?.stops[0]);
+  }, [activeRouteIndex]);
+
+  /**
+   * Navigates back to the previous screen
+   */
   const onBackPress = () => {
     router.back();
   };
@@ -74,64 +92,63 @@ export default function routeSearchDetail() {
     // TODO: implement favourite logic
   };
 
+  /**
+   * Updates the bottom sheet height based on its current index.
+   * @param index
+   */
   const onChangeRouteDetailBottomSheetIndex = (index: number) => {
-    bottomSheetHeight.current = index == 0 ? bottomSheetSnapPoints[0] : bottomSheetMaxHeight;
+    bottomSheetHeight.current =
+      index == 0 ? bottomSheetSnapPoints[0] : bottomSheetMaxHeight;
   };
 
+  /**
+   * Animates the map to focus on a specific bus stop
+   * @param stop
+   */
+  const animateToStop = (stop: Stop) => {
+    const offsetRatio = bottomSheetHeight.current / screenHeight;
+    const adjustedLatitude =
+      stop.coordinate.latitude - offsetRatio * MAP_DELTA.DEFAULT.LATITUDE;
+
+    mapRef.current?.animateToRegion(
+      {
+        latitude: adjustedLatitude,
+        longitude: stop.coordinate.longitude,
+        latitudeDelta: MAP_DELTA.DEFAULT.LATITUDE,
+        longitudeDelta: MAP_DELTA.DEFAULT.LONGITUDE,
+      },
+      500
+    );
+  };
+
+  /**
+   * Selects a bus stop by showing its callout on the map
+   * @param busStop 
+   */
   const handleSelectBusStop = (busStop: Stop | null | undefined) => {
-    if(!busStop) return;
+    if (!busStop) return;
     // hide all stop callouts
     Object.values(markersRef.current).forEach((ref) => ref?.hideCallout());
-
     // show selected stop callout
     markersRef.current[busStop.id]?.showCallout();
-
-    // Calculate vertical map offset caused by bottom sheet
-    const verticalOffsetRatio = bottomSheetHeight.current / screenHeight;
-    const latitudeOffset = verticalOffsetRatio * LATITUDE_DELTA;
-
-    const targetRegion = {
-      latitude: busStop.coordinate.latitude - latitudeOffset,
-      longitude: busStop.coordinate.longitude,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
-    };
-
-    mapRef.current?.animateToRegion(targetRegion, 500);
+    animateToStop(busStop);
   };
 
+  /**
+   *  Handles tapping a bus stop pin by showing its callout
+   * and centering the map on the stop.
+   * 
+   * @param busStop 
+   */
   const onPressBusPin = (busStop: Stop) => {
     markersRef?.current[busStop.id]?.showCallout();
-    // Calculate vertical map offset caused by bottom sheet
-    const verticalOffsetRatio = bottomSheetHeight.current / screenHeight;
-    const latitudeOffset = verticalOffsetRatio * LATITUDE_DELTA;
-
-    const targetRegion = {
-      latitude: busStop.coordinate.latitude - latitudeOffset,
-      longitude: busStop.coordinate.longitude,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
-    };
-
-    mapRef.current?.animateToRegion(targetRegion, 500);
-  }
+    animateToStop(busStop);
+  };
 
   const onChangeRoute = (index: number) => {
     setActiveRouteIndex(index);
     markersRef.current = {};
   };
-
-  useEffect(() => {
-    setRegion({
-      ...yangonRegion,
-      latitudeDelta: INITIAL_LATITUDE_DELTA,
-      longitudeDelta: INITIAL_LONGITUDE_DELTA,
-    });
-  }, []);
-
-  useEffect(() => {
-    handleSelectBusStop(activeRoute?.stops[0]);
-  }, [activeRouteIndex])
 
   if (!searchedRoute) {
     return null;
@@ -144,7 +161,7 @@ export default function routeSearchDetail() {
           ref={mapRef}
           style={styles.mapContainer}
           region={region}
-          initialRegion={yangonRegion}
+          initialRegion={YANGON}
           provider={PROVIDER_GOOGLE}
           mapType="standard"
           showsCompass={false}

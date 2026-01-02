@@ -7,6 +7,10 @@ import AppText from "@/src/components/AppText";
 
 export default function Header() {
   const navigation = useNavigation();
+
+  /**
+   * Opens the navigation drawer.
+   */
   const openDrawer = () => {
     navigation.dispatch(DrawerActions.openDrawer());
   };
@@ -28,7 +32,7 @@ export default function Header() {
           Bus Pin
         </AppText>
         <AppText size={18} style={styles.subTitle}>
-          ဘတ်စကားစီးဖို့အကောင်းဆုံးအကူ
+          ဘတ်စ်ကားစီးဖို့အကောင်းဆုံးအကူ
         </AppText>
       </View>
     </View>

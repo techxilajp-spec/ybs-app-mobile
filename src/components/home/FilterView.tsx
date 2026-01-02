@@ -34,6 +34,16 @@ export default function FilterView({
   const [selectedAccordionOptions, setSelectedAccordionOptions] =
     useState<Option[]>(selectedOptions);
 
+  const hasSelectedAccordionOptions  = selectedAccordionOptions.length > 0;
+
+  /**
+   * Handles selection and deselection of an accordion option.
+   *
+   * If the option is already selected, it will be removed from the selected options.
+   * If it is not selected, it will be added to the selected options.
+   *
+   * @param selectedOption - The option that was selected or deselected by the user.
+   */
   const onAccordionOptionSelect = (selectedOption: Option) => {
     setSelectedAccordionOptions((options) => {
       const isSelected =
@@ -47,17 +57,28 @@ export default function FilterView({
     });
   };
 
-  const removeOption = (optionId : string) => {
+  /**
+   * Removes a selected option from the options list.
+   *
+   * @param optionId - The ID of the option to remove.
+   */
+  const removeOption = (optionId: string) => {
     setSelectedAccordionOptions((options: Option[]) => {
       return options.filter((option: Option) => option.id !== optionId);
     });
-  }
+  };
 
+  /**
+   * Applies the currently selected accordion options as the active filter.
+   */
   const filterOptions = () => {
     onOptionListSelect(selectedAccordionOptions);
     onClose();
   };
 
+  /**
+   * Cancel Filters
+   */
   const removeOptions = () => {
     onOptionListSelect([]);
     onClose();
@@ -67,7 +88,7 @@ export default function FilterView({
     <View style={styles.container}>
       <Header onBack={onClose} />
       <SearchInput style={styles.searchInput} />
-      {selectedAccordionOptions.length > 0 && (
+      {hasSelectedAccordionOptions && (
         <View style={styles.optionTabContainer}>
           {selectedAccordionOptions.map((option) => (
             <OptionTab
@@ -90,7 +111,7 @@ export default function FilterView({
         />
         <View style={styles.buttonContainer}>
           <AppButton
-            title="စစ်ထုတ်ရန်"
+            title={`စစ်ထုတ်ရန် ${hasSelectedAccordionOptions ? `( ${selectedAccordionOptions.length} )` : "" }`}
             style={styles.filterButton}
             textStyle={styles.filterText}
             onPress={filterOptions}

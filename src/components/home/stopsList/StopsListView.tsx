@@ -16,14 +16,23 @@ import SearchInput from "@/src/components/home/stopsList/SearchInput";
 export default function StopsListView() {
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
 
+  /**
+   * Opens the stop filter modal
+   */
   const openStopFilterModal = () => {
     setShowFilterModal(true);
   };
 
+  /**
+   * Closes the stop filter modal
+   */
   const closeStopFilterModal = () => {
     setShowFilterModal(false);
   };
 
+  /**
+   * Navigates to the results page that displays a list of search results.
+   */
   const searchBusStops = () => {
     router.push("/stopSearchResults");
   };
@@ -39,9 +48,7 @@ export default function StopsListView() {
         <SearchInput onPress={openStopFilterModal} style={styles.searchInput} />
         <NoticeMessage
           style={styles.noticeMessage}
-          message="ရှာဖွေရာတွင်အတိုကောက်စာလုံးများက်ိအသုံးပြုပြီးရှာဖွေပါ..ဥပမာ
-                  စာတိုက်မှတ်တိုင် ဆိုလျှင် “ စတ “ ၊
-                  ဖြင့်ရှာကာပေါ်လာသောမှတ်တိုင်ကိုရွေးချယ်ပါ။"
+          message="ရှာဖွေရာတွင်အတိုကောက်စာလုံးများကိုအသုံးပြုပြီးရှာဖွေပါ.. ဥပမာ စာတိုက်မှတ်တိုင် ဆိုလျှင် “ စတ “ ၊ ဖြင့်ရှာကာပေါ်လာသောမှတ်တိုင်ကိုရွေးချယ်ပါ။"
         />
         <AppButton title="မှတ်တိုင်ရှာမယ်" onPress={searchBusStops} />
       </View>

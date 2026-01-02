@@ -28,4 +28,6 @@ const BusPin = forwardRef<ComponentRef<typeof Marker>, BusPinProps>(
   }
 );
 
+BusPin.displayName = "BusPin";
+
 export default BusPin;

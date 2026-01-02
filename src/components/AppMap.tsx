@@ -20,6 +20,8 @@ const AppMap = forwardRef<any, any>(
     }
 )
 
+AppMap.displayName = "AppMap";
+
 const styles = StyleSheet.create({
     mapContainer: {
         flex:1

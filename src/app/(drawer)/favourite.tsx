@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 
-import { useState } from "react";
+// react
+import { useEffect, useState } from "react";
 
 // custom components
 import AppHeader from "@/src/components/AppHeader";
@@ -9,26 +10,33 @@ import AppScreenLayout from "@/src/components/AppScreenLayout";
 import RouteListView from "@/src/components/favourite/RouteListView";
 import StopsListView from "@/src/components/favourite/StopsListView";
 
-const TAB_CONFIG = [
-  {
-    label: "မှတ်တိုင်များ",
-    getProps: () => ({}),
-    component: StopsListView,
-  },
-  {
-    label: "ယာဉ်လိုင်းများ",
-    getProps: () => ({
-      style: {
-        marginTop: 20
-      }
-    }),
-    component: RouteListView
-  },
+// data
+import ROUTE_LIST from "@/src/data/routes.json";
+import STOP_LIST from "@/src/data/stops.json";
+
+// types
+import { Route, Stop } from "@/src/types/bus";
+type TabKey = "stops" | "routes";
+
+const TAB_CONFIG: {
+  key: TabKey;
+  label: string;
+}[] = [
+  { key: "stops", label: "မှတ်တိုင်များ" },
+  { key: "routes", label: "ယာဉ်လိုင်းများ" },
 ];
 
 export default function FavouriteScreen() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
-  const { component: ActiveView, getProps } = TAB_CONFIG[activeIndex];
+  const [busStops, setBusStops] = useState<Stop[]>([]);
+  const [routes, setRoutes] = useState<Route[]>([]);
+
+  const activeTab = TAB_CONFIG[activeIndex].key;
+
+  useEffect(() => {
+    setBusStops(STOP_LIST);
+    setRoutes(ROUTE_LIST);
+  }, [])
 
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
@@ -49,7 +57,8 @@ export default function FavouriteScreen() {
         navigationTabStyle={styles.navigation}
         onNavigationTabPress={setActiveIndex}
       />
-      <ActiveView {...getProps()} />
+      {activeTab === "stops" && <StopsListView data={busStops} />}
+      {activeTab === "routes" && <RouteListView data={routes} style={{ marginTop: 20 }} />}
     </AppScreenLayout>
   );
 }
@@ -59,6 +68,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   navigation: {
-    marginTop: 5
-  }
+    marginTop: 5,
+  },
 });

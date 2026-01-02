@@ -12,10 +12,14 @@ import {
 // custom component
 import AppText from "@/src/components/AppText";
 
+// constants
+import { Colors } from "@/src/constants/color";
+
 export type DirectionSelectorProps = {
   icon: React.ReactNode;
   title: string;
   description: string;
+  value?: string;
   showIndicator?: boolean;
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
@@ -25,6 +29,7 @@ export default function DirectionSelector({
   icon,
   title,
   description,
+  value = "",
   showIndicator = false,
   onPress,
   style,
@@ -51,8 +56,21 @@ export default function DirectionSelector({
           {title}
         </AppText>
         <View style={styles.selector}>
-          <AppText size={14} style={styles.description}>
-            {description}
+          <AppText
+            size={14}
+            style={[
+              styles.inputText,
+              {
+                color:
+                  value.trim() !== ""
+                    ? Colors.text.secondary
+                    : Colors.text.primary,
+              },
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {value.trim() !== "" ? value.trim() : description}
           </AppText>
           <Image
             source={require("@/assets/icons/right_arrow.png")}
@@ -78,9 +96,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontFamily: "MiSansMyanmar-Regular",
   },
-  description: {
+  inputText: {
     flex: 1,
-    color: "#1F2937",
     fontFamily: "MiSansMyanmar-Regular",
   },
   selector: {

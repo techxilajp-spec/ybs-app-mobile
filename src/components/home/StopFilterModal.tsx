@@ -18,16 +18,18 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import NavigationTabs from "@/src/components/AppNavigationTabs";
 import AppText from "@/src/components/AppText";
 import FilterView from "@/src/components/home/FilterView";
+import AppliedFilterSummary from "@/src/components/home/stopFilterModal/AppliedFilterSummary";
 import ListView from "@/src/components/home/stopFilterModal/ListView";
-import OptionTab from "@/src/components/home/stopFilterModal/OptionTab";
 
 // safe area
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // type
 import { Accordian, Option } from "@/src/types/accordian";
+import { Stop } from "@/src/types/bus";
 
 // data
+import stopList from "@/src/data/stop_filter_data.json";
 import yangonAreasBurmese from "@/src/data/yangon_areas.json";
 
 type StopFilterModalProps = {
@@ -39,61 +41,8 @@ type StopFilterModalProps = {
 
 const TABS = ["လတ်တလော", "နှစ်သက်မှု"];
 
-const DummyDatas = {
-  recent: [
-    {
-      title_mm: "အလုံစာတိုက် ( အောက်ကြည်မြင့်တိုင် )",
-      title_en: "Ahlone Sar Tike ( Lower Kyi Myint Tine )",
-      description: "( 16.784547668526493, 96.15749597725802 )",
-      isFavourite: false,
-    },
-    {
-      title_mm: "အလုံစာတိုက် ( ကမ်းနားလမ်း )",
-      title_en: "Ahlone Sar Tike ( Kan Nar Road )",
-      description: "( 16.81891194040748, 96.1352775209624 )",
-      isFavourite: false,
-    },
-    {
-      title_mm: "စာတိုက်ကြီး ( ကြည်မြင့်တိုင် ကမ်းနားလမ်း )",
-      title_en: "Sar Tike ( Lower Kyi Myint Tine )",
-      description: "( 16.784547668526493, 96.15749597725802 )",
-      isFavourite: false,
-    },
-    {
-      title_mm: "စာတိုက် ( မြင်တော်သာလမ်း )",
-      title_en: "Sar Tike ( Myin Taw Tar Road )",
-      description: "( 16.81891194040748, 96.1352775209624 )",
-      isFavourite: false,
-    },
-    {
-      title_mm: "သိမ်ဖြူစာတိုက််",
-      title_en: "Post Office Bus Stop , Thein Phyu Road.",
-      description: "( 16.81891194040748, 96.1352775209624 )",
-      isFavourite: false,
-    },
-  ],
-  favourite: [
-    {
-      title_mm: "သိမ်ဖြူစာတိုက်မှတ်တိုင်",
-      title_en: "Post Office Bus Stop , Thein Phyu Road.",
-      description: "( 16.784547668526493, 96.15749597725802 )",
-      isFavourite: true,
-    },
-  ],
-  searchResult: [
-    {
-      title_mm: "စာတိုက် ( မြင်တော်သာလမ်း )",
-      title_en: "Sar Tike ( Myin Taw Tar Road )",
-      description: "( 16.81891194040748, 96.1352775209624 )",
-      isFavourite: false,
-    },
-    {
-      title_mm: "သိမ်ဖြူစာတိုက်မှတ်တိုင်",
-      title_en: "Post Office Bus Stop , Thein Phyu Road.",
-      description: "( 16.784547668526493, 96.15749597725802 )",
-      isFavourite: true,
-    },
-  ],
+const fetchStops = () => {
+  return stopList.searchResult;
 };
 
 export default function StopFilterModal({
@@ -103,47 +52,78 @@ export default function StopFilterModal({
   onClose,
 }: StopFilterModalProps) {
   const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
+  const [stopsList, setStopsList] = useState<Stop[]>([]);
+
+  const [searchText, setSearchText] = useState<string>("");
   const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
     []
   );
-  const [searchText, setSearchText] = useState<string>("");
+
   const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [stopsList, setStopsList] = useState<any[]>([]);
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false);
 
-  const isValidSearchText = searchText.trim().length > 0;
+  const hasSelectedOptions = selectedFilterOptions.length > 0;
+  const isValidSearchText = searchText.trim() !== "";
+  const canSearch = hasSelectedOptions || isValidSearchText;
 
+  /**
+   * Shows the filter panel.
+   */
   const showFilters = () => {
     setIsFilterVisible(true);
   };
 
+  /**
+   * Hides the filter panel.
+   */
   const hileFilters = () => {
     setIsFilterVisible(false);
   };
 
+  /**
+   * Select a list of city options
+   *
+   * @param selectedOptionList - The list of selected city options.
+   */
   const onOptionListSelect = (selectedOptionList: Option[]) => {
     setSelectedFilterOptions(selectedOptionList);
+    fetchStops();
   };
 
+  /**
+   * Removes a selected option from the options list.
+   *
+   * @param optionId - The ID of the option to remove.
+   */
   const removeOption = (optionId: string) => {
-    setSelectedFilterOptions((options: Option[]) => {
-      return options.filter((option: Option) => option.id !== optionId);
+    setSelectedFilterOptions((options) => {
+      return options.filter((option) => option.id !== optionId);
     });
   };
 
+  /**
+   * Clear all selected Options
+   */
+  const clearOptions = () => {
+    setSelectedFilterOptions([]);
+  };
+
   useEffect(() => {
-    setAreaFilters(yangonAreasBurmese);
-    if (isValidSearchText) {
-      setStopsList(DummyDatas.searchResult);
+    if (canSearch) {
+      // search data
+      const searchData = fetchStops();
+      setStopsList(searchData);
       return;
     }
     const source = activeIndex === 0 ? "recent" : "favourite";
-    setStopsList(DummyDatas[source]);
-  }, [activeIndex, searchText]);
+    setStopsList(stopList[source]);
+  }, [activeIndex, canSearch]);
 
   useEffect(() => {
-    console.log("modal initalized");
+    // dummy initialization
+    setAreaFilters(yangonAreasBurmese);
   }, []);
+
   return (
     <Modal
       visible={visible}
@@ -199,17 +179,14 @@ export default function StopFilterModal({
 
             <View style={{ flex: 1 }}>
               {selectedFilterOptions.length > 0 && (
-                <View style={styles.optionTabContainer}>
-                  {selectedFilterOptions.map((option) => (
-                    <OptionTab
-                      key={option.id}
-                      title={option.name}
-                      remove={() => removeOption(option.id)}
-                    />
-                  ))}
-                </View>
+                <AppliedFilterSummary
+                  filters={selectedFilterOptions}
+                  onRemoveFilter={removeOption}
+                  onClearAll={clearOptions}
+                  style={styles.filterSummary}
+                />
               )}
-              {!isValidSearchText && (
+              {!canSearch && (
                 <NavigationTabs
                   tabs={TABS}
                   activeIndex={activeIndex}
@@ -315,10 +292,7 @@ const styles = StyleSheet.create({
   filterCountBadgeText: {
     fontFamily: "Roboto-Bold",
   },
-  optionTabContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 32,
+  filterSummary: {
+    marginBottom: 18,
   },
 });

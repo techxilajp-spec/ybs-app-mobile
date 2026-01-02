@@ -1,7 +1,5 @@
 import { StyleSheet, View } from "react-native";
 
-// react
-
 // bottom sheet
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 
@@ -11,25 +9,9 @@ import BusStop from "@/src/components/map/busRouteDetailSheet/routeList/BusStop"
 import RouteTab from "@/src/components/map/busRouteDetailSheet/routeList/RouteTab";
 import RouteTitle from "@/src/components/map/busRouteDetailSheet/routeList/RouteTitle";
 
-type Coordinate = {
-  latitude: number;
-  longitude: number;
-};
+// types
+import { Route, Stop } from "@/src/types/map";
 
-type Stop = {
-  id: string;
-  name: string;
-  road: string;
-  coordinate: Coordinate;
-};
-
-type Route = {
-  no: string;
-  name: string;
-  color: string;
-  coordinates: Coordinate[];
-  stops: Stop[];
-};
 
 type RouteListViewProps = {
   routes: Route[];
