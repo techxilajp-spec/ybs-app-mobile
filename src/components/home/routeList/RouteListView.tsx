@@ -18,7 +18,7 @@ import { RouteFilters } from "@/src/types/filter";
 
 // data
 import { Filters } from "@/src/constants/filters";
-import routeData from "@/src/data/routes.json";
+import { useGetRoutes } from "@/src/hooks/bus-route";
 
 export default function RouteListView() {
   const { routes: routeFilterOptions } = Filters;
@@ -27,6 +27,8 @@ export default function RouteListView() {
   );
   const [routes, setRoutes] = useState<Route[]>([]);
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
+
+  const { data: routesData } = useGetRoutes();
 
   /**
    * Opens the filter modal
@@ -55,14 +57,28 @@ export default function RouteListView() {
    * @param id selected option id
    */
   const onSelectFilterOption = (id: string) => {
-    const selectedOption = routeFilterOptions.find((option) => option.id == id);
+    const selectedOption = routeFilterOptions.find(
+      (option) => option.id === id
+    );
     if (!selectedOption) return;
     setActiveOption(selectedOption);
   };
 
   useEffect(() => {
-    setRoutes(routeData);
-  }, []);
+    if (routesData) {
+      const routes = routesData.data.map((rd) => ({
+        id: rd.id,
+        no: rd.number_en,
+        name: rd.name,
+        description: "",
+        color: rd.color,
+        isYps: rd.is_yps,
+      }));
+
+      setRoutes(routes);
+    }
+  }, [routesData]);
+
   return (
     <>
       <View style={styles.container}>
@@ -77,6 +93,7 @@ export default function RouteListView() {
               routeDescription={item.description}
               color={item.color}
               onPress={onPressRouteCard}
+              isYps={item.isYps}
             />
           )}
           keyExtractor={(item) => item.id}

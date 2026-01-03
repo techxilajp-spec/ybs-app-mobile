@@ -11,7 +11,8 @@ type RouteCardProps = {
   routeTitle: string;
   routeDescription: string;
   color: string;
-  onPress: () => void
+  onPress: () => void;
+  isYps: boolean;
 };
 
 export default function RouteCard({
@@ -19,7 +20,8 @@ export default function RouteCard({
   routeTitle,
   routeDescription,
   color,
-  onPress
+  onPress,
+  isYps
 }: RouteCardProps) {
   return (
     <Pressable style={styles.container} onPress={onPress}>
@@ -33,11 +35,11 @@ export default function RouteCard({
           source={require("@/assets/icons/bus.png")}
           style={styles.busIcon}
         />
-        <View style={styles.ypsBadge}>
+        {isYps && <View style={styles.ypsBadge}>
           <AppText size={10} style={{ fontWeight: "bold" }}>
             YPS
           </AppText>
-        </View>
+        </View>}
         <AppText
           size={16}
           style={styles.routeTitle}

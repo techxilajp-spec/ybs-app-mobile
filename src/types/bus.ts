@@ -4,6 +4,7 @@ export type Route = {
     name: string;
     description: string;
     color: string;
+    isYps: boolean;
 }
 
 export type Stop = {
