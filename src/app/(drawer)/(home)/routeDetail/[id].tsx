@@ -2,17 +2,13 @@
 import { Dimensions, StyleSheet, View } from "react-native";
 
 // react
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 // expo router
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 // react-native-map
-import MapView, {
-  MapMarker,
-  PROVIDER_GOOGLE,
-  Region,
-} from "react-native-maps";
+import MapView, { MapMarker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 
 // icons
 import Feather from "@expo/vector-icons/Feather";
@@ -30,65 +26,58 @@ import Button from "@/src/components/routeDetail/Button";
 import { MAP_DELTA, MAP_LOCATIONS } from "@/src/constants/map";
 
 // data
-import route62 from "@/src/data/route62.json";
+import { useGetRouteDetail } from "@/src/hooks/bus-route";
 
 // types
-import { Route, Stop } from "@/src/types/map";
-
-const fetchDataFromApi = (): Route => {
-  const stops: Stop[] = route62.shape.geometry.coordinates
-    .map(([longitude, latitude]) => ({
-      id: Math.random().toString(),
-      name: `${latitude}~${longitude}`,
-      road: Math.random().toString(),
-      coordinate: {
-        latitude,
-        longitude,
-      },
-    }))
-    // take every 5th stop
-    .filter((_, index) => index % 5 === 0);
-
-  const routeInfo: Route = {
-    id: route62.route_id,
-    no: route62.route_id,
-    name: route62.name,
-    description: "",
-    color: route62.color,
-    coordinates: route62.shape.geometry.coordinates.map(
-      ([longitude, latitude]) => ({
-        latitude,
-        longitude,
-      })
-    ),
-    stops,
-  };
-
-  return routeInfo;
-};
+import { Stop } from "@/src/types/map";
 
 export default function RouteDetail() {
   const ACTIVE_ROUTE_INDEX = 0;
   const { YANGON } = MAP_LOCATIONS;
 
   const [region, setRegion] = useState<Region>(YANGON);
-  const [route, setRoute] = useState<Route | null>(null);
-  
+
   const bottomSheetHeight = useRef<number>(100);
   const mapRef = useRef<InstanceType<typeof MapView> | null>(null);
   const markersRef = useRef<Record<string, MapMarker | null>>({});
 
   const { height: screenHeight } = Dimensions.get("screen");
   const bottomSheetMaxHeight = screenHeight * 0.65;
-  const bottomSheetSnapPoints = [100, bottomSheetMaxHeight]
+  const bottomSheetSnapPoints = [100, bottomSheetMaxHeight];
 
+  const { id: routeId } = useLocalSearchParams<{ id: string }>();
+
+  const { data: routeData, error } = useGetRouteDetail(routeId);
+  // parsed data
+  const route = useMemo(() => {
+    if (!routeData) return null;
+    return {
+      id: routeData.routeId,
+      no: routeData.routeNumberEn,
+      name: routeData.routeName,
+      description: "",
+      color: `#${routeData.color}`,
+      coordinates: routeData.coordinates.map(([lng, lat]) => ({
+        latitude: lat,
+        longitude: lng,
+      })),
+      stops: routeData.stops.map((stop) => ({
+        id: stop.stopId,
+        name: stop.name_mm,
+        road: stop.road_mm,
+        coordinate: {
+          latitude: stop.lat,
+          longitude: stop.lng,
+        },
+      })),
+    };
+  }, [routeData]);
+  
   useEffect(() => {
-    const routeInfo = fetchDataFromApi();
-    setRoute(routeInfo);
     setRegion({
       ...YANGON,
       latitudeDelta: MAP_DELTA.INITIAL.LATITUDE,
-      longitudeDelta: MAP_DELTA.INITIAL.LONGITUDE
+      longitudeDelta: MAP_DELTA.INITIAL.LONGITUDE,
     });
   }, []);
 
@@ -105,21 +94,21 @@ export default function RouteDetail() {
 
   /**
    * Updates the bottom sheet height based on its current index.
-   * @param index 
+   * @param index
    */
   const onChangeRouteDetailBottomSheetIndex = (index: number) => {
-    bottomSheetHeight.current = index == 0 ? bottomSheetSnapPoints[0] : bottomSheetMaxHeight;
+    bottomSheetHeight.current =
+      index === 0 ? bottomSheetSnapPoints[0] : bottomSheetMaxHeight;
   };
 
   /**
    * Animates the map to focus on a specific bus stop
-   * @param stop 
+   * @param stop
    */
   const animateToStop = (stop: Stop) => {
     const offsetRatio = bottomSheetHeight.current / screenHeight;
     const adjustedLatitude =
-      stop.coordinate.latitude -
-      offsetRatio * MAP_DELTA.DEFAULT.LATITUDE;
+      stop.coordinate.latitude - offsetRatio * MAP_DELTA.DEFAULT.LATITUDE;
 
     mapRef.current?.animateToRegion(
       {
@@ -134,7 +123,7 @@ export default function RouteDetail() {
 
   /**
    * Selects a bus stop by showing its callout on the map
-   * @param busStop 
+   * @param busStop
    */
   const handleSelectBusStop = (busStop: Stop) => {
     // hide all stop callouts
@@ -147,13 +136,13 @@ export default function RouteDetail() {
   /**
    *  Handles tapping a bus stop pin by showing its callout
    * and centering the map on the stop.
-   * 
-   * @param busStop 
+   *
+   * @param busStop
    */
   const onPressBusPin = (busStop: Stop) => {
     markersRef?.current[busStop.id]?.showCallout();
     animateToStop(busStop);
-  }
+  };
 
   return (
     <AppScreenLayout>

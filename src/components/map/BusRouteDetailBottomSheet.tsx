@@ -10,30 +10,11 @@ import NoticeMessage from "@/src/components/home/NoticeMessage";
 import InstructionListView from "@/src/components/map/busRouteDetailSheet/InstructionListView";
 import RouteListView from "@/src/components/map/busRouteDetailSheet/RouteListView";
 
-type Instructions = any;
-
-type Coordinate = {
-  latitude: number;
-  longitude: number;
-};
-
-type Stop = {
-  id: string;
-  name: string;
-  road: string;
-  coordinate: Coordinate;
-};
-
-type Route = {
-  no: string;
-  name: string;
-  color: string;
-  coordinates: Coordinate[];
-  stops: Stop[];
-};
+// types
+import { Route, Stop } from "@/src/types/map";
 
 type BusRouteDetailSheetProps = {
-  instructions?: Instructions[] | null;
+  instructions?: any | null;
   routes: Route[];
   handleSelectBusStop: (busStop: Stop) => void;
   maxHeight: number;
@@ -42,17 +23,6 @@ type BusRouteDetailSheetProps = {
   onChangeIndex?: (index: number) => void;
   onChangeRouteIndex?: (index: number) => void;
 };
-
-const TAB_CONFIGS = [
-  {
-    label: "လမ်းကြောင်း Guide",
-    key: "instruction",
-  },
-  {
-    label: "မှတ်တိုင်များ",
-    key: "routes",
-  },
-];
 
 export default function BusRouteDetailBottomSheet({
   instructions = null,
@@ -65,7 +35,22 @@ export default function BusRouteDetailBottomSheet({
   onChangeRouteIndex = (index) => {},
 }: BusRouteDetailSheetProps) {
   const [activeIndex, setActiveIndex] = useState<number>(0);
+  const TAB_CONFIGS = [
+    {
+      label: "လမ်းကြောင်း Guide",
+      key: "instruction",
+    },
+    {
+      label: "မှတ်တိုင်များ",
+      key: "routes",
+    },
+  ];
 
+  const totalStops = routes.reduce(
+    (total, route) => total + route.stops.length,
+    0
+  );
+  TAB_CONFIGS[1].label = `${TAB_CONFIGS[1].label} ( ${totalStops} )`;
   const hasInstructions = !!instructions?.length;
   const tabConfig = hasInstructions ? TAB_CONFIGS : TAB_CONFIGS.slice(1);
 
