@@ -9,9 +9,10 @@ import StopCard from "@/src/components/StopCard";
 
 type ListViewProps = {
   data: any[];
+  onPress?: (item: any) => void;
 };
 
-export default function ListView({ data }: ListViewProps) {
+export default function ListView({ data, onPress }: ListViewProps) {
   return (
     <View style={styles.container}>
       {data.length > 0 ? (
@@ -24,14 +25,15 @@ export default function ListView({ data }: ListViewProps) {
               title_en={item.title_en}
               description={item.description}
               isFavourite={item.isFavourite}
+              onPress={() => onPress && onPress(item)}
             />
           )}
-          keyExtractor={(item) => item.title_en}
+          keyExtractor={(item, index) => index + item.title_en}
           showsVerticalScrollIndicator={false}
         />
       ) : (
         <View style={[styles.container, styles.noDataContainer]}>
-            <AppText size={16} style={styles.noDataText}>Data များမရှိသေးပါ</AppText>
+          <AppText size={16} style={styles.noDataText}>ဘတ်စ်ကား ရှာမတွေ့ပါ</AppText>
         </View>
       )}
     </View>

@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View } from "react-native";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 
 // constants
 import { Colors } from "@/src/constants/color";
@@ -10,20 +10,22 @@ import AppText from "@/src/components/AppText";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 type StopCardProps = {
-    title_mm: string;
-    title_en: string;
-    description: string;
-    isFavourite?: boolean
+  title_mm: string;
+  title_en: string;
+  description: string;
+  isFavourite?: boolean;
+  onPress?: () => void;
 }
 
 export default function StopCard({
-    title_mm,
-    title_en,
-    description,
-    isFavourite = false
+  title_mm,
+  title_en,
+  description,
+  isFavourite = false,
+  onPress
 }: StopCardProps) {
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={onPress}>
       <View style={styles.iconContainer}>
         <Image
           source={require("@/assets/icons/bus_yellow.png")}
@@ -40,26 +42,26 @@ export default function StopCard({
           {title_mm}
         </AppText>
         <AppText
-            size={14}
-            style={styles.title_en}
+          size={14}
+          style={styles.title_en}
         >
-            {title_en}
+          {title_en}
         </AppText>
         <AppText
-            size={14}
-            style={styles.description}
+          size={14}
+          style={styles.description}
         >
-            {description}
+          {description}
         </AppText>
       </View>
       <View style={[styles.iconContainer, styles.heartIconContainer]}>
         {isFavourite ? (
-            <FontAwesome name="heart" size={24} color={Colors.primary} />
-        ): (
-            <FontAwesome name="heart-o" size={20} color={Colors.text.disabled} />
+          <FontAwesome name="heart" size={24} color={Colors.primary} />
+        ) : (
+          <FontAwesome name="heart-o" size={20} color={Colors.text.disabled} />
         )}
       </View>
-    </View>
+    </Pressable>
   );
 }
 

@@ -11,6 +11,9 @@ import {
 // react
 import { useEffect, useState } from "react";
 
+// use-debounce
+import { useDebounce } from "use-debounce";
+
 // expo icons
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
@@ -28,6 +31,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Accordian, Option } from "@/src/types/accordian";
 import { Stop } from "@/src/types/bus";
 
+// hooks
+import { useSearchBusStops } from "@/src/hooks/bus-stop";
+
 // data
 import stopList from "@/src/data/stop_filter_data.json";
 import yangonAreasBurmese from "@/src/data/yangon_areas.json";
@@ -37,6 +43,7 @@ type StopFilterModalProps = {
   title: string;
   showCurrentLocation?: boolean;
   onClose: () => void;
+  onSelect?: (stop: any) => void;
 };
 
 const TABS = ["လတ်တလော", "နှစ်သက်မှု"];
@@ -50,11 +57,14 @@ export default function StopFilterModal({
   showCurrentLocation = false,
   title,
   onClose,
+  onSelect,
 }: StopFilterModalProps) {
   const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
   const [stopsList, setStopsList] = useState<Stop[]>([]);
 
   const [searchText, setSearchText] = useState<string>("");
+  const [debouncedSearchText] = useDebounce(searchText, 500);
+
   const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
     []
   );
@@ -62,8 +72,11 @@ export default function StopFilterModal({
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false);
 
+  // useSearchBusStops hook
+  const { data: searchResults, isLoading } = useSearchBusStops(debouncedSearchText);
+
   const hasSelectedOptions = selectedFilterOptions.length > 0;
-  const isValidSearchText = searchText.trim() !== "";
+  const isValidSearchText = debouncedSearchText.trim() !== "";
   const canSearch = hasSelectedOptions || isValidSearchText;
 
   /**
@@ -87,7 +100,6 @@ export default function StopFilterModal({
    */
   const onOptionListSelect = (selectedOptionList: Option[]) => {
     setSelectedFilterOptions(selectedOptionList);
-    fetchStops();
   };
 
   /**
@@ -109,15 +121,16 @@ export default function StopFilterModal({
   };
 
   useEffect(() => {
-    if (canSearch) {
-      // search data
-      const searchData = fetchStops();
-      setStopsList(searchData);
+    if (canSearch && searchResults) {
+      setStopsList(searchResults as any);
       return;
     }
-    const source = activeIndex === 0 ? "recent" : "favourite";
-    setStopsList(stopList[source]);
-  }, [activeIndex, canSearch]);
+
+    if (!canSearch) {
+      const source = activeIndex === 0 ? "recent" : "favourite";
+      setStopsList(stopList[source] as any);
+    }
+  }, [activeIndex, canSearch, searchResults]);
 
   useEffect(() => {
     // dummy initialization
@@ -206,7 +219,15 @@ export default function StopFilterModal({
                   }}
                 />
               )}
-              <ListView data={stopsList} />
+              <ListView
+                data={stopsList}
+                onPress={(stop) => {
+                  if (onSelect) {
+                    onSelect(stop);
+                  }
+                  onClose();
+                }}
+              />
             </View>
           </>
         )}
@@ -234,6 +255,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 15,
     borderRadius: 8,
+    height: 40,
 
     flexDirection: "row",
     alignItems: "center",

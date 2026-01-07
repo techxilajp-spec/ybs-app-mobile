@@ -135,6 +135,9 @@ export default function RouteSearchView() {
     mode: null,
   });
 
+  const [startStop, setStartStop] = useState<any>(null);
+  const [endStop, setEndStop] = useState<any>(null);
+
   const setRoutes = useRouteSearchResultsStore((s) => s.setRoutes);
 
   /**
@@ -159,6 +162,18 @@ export default function RouteSearchView() {
   };
 
   /**
+   * Handles the selection of a bus stop.
+   * @param stop The selected bus stop.
+   */
+  const handleSelect = (stop: any) => {
+    if (showDirectionModal.mode === "start") {
+      setStartStop(stop);
+    } else if (showDirectionModal.mode === "end") {
+      setEndStop(stop);
+    }
+  };
+
+  /**
    * Searches available routes between the selected start and end destinations and
    * makes the results accessible across screens.
    *
@@ -179,6 +194,7 @@ export default function RouteSearchView() {
             : "သွားရောက်လိုသည့်နေရာ"
         }
         onClose={closeDirectionModal}
+        onSelect={handleSelect}
       />
       <View style={styles.container}>
         <View style={styles.selectorContainer}>
@@ -186,7 +202,7 @@ export default function RouteSearchView() {
           <DirectionSelector
             icon={<View style={styles.circleIcon}></View>}
             title="မှ"
-            description="လက်ရှိတည်နေရာ"
+            description={startStop ? startStop.title_mm : "လက်ရှိတည်နေရာ"}
             value=""
             onPress={() => openDirectionModal("start")}
             showIndicator={true}
@@ -202,7 +218,7 @@ export default function RouteSearchView() {
               />
             }
             title="သို"
-            description="သွားရောက်လိုသည့်နေရာ"
+            description={endStop ? endStop.title_mm : "သွားရောက်လိုသည့်နေရာ"}
             onPress={() => openDirectionModal("end")}
           />
         </View>
