@@ -19,7 +19,7 @@ const getRoutes = async (
 ): Promise<RouteListResponse[]> => {
   const { is_yps, bus_number } = filter;
 
-  let { data, error } = await supabase
+  const { data, error } = await supabase
     .from("route_list_view")
     .select(
       `

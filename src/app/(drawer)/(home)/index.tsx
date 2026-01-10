@@ -15,7 +15,7 @@ import { Colors } from "@/src/constants/color";
 
 const TAB_CONFIG = [
   {
-    label: "Bus လမ်းကြောင်းများ",
+    label: "လမ်းကြောင်းရှာမယ်",
     component: RouteSearchView,
   },
   {
