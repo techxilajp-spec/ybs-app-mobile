@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
+import 'react-native-get-random-values';
 
-// custom component
+// custom component`
 import NavigationTabs from "@/src/components/AppNavigationTabs";
 import AppScreenLayout from "@/src/components/AppScreenLayout";
 import AdvertisementModal from "@/src/components/home/AdvertisementModal";

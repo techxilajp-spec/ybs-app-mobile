@@ -10,11 +10,12 @@ import AppScreenLayout from "@/src/components/AppScreenLayout";
 import RouteListView from "@/src/components/favourite/RouteListView";
 import StopsListView from "@/src/components/favourite/StopsListView";
 
-// data
-import ROUTE_LIST from "@/src/data/routes.json";
-import STOP_LIST from "@/src/data/stops.json";
+import { getRouteLocalFavorites } from "@/src/services/routeFav";
+import { supabase } from "@/src/utils/supabase";
+
 
 // types
+import { getStopLocalFavorites } from "@/src/services/stopFav";
 import { Route, Stop } from "@/src/types/bus";
 type TabKey = "stops" | "routes";
 
@@ -22,21 +23,98 @@ const TAB_CONFIG: {
   key: TabKey;
   label: string;
 }[] = [
-  { key: "stops", label: "မှတ်တိုင်များ" },
-  { key: "routes", label: "ယာဉ်လိုင်းများ" },
-];
+    { key: "stops", label: "မှတ်တိုင်များ" },
+    { key: "routes", label: "ယာဉ်လိုင်းများ" },
+  ];
 
 export default function FavouriteScreen() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [busStops, setBusStops] = useState<Stop[]>([]);
   const [routes, setRoutes] = useState<Route[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const activeTab = TAB_CONFIG[activeIndex].key;
 
   useEffect(() => {
-    setBusStops(STOP_LIST);
-    setRoutes(ROUTE_LIST);
-  }, [])
+    if (activeTab === "routes") {
+      loadFavouriteRoutes();
+    }
+
+    if (activeTab === "stops") {
+      loadFavouriteStops();
+    }
+  }, [activeTab]);
+
+  async function loadFavouriteStops() {
+    console.log("loadFavouriteStops started");
+    setLoading(true);
+
+    // get favorite stop IDs from AsyncStorage
+    const favoriteIds = await getStopLocalFavorites();
+    console.log("favoriteIds are: ", favoriteIds);
+    if (favoriteIds.length === 0) {
+      setBusStops([]);
+      setLoading(false);
+      return;
+    }
+
+    // fetch real stops from Supabase
+    const { data, error } = await supabase
+      .from("stops")
+      .select("*")
+      .in("id", favoriteIds);
+    console.log("favorite stops are: ", data);
+    if (error) {
+      console.warn("Failed to load favorite stops", error);
+      setBusStops([]);
+    } else {
+      console.log("testing favorite stops are: ", data);
+      // mark them as favourite for UI
+      const withFavFlag = (data ?? []).map(stop => ({
+        id: stop.id,
+        title_mm: stop.name_mm,
+        title_en: stop.name_en,
+        description: stop.road_mm ?? stop.road_en,
+        lat: stop.lat,
+        lng: stop.lng,
+        isFavourite: true,
+      }));
+      console.log("with fav Flag favorite stops are: ", withFavFlag);
+
+      setBusStops(withFavFlag);
+    }
+
+    setLoading(false);
+  }
+
+  async function loadFavouriteRoutes() {
+    setLoading(true);
+
+    // get favorite route IDs from AsyncStorage
+    const favoriteIds = await getRouteLocalFavorites();
+
+    if (favoriteIds.length === 0) {
+      setRoutes([]);
+      setLoading(false);
+      return;
+    }
+
+    // fetch real routes from Supabase
+    const { data, error } = await supabase
+      .from("routes")
+      .select("*")
+      .in("id", favoriteIds)
+      .eq("del_flg", 0);
+
+    if (error) {
+      console.warn("Failed to load favorite routes", error);
+    } else {
+      setRoutes(data ?? []);
+    }
+
+    setLoading(false);
+  }
+
 
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
