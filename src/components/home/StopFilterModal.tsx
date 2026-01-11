@@ -31,6 +31,7 @@ import { Stop } from "@/src/types/bus";
 // data
 import stopList from "@/src/data/stop_filter_data.json";
 import yangonAreasBurmese from "@/src/data/yangon_areas.json";
+import { addFavoriteRemote, getStopLocalFavorites, removeFavoriteRemote, setStopLocalFavorites } from "@/src/services/stopFav";
 
 type StopFilterModalProps = {
   visible: boolean;
@@ -108,21 +109,69 @@ export default function StopFilterModal({
     setSelectedFilterOptions([]);
   };
 
+  async function applyStopFavorites(stops: Stop[]) {
+    const favoriteIds = await getStopLocalFavorites();
+
+    return stops.map(stop => ({
+      ...stop,
+      isFavourite: favoriteIds.includes(stop.id.toString()),
+    }));
+  }
+
   useEffect(() => {
-    if (canSearch) {
-      // search data
-      const searchData = fetchStops();
-      setStopsList(searchData);
-      return;
-    }
-    const source = activeIndex === 0 ? "recent" : "favourite";
-    setStopsList(stopList[source]);
+    const loadStops = async () => {
+      let sourceStops: Stop[];
+
+      if (canSearch) {
+        sourceStops = fetchStops();
+      } else {
+        const source = activeIndex === 0 ? "recent" : "favourite";
+        sourceStops = stopList[source];
+      }
+
+      const withFavorites = await applyStopFavorites(sourceStops);
+      setStopsList(withFavorites);
+    };
+
+    loadStops();
   }, [activeIndex, canSearch]);
+
 
   useEffect(() => {
     // dummy initialization
     setAreaFilters(yangonAreasBurmese);
   }, []);
+  const toggleFavourite = async (stop: Stop) => {
+    // UI update (instant)
+    setStopsList(prev =>
+      prev.map(s =>
+        s.id === stop.id
+          ? { ...s, isFavourite: !s.isFavourite }
+          : s
+      )
+    );
+
+    const stopIdStr = stop.id.toString();   // AsyncStorage
+    const stopIdNum = Number(stop.id);      // Supabase
+
+    const favorites = await getStopLocalFavorites();
+
+    if (favorites.includes(stopIdStr)) {
+      // REMOVE (offline-first)
+      await setStopLocalFavorites(
+        favorites.filter(id => id !== stopIdStr)
+      );
+
+      removeFavoriteRemote(stopIdNum).catch(console.warn);
+    } else {
+      // ADD
+      await setStopLocalFavorites([...favorites, stopIdStr]);
+
+      addFavoriteRemote(stopIdNum).catch(console.warn);
+    }
+
+    console.log("stop favourite toggled.......", stop);
+  };
 
   return (
     <Modal
@@ -206,7 +255,9 @@ export default function StopFilterModal({
                   }}
                 />
               )}
-              <ListView data={stopsList} />
+              <ListView data={stopsList}
+                onToggleFavourite={toggleFavourite}
+              />
             </View>
           </>
         )}

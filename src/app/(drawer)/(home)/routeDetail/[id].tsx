@@ -89,7 +89,8 @@ export default function RouteDetail() {
   };
 
   const onAddFavourite = () => {
-    // TODO: implement favourite logic
+    console.log('shine ', route?.id);
+    console.log('onAddFavourite route detail pressed');
   };
 
   /**
@@ -187,12 +188,12 @@ export default function RouteDetail() {
         </MapView>
         <Button
           style={styles.backButton}
-          icon={<Ionicons name="arrow-back-sharp" size={20} color="#101828" />}
+          icon={<Ionicons name="arrow-back-sharp" size={20} color="blue" />}
           onPress={onBackPress}
         />
         <Button
           style={styles.favouriteIcon}
-          icon={<Feather name="heart" size={20} color="#101828" />}
+          icon={<Feather name="heart" size={20} color="green" />}
           onPress={onAddFavourite}
         />
         {route && (

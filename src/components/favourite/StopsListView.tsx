@@ -25,6 +25,7 @@ export default function StopsListView({
           title_en={item.title_en}
           description={item.description}
           isFavourite={item.isFavourite}
+          onToggleFavourite={() => { console.log("onToggleFavourite in stop view") }}
         />
       )}
       keyExtractor={(item) => item.id}

@@ -36,6 +36,14 @@ import { useRouteSearchResultsStore } from "@/src/stores/useRouteSearchResultsSt
 // constants
 import { MAP_DELTA, MAP_LOCATIONS } from "@/src/constants/map";
 
+// Favorites
+import {
+  addFavoriteRemote,
+  getRouteLocalFavorites,
+  removeFavoriteRemote,
+  setLocalFavorites,
+} from '@/src/services/routeFav';
+
 type Stop = {
   id: string;
   name: string;
@@ -88,9 +96,42 @@ export default function RouteSearchDetail() {
     router.back();
   };
 
-  const onAddFavourite = () => {
-    // TODO: implement favourite logic
+  const [isFavourite, setIsFavourite] = useState(false);
+  const onAddFavourite = async () => {
+    if (!activeRoute) return;
+
+    const routeIdStr = activeRoute.id.toString(); // AsyncStorage
+    const routeIdNum = Number(activeRoute.id);    // Supabase
+
+    const favorites = await getRouteLocalFavorites();
+
+    if (favorites.includes(routeIdStr)) {
+      // REMOVE (offline-first)
+      await setLocalFavorites(favorites.filter(id => id !== routeIdStr));
+      setIsFavourite(false);
+      console.log('onAddFavourite removed');
+
+      // Remote sync (best effort)
+      removeFavoriteRemote(routeIdNum).catch(console.warn);
+    } else {
+      // ADD
+      await setLocalFavorites([...favorites, routeIdStr]);
+      setIsFavourite(true);
+      console.log('onAddFavourite added');
+
+      addFavoriteRemote(routeIdNum).catch(console.warn);
+    }
+    console.log('onAddFavourite ended');
   };
+
+  useEffect(() => {
+    if (!activeRoute) return;
+
+    (async () => {
+      const favorites = await getRouteLocalFavorites();
+      setIsFavourite(favorites.includes(activeRoute.id.toString()));
+    })();
+  }, [activeRoute?.id]);
 
   /**
    * Updates the bottom sheet height based on its current index.
@@ -98,7 +139,7 @@ export default function RouteSearchDetail() {
    */
   const onChangeRouteDetailBottomSheetIndex = (index: number) => {
     bottomSheetHeight.current =
-      index == 0 ? bottomSheetSnapPoints[0] : bottomSheetMaxHeight;
+      index === 0 ? bottomSheetSnapPoints[0] : bottomSheetMaxHeight;
   };
 
   /**
@@ -202,10 +243,20 @@ export default function RouteSearchDetail() {
           onPress={onBackPress}
         />
         <Button
-          style={styles.favouriteIcon}
-          icon={<Feather name="heart" size={20} color="#101828" />}
+          style={[
+            styles.favouriteIcon,
+            isFavourite && styles.favouriteIconActive,
+          ]}
+          icon={
+            <Feather
+              name="heart"
+              size={20}
+              color={isFavourite ? '#fff' : 'red'}
+            />
+          }
           onPress={onAddFavourite}
         />
+
         <BusRouteDetailBottomSheet
           routes={routeList}
           maxHeight={bottomSheetMaxHeight}
@@ -237,5 +288,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 15,
     right: 20,
+  },
+  favouriteIconActive: {
+    backgroundColor: "red",
   },
 });

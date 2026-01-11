@@ -5,6 +5,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { syncFavoritesFromSupabase, syncFavoritesToSupabase } from "../services/routeFav";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,6 +35,8 @@ export default function RootLayout() {
   useEffect(() => {
     async function loadInitialData() {
       try {
+        await syncFavoritesFromSupabase();
+        await syncFavoritesToSupabase();
       } catch (e) {
         console.warn(e);
       } finally {
