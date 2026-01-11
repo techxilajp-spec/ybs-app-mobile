@@ -98,7 +98,6 @@ export default function RouteSearchDetail() {
 
   const [isFavourite, setIsFavourite] = useState(false);
   const onAddFavourite = async () => {
-    console.log('onAddFavourite started');
     if (!activeRoute) return;
 
     const routeIdStr = activeRoute.id.toString(); // AsyncStorage
@@ -140,7 +139,7 @@ export default function RouteSearchDetail() {
    */
   const onChangeRouteDetailBottomSheetIndex = (index: number) => {
     bottomSheetHeight.current =
-      index == 0 ? bottomSheetSnapPoints[0] : bottomSheetMaxHeight;
+      index === 0 ? bottomSheetSnapPoints[0] : bottomSheetMaxHeight;
   };
 
   /**

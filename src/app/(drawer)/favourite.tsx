@@ -46,12 +46,10 @@ export default function FavouriteScreen() {
   }, [activeTab]);
 
   async function loadFavouriteStops() {
-    console.log("loadFavouriteStops started");
     setLoading(true);
 
     // get favorite stop IDs from AsyncStorage
     const favoriteIds = await getStopLocalFavorites();
-    console.log("favoriteIds are: ", favoriteIds);
     if (favoriteIds.length === 0) {
       setBusStops([]);
       setLoading(false);
@@ -63,12 +61,10 @@ export default function FavouriteScreen() {
       .from("stops")
       .select("*")
       .in("id", favoriteIds);
-    console.log("favorite stops are: ", data);
     if (error) {
       console.warn("Failed to load favorite stops", error);
       setBusStops([]);
     } else {
-      console.log("testing favorite stops are: ", data);
       // mark them as favourite for UI
       const withFavFlag = (data ?? []).map(stop => ({
         id: stop.id,
@@ -79,7 +75,6 @@ export default function FavouriteScreen() {
         lng: stop.lng,
         isFavourite: true,
       }));
-      console.log("with fav Flag favorite stops are: ", withFavFlag);
 
       setBusStops(withFavFlag);
     }
