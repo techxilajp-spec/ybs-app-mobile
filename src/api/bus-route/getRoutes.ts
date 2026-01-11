@@ -23,19 +23,18 @@ const getRoutes = async (
     .from("route_list_view")
     .select(
       `
-      routeId,
-      routeName,
-      routeNumberEn,
-      routeColor,
-      isYps,
-      busStopNamesMm
-    `
+        routeId,
+        routeName,
+        routeNumberEn,
+        routeColor,
+        isYps,
+        busStopNamesMm
+      `
     )
     .or(`routeNumberEn.ilike.%${bus_number}%,routeNumberMm.ilike.%${bus_number}%`)
     .eq("isYps", is_yps);
 
   if (error) {
-    console.error("Error fetching routes:", error);
     throw new Error(error.message);
   }
 

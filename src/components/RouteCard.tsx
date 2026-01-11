@@ -4,6 +4,7 @@ import { Image, Pressable, StyleSheet, View } from "react-native";
 import AppText from "@/src/components/AppText";
 
 // constants
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Colors } from "../constants/color";
 
 type RouteCardProps = {
@@ -12,6 +13,7 @@ type RouteCardProps = {
   routeDescription: string;
   color: string;
   onPress: () => void;
+  onPressRemoveFavoriteRoute?: () => void;
   isYps: boolean;
 };
 
@@ -21,49 +23,66 @@ export default function RouteCard({
   routeDescription,
   color,
   onPress,
-  isYps
+  onPressRemoveFavoriteRoute,
+  isYps,
 }: RouteCardProps) {
   return (
-    <Pressable style={styles.container} onPress={onPress}>
-      <View style={[styles.routeNo, { backgroundColor: color }]}>
-        <AppText size={20} style={{ color: "#FFF", fontWeight: "semibold" }}>
-          {routeNo}
-        </AppText>
-      </View>
-      <View style={styles.routeDetailContainer}>
-        <Image
-          source={require("@/assets/icons/bus.png")}
-          style={styles.busIcon}
-        />
-        {isYps && <View style={styles.ypsBadge}>
-          <AppText size={10} style={{ fontWeight: "bold" }}>
-            YPS
+    <View
+      style={{
+        position: "relative",
+      }}
+    >
+      <Pressable style={styles.container} onPress={onPress}>
+        <View style={[styles.routeNo, { backgroundColor: color }]}>
+          <AppText size={20} style={{ color: "#FFF", fontWeight: "semibold" }}>
+            {routeNo}
           </AppText>
-        </View>}
-        <AppText
-          size={16}
-          style={styles.routeTitle}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {routeTitle}
-        </AppText>
-        <AppText
-          size={14}
-          style={styles.routeDescription}
-          numberOfLines={2}
-          ellipsizeMode="tail"
-        >
-          {routeDescription}
-        </AppText>
-      </View>
-    </Pressable>
+        </View>
+        <View style={styles.routeDetailContainer}>
+          {!onPressRemoveFavoriteRoute && <Image
+            source={require("@/assets/icons/bus.png")}
+            style={styles.busIcon}
+          />}
+          {isYps && (
+            <View style={styles.ypsBadge}>
+              <AppText size={10} style={{ fontWeight: "bold" }}>
+                YPS
+              </AppText>
+            </View>
+          )}
+          <AppText
+            size={16}
+            style={styles.routeTitle}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {routeTitle}
+          </AppText>
+          <AppText
+            size={14}
+            style={styles.routeDescription}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {routeDescription}
+          </AppText>
+        </View>
+      </Pressable>
+
+      {
+        onPressRemoveFavoriteRoute && (
+          <Pressable style={styles.removeFavoriteContainer} onPress={onPressRemoveFavoriteRoute}>
+            <FontAwesome name="heart" size={20} color="red" />
+          </Pressable>
+        )
+      }
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
@@ -114,6 +133,11 @@ const styles = StyleSheet.create({
   },
   routeDescription: {
     color: Colors.text.secondary,
-    fontFamily: "MiSansMyanmar-Regular"
+    fontFamily: "MiSansMyanmar-Regular",
+  },
+  removeFavoriteContainer: {
+    position: "absolute",
+    top: 14,
+    right: 14,
   },
 });

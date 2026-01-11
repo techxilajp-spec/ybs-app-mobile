@@ -5,15 +5,18 @@ import RouteCard from "@/src/components/RouteCard";
 
 // types
 import { Route } from "@/src/types/bus";
+import { favouriteRouteRequest } from "@/src/types/favourite";
 
 type RouteListViewProps = {
-  data: Route[],
+  data: Route[];
   style?: ViewStyle;
-}
+  onPressRemoveFavoriteRoute?: (body: favouriteRouteRequest) => void;
+};
 
 export default function RouteListView({
   data,
-  style
+  style,
+  onPressRemoveFavoriteRoute,
 }: RouteListViewProps) {
   return (
     <FlatList
@@ -24,7 +27,19 @@ export default function RouteListView({
           routeTitle={item.name}
           routeDescription={item.description}
           color={item.color}
+          isYps={item.isYps}
           onPress={() => {}}
+          onPressRemoveFavoriteRoute={() => {
+            if (!onPressRemoveFavoriteRoute) return;
+            onPressRemoveFavoriteRoute({
+              routeId: Number(item.id),
+              routeName: item.name,
+              routeNumberEn: item.no,
+              routeNumberMm: item.description,
+              color: item.color,
+              isYps: item.isYps,
+            });
+          }}
         />
       )}
       keyExtractor={(item) => `${item.no}-${item.id}`}

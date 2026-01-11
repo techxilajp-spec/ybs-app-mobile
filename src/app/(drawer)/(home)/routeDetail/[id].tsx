@@ -12,6 +12,7 @@ import MapView, { MapMarker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 
 // icons
 import Feather from "@expo/vector-icons/Feather";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 // custom components
@@ -29,6 +30,11 @@ import { MAP_DELTA, MAP_LOCATIONS } from "@/src/constants/map";
 import { useGetRouteDetail } from "@/src/hooks/bus-route";
 
 // types
+import {
+  useAddFavoriteRoute,
+  useIsFavoriteRoute,
+  useRemoveFavoriteRoute,
+} from "@/src/hooks/favourite";
 import { Stop } from "@/src/types/map";
 
 export default function RouteDetail() {
@@ -44,10 +50,15 @@ export default function RouteDetail() {
   const { height: screenHeight } = Dimensions.get("screen");
   const bottomSheetMaxHeight = screenHeight * 0.65;
   const bottomSheetSnapPoints = [100, bottomSheetMaxHeight];
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const { id: routeId } = useLocalSearchParams<{ id: string }>();
 
-  const { data: routeData, error } = useGetRouteDetail(routeId);
+  const { mutate: addFavoriteRoute } = useAddFavoriteRoute();
+  const { mutate: isFavoriteRoute } = useIsFavoriteRoute();
+  const { mutate: removeFavoriteRoute } = useRemoveFavoriteRoute();
+
+  const { data: routeData } = useGetRouteDetail(routeId);
   // parsed data
   const route = useMemo(() => {
     if (!routeData) return null;
@@ -57,6 +68,7 @@ export default function RouteDetail() {
       name: routeData.routeName,
       description: "",
       color: `#${routeData.color}`,
+      isYps: routeData.isYps,
       coordinates: routeData.coordinates.map(([lng, lat]) => ({
         latitude: lat,
         longitude: lng,
@@ -72,13 +84,14 @@ export default function RouteDetail() {
       })),
     };
   }, [routeData]);
-  
+
   useEffect(() => {
     setRegion({
       ...YANGON,
       latitudeDelta: MAP_DELTA.INITIAL.LATITUDE,
       longitudeDelta: MAP_DELTA.INITIAL.LONGITUDE,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -89,9 +102,34 @@ export default function RouteDetail() {
   };
 
   const onAddFavourite = () => {
-    console.log('shine ', route?.id);
-    console.log('onAddFavourite route detail pressed');
+    if (!route) return;
+    const body = {
+      routeId: route?.id || 0,
+      routeName: route?.name || "",
+      routeNumberEn: route?.no || "",
+      routeNumberMm: route?.no || "",
+      color: route?.color || "",
+      isYps: route?.isYps || false,
+    };
+
+    if (isFavorite) {
+      removeFavoriteRoute(body, {
+        onSuccess: () => {
+          setIsFavorite(false);
+        },
+        onError: () => {},
+      });
+    } else {
+      addFavoriteRoute(body, {
+        onSuccess: () => {
+          setIsFavorite(true);
+        },
+        onError: () => {},
+      });
+    }
   };
+
+  const heartIcon = isFavorite ? <FontAwesome name="heart" size={20} color="red" /> : <Feather name="heart" size={20} color="black" />;
 
   /**
    * Updates the bottom sheet height based on its current index.
@@ -145,6 +183,19 @@ export default function RouteDetail() {
     animateToStop(busStop);
   };
 
+  /**
+   * Checks if a route is favorited
+   */
+  useEffect(() => {
+    if (routeId) {
+      isFavoriteRoute(Number(routeId), {
+        onSuccess: (data) => {
+          setIsFavorite(data);
+        },
+      });
+    }
+  }, [routeId, isFavoriteRoute]);
+
   return (
     <AppScreenLayout>
       <View style={styles.container}>
@@ -193,7 +244,7 @@ export default function RouteDetail() {
         />
         <Button
           style={styles.favouriteIcon}
-          icon={<Feather name="heart" size={20} color="green" />}
+          icon={heartIcon}
           onPress={onAddFavourite}
         />
         {route && (
