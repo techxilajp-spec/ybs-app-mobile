@@ -12,7 +12,7 @@ import MapView, { MapMarker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 
 // icons
 import Feather from "@expo/vector-icons/Feather";
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 // custom components
@@ -103,24 +103,16 @@ export default function RouteDetail() {
 
   const onAddFavourite = () => {
     if (!route) return;
-    const body = {
-      routeId: route?.id || 0,
-      routeName: route?.name || "",
-      routeNumberEn: route?.no || "",
-      routeNumberMm: route?.no || "",
-      color: route?.color || "",
-      isYps: route?.isYps || false,
-    };
 
     if (isFavorite) {
-      removeFavoriteRoute(body, {
+      removeFavoriteRoute(route.id, {
         onSuccess: () => {
           setIsFavorite(false);
         },
         onError: () => {},
       });
     } else {
-      addFavoriteRoute(body, {
+      addFavoriteRoute(route.id, {
         onSuccess: () => {
           setIsFavorite(true);
         },
@@ -129,7 +121,11 @@ export default function RouteDetail() {
     }
   };
 
-  const heartIcon = isFavorite ? <FontAwesome name="heart" size={20} color="red" /> : <Feather name="heart" size={20} color="black" />;
+  const heartIcon = isFavorite ? (
+    <FontAwesome name="heart" size={20} color="red" />
+  ) : (
+    <Feather name="heart" size={20} color="black" />
+  );
 
   /**
    * Updates the bottom sheet height based on its current index.

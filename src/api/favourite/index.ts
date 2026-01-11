@@ -1,4 +1,5 @@
-import { FAVORITE_KEY, favouriteRouteRequest } from "@/src/types/favourite";
+import { FAVORITE_KEY } from "@/src/types/favourite";
+import { supabase } from "@/src/utils/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /**
@@ -14,30 +15,56 @@ const safeParse = <T>(value: string | null, fallback: T): T => {
   } catch {
     return fallback;
   }
-}
+};
 
 /**
  * Retrieves the list of favorite routes from AsyncStorage.
  * @returns The list of favorite routes.
  */
-const getFavorites = async (): Promise<favouriteRouteRequest[]> => {
+const getFavorites = async (): Promise<number[]> => {
   const json = await AsyncStorage.getItem(FAVORITE_KEY);
 
-  return safeParse<favouriteRouteRequest[]>(json, []);
+  return safeParse<number[]>(json, []);
 };
+
+/**
+ * Retrieves the list of favorite routes from Supabase.
+ * @returns The list of favorite routes.
+ */
+const getFavoriteRoutes = async (): Promise<any[]> => {
+  const favoriteIds = await getFavorites();
+
+  if (!favoriteIds || favoriteIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await supabase.rpc(
+    "get_routes_by_ids",
+    {
+      route_ids: favoriteIds,
+    }
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+};
+
 
 /**
  * Adds a favorite route to AsyncStorage.
  * @param route The route to add.
  * @returns The updated list of favorite routes.
  */
-const addFavorite = async (route: favouriteRouteRequest) => {
+const addFavorite = async (routeId: number) => {
   const favorites = await getFavorites();
 
-  const exists = favorites.some((fav) => fav.routeId === route.routeId);
+  const exists = favorites.some((fav) => fav === routeId);
 
   if (!exists) {
-    const updated = [...favorites, route];
+    const updated = [...favorites, routeId];
     await AsyncStorage.setItem(FAVORITE_KEY, JSON.stringify(updated));
     return updated;
   }
@@ -50,10 +77,10 @@ const addFavorite = async (route: favouriteRouteRequest) => {
  * @param route The route to remove.
  * @returns The updated list of favorite routes.
  */
-const removeFavorite = async (route: favouriteRouteRequest) => {
+const removeFavorite = async (routeId: number) => {
   const favorites = await getFavorites();
 
-  const updated = favorites.filter((fav) => fav.routeId !== route.routeId);
+  const updated = favorites.filter((fav) => fav !== routeId);
 
   await AsyncStorage.setItem(FAVORITE_KEY, JSON.stringify(updated));
   return updated;
@@ -66,7 +93,7 @@ const removeFavorite = async (route: favouriteRouteRequest) => {
  */
 const isFavorite = async (routeId: number): Promise<boolean> => {
   const favorites = await getFavorites();
-  return favorites.some((fav) => fav.routeId === routeId);
+  return favorites.some((fav) => fav.toString() === routeId.toString());
 };
 
 /**
@@ -84,4 +111,7 @@ export default {
   removeFavorite,
   isFavorite,
   clearFavorites,
+  getFavoriteRoutes,
 };
+
+

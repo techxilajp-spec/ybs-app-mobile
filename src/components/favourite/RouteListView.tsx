@@ -5,12 +5,11 @@ import RouteCard from "@/src/components/RouteCard";
 
 // types
 import { Route } from "@/src/types/bus";
-import { favouriteRouteRequest } from "@/src/types/favourite";
 
 type RouteListViewProps = {
   data: Route[];
   style?: ViewStyle;
-  onPressRemoveFavoriteRoute?: (body: favouriteRouteRequest) => void;
+  onPressRemoveFavoriteRoute?: (routeId: number) => void;
 };
 
 export default function RouteListView({
@@ -26,23 +25,16 @@ export default function RouteListView({
           routeNo={item.no}
           routeTitle={item.name}
           routeDescription={item.description}
-          color={item.color}
+          color={"#" + item.color}
           isYps={item.isYps}
           onPress={() => {}}
           onPressRemoveFavoriteRoute={() => {
             if (!onPressRemoveFavoriteRoute) return;
-            onPressRemoveFavoriteRoute({
-              routeId: Number(item.id),
-              routeName: item.name,
-              routeNumberEn: item.no,
-              routeNumberMm: item.description,
-              color: item.color,
-              isYps: item.isYps,
-            });
+            onPressRemoveFavoriteRoute(Number(item.id));
           }}
         />
       )}
-      keyExtractor={(item) => `${item.no}-${item.id}`}
+      keyExtractor={(item) => `${item.id}`}
       style={[styles.listContainer, style]}
       showsVerticalScrollIndicator={false}
     />

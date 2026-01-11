@@ -1,17 +1,14 @@
 import api from "@/src/api";
-import { favouriteRouteRequest } from "@/src/types/favourite";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 /**
  * Get favorite routes
- * @param activeTab
  * @returns
  */
-export const useGetFavoriteRoutes = (activeTab: string) => {
-  return useQuery({
-    queryKey: ["favorite_routes", activeTab],
-    queryFn: () => api.favouriteApi.getFavorites(),
-    enabled: activeTab === "routes",
+export const useGetFavoriteRoutes = () => {
+  return useMutation({
+    mutationKey: ["favorite_routes"],
+    mutationFn: () => api.favouriteApi.getFavoriteRoutes(),
   });
 };
 
@@ -23,8 +20,7 @@ export const useAddFavoriteRoute = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (route: favouriteRouteRequest) =>
-      api.favouriteApi.addFavorite(route),
+    mutationFn: (routeId: number) => api.favouriteApi.addFavorite(routeId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorite_routes"] });
     },
@@ -39,8 +35,7 @@ export const useRemoveFavoriteRoute = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (route: favouriteRouteRequest) =>
-      api.favouriteApi.removeFavorite(route),
+    mutationFn: (routeId: number) => api.favouriteApi.removeFavorite(routeId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorite_routes"] });
     },
