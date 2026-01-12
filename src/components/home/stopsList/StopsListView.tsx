@@ -72,7 +72,7 @@ export default function StopsListView() {
         visible={showFilterModal}
         title=""
         onClose={closeStopFilterModal}
-        onSelectStop={(stop) => {
+        onSelect={(stop) => {
           setSelectedStop(stop);
         }}
       />

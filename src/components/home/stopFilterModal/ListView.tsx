@@ -6,9 +6,10 @@ import { Colors } from "@/src/constants/color";
 // customComponent
 import AppText from "@/src/components/AppText";
 import StopCard from "@/src/components/StopCard";
+import { Stop } from "@/src/types/bus";
 
 type ListViewProps = {
-  data: any[];
+  data: Stop[];
   onPress?: (item: any) => void;
 };
 
@@ -28,10 +29,10 @@ export default function ListView({ data, onPress }: ListViewProps) {
               lng={item.lng}
               isFavourite={item.isFavourite}
               onPress={() => onPress && onPress(item)}
-              onToggleFavourite={() => { }}
+              // onToggleFavourite={() => { }}
             />
           )}
-          keyExtractor={(item, index) => index + item.title_en}
+          keyExtractor={(item, index) => index + item.name_en}
           showsVerticalScrollIndicator={false}
         />
       ) : (
