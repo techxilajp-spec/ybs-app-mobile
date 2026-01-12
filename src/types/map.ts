@@ -1,14 +1,14 @@
 import { LatLng } from "react-native-maps";
 
 export type Stop = {
-  id: string;
+  id: string | number;
   name: string;
   road: string;
   coordinate: LatLng;
 };
 
 export type Route = {
-  id: string;
+  id: string | number;
   no: string;
   name: string;
   description: string;

@@ -1,19 +1,19 @@
 // react native
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet, View } from "react-native";
 
 // react
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 //expo router
 import { router } from "expo-router";
 
 // custom component
-import RouteCard from "@/src/components/RouteCard";
 import FilterModal from "@/src/components/home/routeList/FilterModal";
 import RouteListFilter from "@/src/components/home/routeList/RouteListFilter";
+import RouteCard from "@/src/components/RouteCard";
+import SkeletonCard from "@/src/components/SkeletonCard";
 
 // type
-import { Route } from "@/src/types/bus";
 import { RouteFilters } from "@/src/types/filter";
 
 // data
@@ -25,10 +25,16 @@ export default function RouteListView() {
   const [activeOption, setActiveOption] = useState<RouteFilters>(
     routeFilterOptions[0]
   );
-  const [routes, setRoutes] = useState<Route[]>([]);
+  const [busNumber, setBusNumber] = useState<string>("");
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
 
-  const { data: routesData } = useGetRoutes();
+  const isYpsServiceRoutes = activeOption.id === "YBS_SERVICE_ROUTES";
+  const {
+    isPending: isRoutesLoading,
+    isError: isRoutesError,
+    data: routes,
+    error: routesError,
+  } = useGetRoutes(isYpsServiceRoutes, busNumber);
 
   /**
    * Opens the filter modal
@@ -47,9 +53,13 @@ export default function RouteListView() {
 
   /**
    * go to route detail page
+   * @param routeId
    */
-  const onPressRouteCard = () => {
-    router.push("/(drawer)/(home)/routeDetail");
+  const onPressRouteCard = (routeId: string) => {
+    router.push({
+      pathname: "/(drawer)/(home)/routeDetail/[id]",
+      params: { id: routeId },
+    });
   };
 
   /**
@@ -62,43 +72,48 @@ export default function RouteListView() {
     );
     if (!selectedOption) return;
     setActiveOption(selectedOption);
+    closeFilterModal();
   };
-
-  useEffect(() => {
-    if (routesData) {
-      const routes = routesData.data.map((rd) => ({
-        id: rd.id,
-        no: rd.number_en,
-        name: rd.name,
-        description: "",
-        color: rd.color,
-        isYps: rd.is_yps,
-      }));
-
-      setRoutes(routes);
-    }
-  }, [routesData]);
 
   return (
     <>
       <View style={styles.container}>
-        <RouteListFilter onPressFilterButton={openFilterModal} />
-        <FlatList
-          style={{ marginTop: 20 }}
-          data={routes}
-          renderItem={({ item }) => (
-            <RouteCard
-              routeNo={item.no}
-              routeTitle={item.name}
-              routeDescription={item.description}
-              color={item.color}
-              onPress={onPressRouteCard}
-              isYps={item.isYps}
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
+        <RouteListFilter
+          busNumber={busNumber}
+          onChangeBusNumber={setBusNumber}
+          onPressFilterButton={openFilterModal}
         />
+        {isRoutesLoading ? (
+          // skeleton view
+          <ScrollView
+            style={{
+              marginTop: 20,
+              flex: 1,
+            }}
+          >
+            {new Array(5).fill(0).map((_, index) => (
+              <SkeletonCard key={index}/>
+            ))}
+          </ScrollView>
+        ) : (
+          // route list view
+          <FlatList
+            style={{ marginTop: 20 }}
+            data={routes ?? []}
+            renderItem={({ item }) => (
+              <RouteCard
+                routeNo={item.routeNumberEn}
+                routeTitle={item.routeName}
+                routeDescription={item.busStopNamesMm}
+                color={`#${item.routeColor}`}
+                onPress={() => onPressRouteCard(item.routeId.toString())}
+                isYps={item.isYps}
+              />
+            )}
+            keyExtractor={(item) => item.routeId.toString()}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
       </View>
       <FilterModal
         visible={filterModalVisible}

@@ -16,7 +16,7 @@ export default function HomeScreenLayout() {
         }}
       />
       <Stack.Screen
-        name="routeDetail"
+        name="routeDetail/[id]"
         options={{
           headerShown: false,
         }}
