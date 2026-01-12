@@ -31,7 +31,7 @@ export default function AvailableLinesView({ lines }: AvailableLinesViewProps) {
                         isYps={item.isYps}
                     />
                 )}
-                keyExtractor={item => item.id}
+                keyExtractor={(item, index) => index + item.id}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
