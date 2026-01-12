@@ -17,6 +17,9 @@ import { useDebounce } from "use-debounce";
 // expo icons
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
+// expo router
+import { router } from "expo-router";
+
 // custom components
 import NavigationTabs from "@/src/components/AppNavigationTabs";
 import AppText from "@/src/components/AppText";
@@ -30,6 +33,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 // type
 import { Accordian, Option } from "@/src/types/accordian";
 import { Stop } from "@/src/types/bus";
+
+// constants
+import { Colors } from "@/src/constants/color";
 
 // hooks
 import { useSearchBusStops } from "@/src/hooks/bus-stop";
@@ -191,6 +197,26 @@ export default function StopFilterModal({
             </View>
 
             <View style={{ flex: 1 }}>
+              <Pressable
+                style={styles.mapSelectionButton}
+                onPress={() => {
+                  // Navigate to map selection
+                  if (onClose) onClose();
+                  const mode = title.includes("စထွက်") ? "start" : "end";
+                  // Using router.push with relative path since we are in (home) group
+                  // Or absolute path
+                  const params = { mode };
+                  // @ts-ignore
+                  router.push({ pathname: "/mapSelection", params });
+                }}
+              >
+                <View style={styles.mapIconCircle}>
+                  <MaterialIcons name="map" size={20} color="#FFF" />
+                </View>
+                <AppText style={styles.mapSelectionText}>မြေပုံမှရွေးချယ်မည်</AppText>
+                <MaterialIcons name="chevron-right" size={24} color={Colors.text.secondary} />
+              </Pressable>
+
               {selectedFilterOptions.length > 0 && (
                 <AppliedFilterSummary
                   filters={selectedFilterOptions}
@@ -317,4 +343,28 @@ const styles = StyleSheet.create({
   filterSummary: {
     marginBottom: 18,
   },
+  mapSelectionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#EAECF0",
+    marginBottom: 15,
+  },
+  mapIconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10
+  },
+  mapSelectionText: {
+    flex: 1,
+    color: Colors.text.primary,
+    fontWeight: "600"
+  }
 });

@@ -20,6 +20,11 @@ export const TripPlannerService = {
             throw error;
         }
 
+        // API returns {message, routes} structure
+        if (data && typeof data === 'object' && 'routes' in data) {
+            return data.routes as RouteSearchResult[];
+        }
+
         return data as RouteSearchResult[];
     }
 };

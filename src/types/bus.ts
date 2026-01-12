@@ -15,5 +15,9 @@ export type Stop = {
     road_en: string;
     lat: number;
     lng: number;
+    coordinate?: {
+        latitude: number;
+        longitude: number;
+    };
     isFavourite: boolean;
 }

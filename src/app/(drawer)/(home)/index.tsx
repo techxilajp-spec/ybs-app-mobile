@@ -10,6 +10,9 @@ import RouteListView from "@/src/components/home/routeList/RouteListView";
 import RouteSearchView from "@/src/components/home/routeSearch/RouteSearchView";
 import StopsListView from "@/src/components/home/stopsList/StopsListView";
 
+// stores
+import { useAdvertisementStore } from "@/src/stores/useAdvertisementStore";
+
 // constants
 import { Colors } from "@/src/constants/color";
 
@@ -30,18 +33,24 @@ const TAB_CONFIG = [
 
 export default function HomeScreen() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [isAdvertisementVisible, setIsAdvertisementVisible] =
-    useState<boolean>(true);
+
+  const hasSeenAdvertisement = useAdvertisementStore((s) => s.hasSeenAdvertisement);
+  const setHasSeenAdvertisement = useAdvertisementStore((s) => s.setHasSeenAdvertisement);
+
+  // Show only if not seen yet
+  const [isAdvertisementVisible, setIsAdvertisementVisible] = useState<boolean>(!hasSeenAdvertisement);
+
   const { component: ActiveView } = TAB_CONFIG[activeIndex];
 
   const hideAdvertisement = () => {
     setIsAdvertisementVisible(false);
+    setHasSeenAdvertisement(true);
   };
 
   return (
     <>
       <AdvertisementModal
-        visible={isAdvertisementVisible}
+        visible={isAdvertisementVisible && !hasSeenAdvertisement}
         onClose={hideAdvertisement}
       />
       <ImageBackground

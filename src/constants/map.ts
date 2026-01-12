@@ -7,6 +7,10 @@ export const MAP_DELTA = {
     LATITUDE: 0.05,
     LONGITUDE: 0.05,
   },
+  CLOSE: {
+    LATITUDE: 0.01,
+    LONGITUDE: 0.01,
+  },
 };
 
 export const MAP_LOCATIONS = {
