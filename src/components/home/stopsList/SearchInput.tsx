@@ -1,3 +1,4 @@
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Image, Pressable, StyleSheet, View, ViewStyle } from "react-native";
 
 // custom components
@@ -9,9 +10,11 @@ import { Colors } from "@/src/constants/color";
 type SearchInputProps = {
   style?: ViewStyle;
   onPress: () => void;
+  value?: string | undefined;
+  onClear?: () => void;
 };
 
-export default function SearchInput({ style, onPress }: SearchInputProps) {
+export default function SearchInput({ style, onPress, value, onClear }: SearchInputProps) {
   return (
     <Pressable style={[styles.container, style]} onPress={onPress}>
       <View style={styles.inputContainer}>
@@ -21,9 +24,14 @@ export default function SearchInput({ style, onPress }: SearchInputProps) {
         />
         <View style={styles.titleContainer}>
           <AppText size={14} style={styles.title}>
-            မှတ်တိုင်နာမည်ကိုရိုက်ထည့်ပါ။
+            {value ?? "မှတ်တိုင်နာမည်ကိုရိုက်ထည့်ပါ။"}
           </AppText>
         </View>
+        {value ? (
+          <Pressable onPress={(e) => { e.stopPropagation(); onClear?.(); }}>
+            <MaterialIcons name="close" size={18} color={Colors.text.quaternary} />
+          </Pressable>
+        ) : null}
       </View>
     </Pressable>
   );

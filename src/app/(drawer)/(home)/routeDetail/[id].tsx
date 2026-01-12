@@ -20,6 +20,7 @@ import * as Location from "expo-location";
 
 // icons
 import Feather from "@expo/vector-icons/Feather";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
@@ -39,6 +40,11 @@ import { MAP_DELTA, MAP_LOCATIONS } from "@/src/constants/map";
 import { useGetRouteDetail } from "@/src/hooks/bus-route";
 
 // types
+import {
+  useAddFavoriteRoute,
+  useIsFavoriteRoute,
+  useRemoveFavoriteRoute,
+} from "@/src/hooks/favourite";
 import { Stop } from "@/src/types/map";
 
 export default function RouteDetail() {
@@ -57,10 +63,15 @@ export default function RouteDetail() {
   const { height: screenHeight } = Dimensions.get("screen");
   const bottomSheetMaxHeight = screenHeight * 0.65;
   const bottomSheetSnapPoints = [100, bottomSheetMaxHeight];
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const { id: routeId } = useLocalSearchParams<{ id: string }>();
 
-  const { data: routeData, error } = useGetRouteDetail(routeId);
+  const { mutate: addFavoriteRoute } = useAddFavoriteRoute();
+  const { mutate: isFavoriteRoute } = useIsFavoriteRoute();
+  const { mutate: removeFavoriteRoute } = useRemoveFavoriteRoute();
+
+  const { data: routeData } = useGetRouteDetail(routeId);
   // parsed data
   const route = useMemo(() => {
     if (!routeData) return null;
@@ -70,6 +81,7 @@ export default function RouteDetail() {
       name: routeData.routeName,
       description: "",
       color: `#${routeData.color}`,
+      isYps: routeData.isYps,
       coordinates: routeData.coordinates.map(([lng, lat]) => ({
         latitude: lat,
         longitude: lng,
@@ -135,9 +147,30 @@ export default function RouteDetail() {
   };
 
   const onAddFavourite = () => {
-    console.log('shine ', route?.id);
-    console.log('onAddFavourite route detail pressed');
+    if (!route) return;
+
+    if (isFavorite) {
+      removeFavoriteRoute(route.id, {
+        onSuccess: () => {
+          setIsFavorite(false);
+        },
+        onError: () => {},
+      });
+    } else {
+      addFavoriteRoute(route.id, {
+        onSuccess: () => {
+          setIsFavorite(true);
+        },
+        onError: () => {},
+      });
+    }
   };
+
+  const heartIcon = isFavorite ? (
+    <FontAwesome name="heart" size={20} color="red" />
+  ) : (
+    <Feather name="heart" size={20} color="black" />
+  );
 
   /**
    * Updates the bottom sheet height based on its current index.
@@ -201,6 +234,19 @@ export default function RouteDetail() {
     animateToLocation(userCoordinate);
   };
 
+  /**
+   * Checks if a route is favorited
+   */
+  useEffect(() => {
+    if (routeId) {
+      isFavoriteRoute(Number(routeId), {
+        onSuccess: (data) => {
+          setIsFavorite(data);
+        },
+      });
+    }
+  }, [routeId, isFavoriteRoute]);
+
   return (
     <AppScreenLayout>
       <View style={styles.container}>
@@ -260,7 +306,7 @@ export default function RouteDetail() {
         />
         <Button
           style={styles.favouriteIcon}
-          icon={<Feather name="heart" size={20} color="#1C274C" />}
+          icon={heartIcon}
           onPress={onAddFavourite}
         />
         <Button

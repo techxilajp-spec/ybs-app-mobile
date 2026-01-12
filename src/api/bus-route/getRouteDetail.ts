@@ -15,9 +15,10 @@ interface RouteDetailResponse {
   routeName: string;
   routeNumberEn: string;
   routeNumberMm: string;
-  coordinates: Array<[number, number]>;
+  coordinates: [number, number][];
   color: string;
   stops: StopResponse[];
+  isYps: boolean;
 }
 
 /**
@@ -53,7 +54,8 @@ const getRouteDetail = async (
       routeNumberMm,
       coordinates,
       color,
-      stops
+      stops,
+      isYps
     `
     )
     .eq("routeId", id)
@@ -65,7 +67,7 @@ const getRouteDetail = async (
 
   if (!data) return null;
 
-  const coordinates = safeParse<Array<[number, number]>>(data.coordinates, []);
+  const coordinates = safeParse<[number, number][]>(data.coordinates, []);
   const stops = safeParse<StopResponse[]>(data.stops, []);
 
   return {

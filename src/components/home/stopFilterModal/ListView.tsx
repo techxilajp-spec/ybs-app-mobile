@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, View } from "react-native";
 
 // constants
 import { Colors } from "@/src/constants/color";
@@ -9,10 +9,10 @@ import StopCard from "@/src/components/StopCard";
 
 type ListViewProps = {
   data: any[];
-  onToggleFavourite: (stop: any) => void;
+  onItemPress?: (item: any) => void;
 };
 
-export default function ListView({ data, onToggleFavourite }: ListViewProps) {
+export default function ListView({ data, onItemPress }: ListViewProps) {
   return (
     <View style={styles.container}>
       {data.length > 0 ? (
@@ -20,15 +20,18 @@ export default function ListView({ data, onToggleFavourite }: ListViewProps) {
           style={styles.container}
           data={data}
           renderItem={({ item }) => (
-            <StopCard
-              title_mm={item.title_mm}
-              title_en={item.title_en}
-              description={item.description}
-              isFavourite={item.isFavourite}
-              onToggleFavourite={() => onToggleFavourite(item)}
-            />
+            <Pressable onPress={() => onItemPress?.(item)}>
+              <StopCard
+                title_mm={item.name_mm ?? ""}
+                title_en={item.name_en ?? ""}
+                description={
+                  item.description ?? (item.lat && item.lng ? `${item.lat}, ${item.lng}` : "")
+                }
+                isFavourite={item.is_favourite ?? false}
+              />
+            </Pressable>
           )}
-          keyExtractor={(item) => item.title_en}
+          keyExtractor={(item) => String(item.id)}
           showsVerticalScrollIndicator={false}
         />
       ) : (
