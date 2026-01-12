@@ -16,6 +16,7 @@ import SearchInput from "@/src/components/home/stopsList/SearchInput";
 
 export default function StopsListView() {
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
+  const [selectedStop, setSelectedStop] = useState<any | null>(null);
 
   /**
    * Opens the stop filter modal
@@ -35,6 +36,13 @@ export default function StopsListView() {
    * Navigates to the results page that displays a list of search results.
    */
   const searchBusStops = () => {
+    const stopId = selectedStop?.id;
+    if (stopId) {
+      router.push(`/stopSearchResults?stopId=${encodeURIComponent(stopId)}`);
+      return;
+    }
+
+    // fallback: go to search results without specific stop
     router.push("/stopSearchResults");
   };
 
@@ -44,9 +52,17 @@ export default function StopsListView() {
         visible={showFilterModal}
         title=""
         onClose={closeStopFilterModal}
+        onSelectStop={(stop) => {
+          setSelectedStop(stop);
+        }}
       />
       <View style={styles.container}>
-        <SearchInput onPress={openStopFilterModal} style={styles.searchInput} />
+        <SearchInput
+          onPress={openStopFilterModal}
+          style={styles.searchInput}
+          value={selectedStop?.name_mm ?? selectedStop?.name_en}
+          onClear={() => setSelectedStop(null)}
+        />
         <NoticeMessage
           style={styles.noticeMessage}
           message="ရှာဖွေရာတွင်အတိုကောက်စာလုံးများကိုအသုံးပြုပြီးရှာဖွေပါ.. ဥပမာ စာတိုက်မှတ်တိုင် ဆိုလျှင် “ စတ “ ၊ ဖြင့်ရှာကာပေါ်လာသောမှတ်တိုင်ကိုရွေးချယ်ပါ။"

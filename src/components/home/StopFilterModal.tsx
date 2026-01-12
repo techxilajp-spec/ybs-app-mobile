@@ -26,33 +26,33 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 // type
 import { Accordian, Option } from "@/src/types/accordian";
-import { Stop } from "@/src/types/bus";
 
 // data
-import stopList from "@/src/data/stop_filter_data.json";
-import yangonAreasBurmese from "@/src/data/yangon_areas.json";
+import { useGetStops } from "@/src/hooks/bus-stop";
 
 type StopFilterModalProps = {
   visible: boolean;
   title: string;
   showCurrentLocation?: boolean;
   onClose: () => void;
+  onSelectStop?: (stop: any) => void;
 };
 
 const TABS = ["လတ်တလော", "နှစ်သက်မှု"];
-
-const fetchStops = () => {
-  return stopList.searchResult;
-};
 
 export default function StopFilterModal({
   visible,
   showCurrentLocation = false,
   title,
   onClose,
+  onSelectStop,
 }: StopFilterModalProps) {
   const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
-  const [stopsList, setStopsList] = useState<Stop[]>([]);
+  const [stopsList, setStopsList] = useState<any[]>([]);
+
+  const { data } = useGetStops();
+  const stops = data?.stops ?? [];
+  const areas = data?.areas ?? [];
 
   const [searchText, setSearchText] = useState<string>("");
   const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
@@ -65,6 +65,7 @@ export default function StopFilterModal({
   const hasSelectedOptions = selectedFilterOptions.length > 0;
   const isValidSearchText = searchText.trim() !== "";
   const canSearch = hasSelectedOptions || isValidSearchText;
+
 
   /**
    * Shows the filter panel.
@@ -87,8 +88,7 @@ export default function StopFilterModal({
    */
   const onOptionListSelect = (selectedOptionList: Option[]) => {
     setSelectedFilterOptions(selectedOptionList);
-    fetchStops();
-  };
+  }; 
 
   /**
    * Removes a selected option from the options list.
@@ -110,19 +110,39 @@ export default function StopFilterModal({
 
   useEffect(() => {
     if (canSearch) {
-      // search data
-      const searchData = fetchStops();
+      // perform combined search and township filter over fetched stops
+      const searchLower = searchText.trim().toLowerCase();
+      const selectedTownshipIds = selectedFilterOptions.map((o) => String(o.id));
+
+      const searchData = stops.filter((s: any) => {
+        // match search text
+        const nameMm = (s.name_mm || "").toLowerCase();
+        const nameEn = (s.name_en || "").toLowerCase();
+        const matchesSearch =
+          !searchLower || nameMm.includes(searchLower) || nameEn.includes(searchLower);
+
+        // match township filter
+        const townshipId = s?.township?.id;
+        const matchesTownship =
+          selectedTownshipIds.length === 0 || (townshipId && selectedTownshipIds.includes(String(townshipId)));
+
+        return matchesSearch && matchesTownship;
+      });
+
       setStopsList(searchData);
       return;
     }
-    const source = activeIndex === 0 ? "recent" : "favourite";
-    setStopsList(stopList[source]);
-  }, [activeIndex, canSearch]);
+
+    // default view: recent shows all stops, favourite shows only favourites
+    const list = activeIndex === 0 ? stops : stops.filter((s: any) => s.is_favourite);
+    setStopsList(list);
+  }, [activeIndex, canSearch, searchText, stops, selectedFilterOptions]);
 
   useEffect(() => {
-    // dummy initialization
-    setAreaFilters(yangonAreasBurmese);
-  }, []);
+    if (areas && areas.length > 0) {
+      setAreaFilters(areas);
+    }
+  }, [areas]);
 
   return (
     <Modal
@@ -206,7 +226,16 @@ export default function StopFilterModal({
                   }}
                 />
               )}
-              <ListView data={stopsList} />
+              <ListView
+                data={stopsList}
+                onItemPress={(item) => {
+                  // pass the selected stop back to parent
+                  onSelectStop?.(item);
+
+                  // close modal
+                  onClose();
+                }}
+              />
             </View>
           </>
         )}
