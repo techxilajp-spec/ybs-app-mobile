@@ -16,7 +16,7 @@ type AvailableRoutesViewProps = {
 
 export default function AvailableRoutesView({
   routes
-} : AvailableRoutesViewProps) {
+}: AvailableRoutesViewProps) {
   return (
     <View style={styles.container}>
       <FlatList

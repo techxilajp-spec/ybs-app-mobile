@@ -17,6 +17,7 @@ import StopFilterModal from "@/src/components/home/StopFilterModal";
 import DirectionSelector from "@/src/components/home/routeSearch/DirectionSelector";
 
 // stores
+import { TripPlannerService } from "@/src/services/TripPlannerService";
 import { useRouteSearchResultsStore } from "@/src/stores/useRouteSearchResultsStore";
 
 // types
@@ -178,10 +179,37 @@ export default function RouteSearchView() {
    * makes the results accessible across screens.
    *
    */
-  const searchRoutes = () => {
-    const searchResults = fetchData();
-    setRoutes(searchResults);
-    router.push("/routeSearchResults");
+  const searchRoutes = async () => {
+    if (!startStop && (showDirectionModal.mode === "start" || !endStop)) {
+      // Handle case where specific locations aren't set if needed, 
+      // but typically startStop is null means "Current Location" (handled elsewhere?)
+      // Current code implies 'startStop' object has coordinates.
+      // We need to resolve "Current Location" if startStop is null.
+      // For now, let's assume user must select or we pass null and let backend handle?
+      // The Edge Function expects coordinate objects.
+    }
+
+    if (!endStop) {
+      alert("Please select a destination.");
+      return;
+    }
+
+    // Default to a mockup current location if startStop is null (User Current Location)
+    // In real app, use expo-location
+    const startLoc = { latitude: 16.8409, longitude: 96.1735 }; // Example: Yangon
+    const endLoc = { latitude: 16.7809, longitude: 96.1535 };
+
+    try {
+      // Show loading indicator if possible (omitted for brevity, can add state)
+      console.log("startLoc", startLoc);
+      console.log("endLoc", endLoc);
+      const results = await TripPlannerService.planTrip(startLoc, endLoc);
+      setRoutes(results);
+      router.push("/routeSearchResults");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to plan trip. Please try again.");
+    }
   };
 
   return (

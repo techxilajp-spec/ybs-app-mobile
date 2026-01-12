@@ -7,11 +7,11 @@ import Summary from "@/src/components/home/routeSearchResults/RouteCard/Summary"
 import WalkStep from "@/src/components/home/routeSearchResults/RouteCard/WalkStep";
 
 type RouteCardProps = {
-    onPressCard?: () => void
+  onPressCard?: () => void
 }
 
 export default function RouteCard({
-    onPressCard
+  onPressCard
 }: RouteCardProps) {
   return (
     <Pressable style={styles.container} onPress={onPressCard}>
