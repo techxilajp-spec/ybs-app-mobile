@@ -5,7 +5,7 @@ import {
   Pressable,
   StyleSheet,
   TextInput,
-  View,
+  View
 } from "react-native";
 
 // react
@@ -161,7 +161,7 @@ export default function StopFilterModal({
       animationType="slide"
       statusBarTranslucent={true}
     >
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { paddingTop: 0 }]}>
         {isFilterVisible ? (
           <FilterView
             onClose={hileFilters}
