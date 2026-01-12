@@ -132,10 +132,11 @@ export default function StopFilterModal({
       return;
     }
 
-    if (!canSearch) {
-      const source = activeIndex === 0 ? "recent" : "favourite";
-      setStopsList(stopList[source] as any);
-    }
+    // TODO : show recent search
+    // if (!canSearch) {
+    //   const source = activeIndex === 0 ? "recent" : "favourite";
+    //   setStopsList(stopList[source] as any);
+    // }
   }, [activeIndex, canSearch, searchResults]);
 
   useEffect(() => {
