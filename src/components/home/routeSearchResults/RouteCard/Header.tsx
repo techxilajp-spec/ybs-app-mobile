@@ -7,16 +7,17 @@ import AppText from "@/src/components/AppText";
 import { Colors } from "@/src/constants/color";
 
 type HeaderProps = {
+  title: string;
   isFastest?: boolean;
   style?: ViewStyle | ViewStyle[];
 };
 
-export default function Header({ isFastest, style }: HeaderProps) {
+export default function Header({ title, isFastest, style }: HeaderProps) {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.row}>
         <AppText size={14} style={styles.title}>
-          လမ်းကြောင်း ၁
+          {title}
         </AppText>
         {isFastest && (
           <View style={styles.badge}>

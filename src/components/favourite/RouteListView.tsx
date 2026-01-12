@@ -24,7 +24,8 @@ export default function RouteListView({
           routeTitle={item.name}
           routeDescription={item.description}
           color={item.color}
-          onPress={() => {}}
+          onPress={() => { }}
+          isYps={item.isYps}
         />
       )}
       keyExtractor={(item) => `${item.no}-${item.id}`}

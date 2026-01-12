@@ -23,7 +23,8 @@ export default function StopsListView({
         <StopCard
           title_mm={item.title_mm}
           title_en={item.title_en}
-          description={item.description}
+          lat={item.lat}
+          lng={item.lng}
           isFavourite={item.isFavourite}
         />
       )}

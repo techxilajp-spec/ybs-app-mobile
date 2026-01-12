@@ -33,7 +33,8 @@ export default function DirectionSelector({
   showIndicator = false,
   onPress,
   style,
-}: DirectionSelectorProps) {
+  subtitle,
+}: DirectionSelectorProps & { subtitle?: string }) {
   return (
     <Pressable style={[styles.container, style]} onPress={onPress}>
       <View
@@ -56,22 +57,34 @@ export default function DirectionSelector({
           {title}
         </AppText>
         <View style={styles.selector}>
-          <AppText
-            size={14}
-            style={[
-              styles.inputText,
-              {
-                color:
-                  value.trim() !== ""
-                    ? Colors.text.secondary
-                    : Colors.text.primary,
-              },
-            ]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {value.trim() !== "" ? value.trim() : description}
-          </AppText>
+          <View style={{ flex: 1 }}>
+            <AppText
+              size={14}
+              style={[
+                styles.inputText,
+                {
+                  color:
+                    value.trim() !== ""
+                      ? Colors.text.secondary
+                      : Colors.text.primary,
+                },
+              ]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {value.trim() !== "" ? value.trim() : description}
+            </AppText>
+            {/* {subtitle && (
+              <AppText
+                size={12}
+                style={{ color: Colors.text.description, marginTop: 2, fontFamily: "MiSansMyanmar-Regular" }}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {subtitle}
+              </AppText>
+            )} */}
+          </View>
           <Image
             source={require("@/assets/icons/right_arrow.png")}
             style={styles.rightArrowIcon}

@@ -23,7 +23,9 @@ export default function ListView({ data, onPress }: ListViewProps) {
             <StopCard
               title_mm={item.title_mm}
               title_en={item.title_en}
-              description={item.description}
+              road_mm={item.road_mm}
+              lat={item.lat}
+              lng={item.lng}
               isFavourite={item.isFavourite}
               onPress={() => onPress && onPress(item)}
             />

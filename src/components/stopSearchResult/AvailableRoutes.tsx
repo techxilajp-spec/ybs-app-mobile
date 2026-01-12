@@ -36,6 +36,7 @@ export default function AvailableRoutes({ routes, style }: AvailableRoutesProps)
             routeDescription={item.description}
             color={item.color}
             onPress={onPressRouteCard}
+            isYps={item.isYps}
           />
         )}
         keyExtractor={(item) => item.id}

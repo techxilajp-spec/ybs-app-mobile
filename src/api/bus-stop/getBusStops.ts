@@ -9,7 +9,10 @@ const getBusStops = async (name?: string) => {
     id,
     title_mm:name_mm,
     title_en:name_en,
-    description
+    road_mm,
+    road_en,
+    lat,
+    lng
   `);
 
     if (name) {
@@ -26,8 +29,16 @@ const getBusStops = async (name?: string) => {
         throw new Error(error.message);
     }
 
+    const mappedData = data?.map((stop: any) => ({
+        ...stop,
+        coordinate: {
+            latitude: stop.lat,
+            longitude: stop.lng,
+        },
+    }));
+
     return {
-        data: data || [],
+        data: mappedData || [],
     };
 };
 

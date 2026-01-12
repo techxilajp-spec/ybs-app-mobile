@@ -6,19 +6,29 @@ import AppText from "@/src/components/AppText";
 // constants
 import { Colors } from "@/src/constants/color";
 
-export default function Summary() {
+type SummaryProps = {
+    routeNames: string;
+    totalBusStops: number;
+    estimatedTime: number;
+};
+
+export default function Summary({
+    routeNames,
+    totalBusStops,
+    estimatedTime,
+}: SummaryProps) {
     return (
         <View>
             <View style={styles.row}>
                 <Image source={require("@/assets/icons/bus1.png")} style={styles.busIcon} />
-                <AppText size={16} style={styles.availableRoutesText}>Bus 89, 34</AppText>
+                <AppText size={16} style={styles.availableRoutesText}>{routeNames}</AppText>
             </View>
             <View style={[styles.row, { marginTop: 25 }]}>
                 <View style={styles.button}>
-                    <AppText size={12} style={styles.buttonText}>Total Bus Stop : 22</AppText>
+                    <AppText size={12} style={styles.buttonText}>Total Bus Stop : {totalBusStops}</AppText>
                 </View>
                 <View style={styles.button}>
-                    <AppText size={12} style={styles.buttonText}>Est : 35 minutes</AppText>
+                    <AppText size={12} style={styles.buttonText}>Est : {estimatedTime} minutes</AppText>
                 </View>
             </View>
         </View>

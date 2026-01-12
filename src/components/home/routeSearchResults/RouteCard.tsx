@@ -6,37 +6,55 @@ import Header from "@/src/components/home/routeSearchResults/RouteCard/Header";
 import Summary from "@/src/components/home/routeSearchResults/RouteCard/Summary";
 import WalkStep from "@/src/components/home/routeSearchResults/RouteCard/WalkStep";
 
+// types
+import { RouteSearchResult } from "@/src/types/map";
+
 type RouteCardProps = {
+  route: RouteSearchResult;
+  index: number;
   onPressCard?: () => void
 }
 
 export default function RouteCard({
+  route,
+  index,
   onPressCard
 }: RouteCardProps) {
+  const routeNames = route.routes.map((r) => r.no).join(", ");
+
   return (
     <Pressable style={styles.container} onPress={onPressCard}>
-      <Header isFastest={true} style={styles.header} />
-      <Summary />
+      <Header title={`လမ်းကြောင်း ${index + 1}`} isFastest={route.isFastest} style={styles.header} />
+      <Summary
+        routeNames={routeNames}
+        totalBusStops={route.totalBusStop}
+        estimatedTime={route.estimatedTime}
+      />
       <View style={styles.stepsWrapper}>
-        <WalkStep
-          description="ဆင်မင်းစျေး သိုသွားပါ။"
-          style={styles.stepItem}
-        />
-        <BusStep
-          busNo={89}
-          busColor="#E53E3E"
-          busTitle="သာကေတ (ရတနာအိမ်ရာ ) - အထက်ကြည့်မြင်တိုင်"
-          startStopTitle="ဆင်မင်းစျေးမှတ်တိုင်"
-          endStopTitle="ဆီဆိုင် မှတ်တိုင်"
-          style={styles.stepItem}
-        />
-        <BusStep
-          busNo={34}
-          busColor="#815AD5"
-          busTitle="ခရမ်း - ဗိုလ်တစ်ထောင်ဘုရား"
-          startStopTitle="ဆီဆိုင် မှတ်တိုင်"
-          endStopTitle="ဖိုက်စတား မှတ်တိုင်"
-        />
+        {route.instructions.map((instruction, idx) => {
+          if (instruction.type === "walk") {
+            return (
+              <WalkStep
+                key={idx}
+                description={instruction.description}
+                style={styles.stepItem}
+              />
+            );
+          } else if (instruction.type === "bus") {
+            return (
+              <BusStep
+                key={idx}
+                busNo={instruction.busNo}
+                busColor={route.routes.find((r) => r.no === instruction.busNo)?.color || "#000"}
+                busTitle={instruction.busTitle}
+                startStopTitle={instruction.startStop}
+                endStopTitle={instruction.endStop}
+                style={styles.stepItem}
+              />
+            );
+          }
+          return null;
+        })}
       </View>
     </Pressable>
   );
@@ -49,6 +67,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 8,
+    marginBottom: 15,
   },
 
   header: {

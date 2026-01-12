@@ -11,6 +11,8 @@ type StopInformationProps = {
   stopName: string;
   roadName: string;
   townshipName: string;
+  lat: number;
+  lng: number;
   style?: ViewStyle;
 };
 
@@ -18,6 +20,8 @@ export default function StopInformation({
   stopName,
   roadName,
   townshipName,
+  lat,
+  lng,
   style,
 }: StopInformationProps) {
   return (
@@ -40,6 +44,12 @@ export default function StopInformation({
         TownShip :{" "}
         <AppText size={14} style={styles.townShipName}>
           {townshipName}
+        </AppText>
+      </AppText>
+      <AppText size={14} style={{ marginTop: 7 }}>
+        Location :{" "}
+        <AppText size={14} style={styles.townShipName}>
+          ({lat}, {lng})
         </AppText>
       </AppText>
     </View>

@@ -31,10 +31,12 @@ export default function StopSearchResults() {
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
       <AppHeader title="ရှာဖွေမှုရလဒ်" />
-      <StopInformation 
+      <StopInformation
         stopName="အလုံစာတိုက် ( အောက်ကြည်မြင့်တိုင် )"
         roadName="အောက်ကြည်မြင်တိုင်လမ်း"
         townshipName="ကြည်မြင်တိုင်"
+        lat={16.80528}
+        lng={96.15611}
         style={styles.stopInformation}
       />
       <AvailableRoutes style={styles.routeListContainer} routes={availableRoutes} />

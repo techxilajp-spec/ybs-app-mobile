@@ -21,13 +21,17 @@ export default function AvailableRoutesView({
     <View style={styles.container}>
       <FlatList
         data={routes}
-        renderItem={({ item }) => (
-          <RouteCard onPressCard={() => router.push({
-            pathname: "/routeSearchDetail",
-            params: {
-              id: item.id,
-            }
-          })} />
+        renderItem={({ item, index }) => (
+          <RouteCard
+            route={item}
+            index={index}
+            onPressCard={() => router.push({
+              pathname: "/routeSearchDetail",
+              params: {
+                id: item.id,
+              }
+            })}
+          />
         )}
         keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}

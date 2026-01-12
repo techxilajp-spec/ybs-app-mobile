@@ -12,7 +12,9 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 type StopCardProps = {
   title_mm: string;
   title_en: string;
-  description: string;
+  road_mm: string;
+  lat: number;
+  lng: number;
   isFavourite?: boolean;
   onPress?: () => void;
 }
@@ -20,7 +22,9 @@ type StopCardProps = {
 export default function StopCard({
   title_mm,
   title_en,
-  description,
+  road_mm,
+  lat,
+  lng,
   isFavourite = false,
   onPress
 }: StopCardProps) {
@@ -49,9 +53,15 @@ export default function StopCard({
         </AppText>
         <AppText
           size={14}
+          style={styles.title_en}
+        >
+          {road_mm}
+        </AppText>
+        <AppText
+          size={14}
           style={styles.description}
         >
-          {description}
+          ({lat}, {lng})
         </AppText>
       </View>
       <View style={[styles.iconContainer, styles.heartIconContainer]}>

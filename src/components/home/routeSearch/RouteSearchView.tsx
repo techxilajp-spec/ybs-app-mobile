@@ -179,31 +179,35 @@ export default function RouteSearchView() {
    * makes the results accessible across screens.
    *
    */
+  /**
+   * Searches available routes between the selected start and end destinations and
+   * makes the results accessible across screens.
+   *
+   */
   const searchRoutes = async () => {
-    if (!startStop && (showDirectionModal.mode === "start" || !endStop)) {
-      // Handle case where specific locations aren't set if needed, 
-      // but typically startStop is null means "Current Location" (handled elsewhere?)
-      // Current code implies 'startStop' object has coordinates.
-      // We need to resolve "Current Location" if startStop is null.
-      // For now, let's assume user must select or we pass null and let backend handle?
-      // The Edge Function expects coordinate objects.
+    // Current location fallback logic
+    let startLoc;
+    if (!startStop) {
+      alert("Please select a start destination.");
+      return;
     }
 
-    if (!endStop) {
+    if (!endStop && showDirectionModal.mode !== 'end') {
       alert("Please select a destination.");
       return;
     }
 
-    // Default to a mockup current location if startStop is null (User Current Location)
-    // In real app, use expo-location
-    const startLoc = { latitude: 16.8409, longitude: 96.1735 }; // Example: Yangon
-    const endLoc = { latitude: 16.7809, longitude: 96.1535 };
+    // Safety check if endStop might be null (though UI suggests selecting it)
+    if (!endStop) {
+      // Just for safety
+      alert("Please select a destination.");
+      return;
+    }
 
     try {
       // Show loading indicator if possible (omitted for brevity, can add state)
-      console.log("startLoc", startLoc);
-      console.log("endLoc", endLoc);
-      const results = await TripPlannerService.planTrip(startLoc, endLoc);
+      console.log("Searching routes from:", startStop.coordinate, "to:", endStop.coordinate);
+      const results = await TripPlannerService.planTrip(startStop.coordinate, endStop.coordinate);
       setRoutes(results);
       router.push("/routeSearchResults");
     } catch (e) {
@@ -231,6 +235,7 @@ export default function RouteSearchView() {
             icon={<View style={styles.circleIcon}></View>}
             title="မှ"
             description={startStop ? startStop.title_mm : "လက်ရှိတည်နေရာ"}
+            subtitle={startStop ? `${startStop.coordinate.latitude.toFixed(5)}, ${startStop.coordinate.longitude.toFixed(5)}` : undefined}
             value=""
             onPress={() => openDirectionModal("start")}
             showIndicator={true}
@@ -247,6 +252,7 @@ export default function RouteSearchView() {
             }
             title="သို"
             description={endStop ? endStop.title_mm : "သွားရောက်လိုသည့်နေရာ"}
+            subtitle={endStop ? `${endStop.coordinate.latitude.toFixed(5)}, ${endStop.coordinate.longitude.toFixed(5)}` : undefined}
             onPress={() => openDirectionModal("end")}
           />
         </View>

@@ -11,7 +11,7 @@ type AvailableLinesViewProps = {
     lines: Route[]
 }
 
-export default function AvailableLinesView({ lines } : AvailableLinesViewProps) {
+export default function AvailableLinesView({ lines }: AvailableLinesViewProps) {
     return (
         <View style={styles.container}>
             <FlatList
@@ -24,6 +24,7 @@ export default function AvailableLinesView({ lines } : AvailableLinesViewProps) 
                         routeDescription={item.description}
                         color={item.color}
                         onPress={() => console.log("hello")}
+                        isYps={item.isYps}
                     />
                 )}
                 keyExtractor={item => item.id}

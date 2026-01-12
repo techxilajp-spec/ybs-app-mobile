@@ -11,6 +11,9 @@ export type Stop = {
     id: string;
     title_mm: string;
     title_en: string;
-    description: string;
+    road_mm: string;
+    road_en: string;
+    lat: number;
+    lng: number;
     isFavourite: boolean;
 }
