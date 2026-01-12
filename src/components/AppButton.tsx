@@ -1,10 +1,10 @@
 import React from "react";
 import {
-    Pressable,
-    StyleProp,
-    StyleSheet,
-    TextStyle,
-    ViewStyle
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  TextStyle,
+  ViewStyle
 } from "react-native";
 
 // custom component
@@ -14,6 +14,8 @@ export type AppButtonProps = {
   title: string;
   onPress: () => void;
   disabled?: boolean;
+  loading?: boolean;
+  loadingText?: string;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
 };
@@ -22,16 +24,20 @@ export default function AppButton({
   title,
   onPress,
   disabled = false,
+  loading = false,
+  loadingText = "ရှာဖွေနေသည်...",
   style,
   textStyle,
 }: AppButtonProps) {
   return (
     <Pressable
-      style={[styles.button, disabled && styles.disabledButton, style]}
+      style={[styles.button, (disabled || loading) && styles.disabledButton, style]}
       onPress={onPress}
-      disabled={disabled}
+      disabled={disabled || loading}
     >
-        <AppText style={[styles.title, textStyle]}>{title}</AppText>
+      <AppText style={[styles.title, textStyle]}>
+        {loading ? loadingText : title}
+      </AppText>
     </Pressable>
   );
 }

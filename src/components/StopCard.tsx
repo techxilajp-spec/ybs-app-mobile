@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View } from "react-native";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 
 // constants
 import { Colors } from "@/src/constants/color";
@@ -12,7 +12,10 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 type StopCardProps = {
   title_mm: string;
   title_en: string;
-  description: string;
+  road_mm: string;
+  lat: number;
+  lng: number;
+  onPress?: () => void;
   isFavourite?: boolean;
   // onToggleFavourite: () => void;
 }
@@ -20,11 +23,14 @@ type StopCardProps = {
 export default function StopCard({
   title_mm,
   title_en,
-  description,
+  road_mm,
+  lat,
+  lng,
+  onPress,
   isFavourite = false,
 }: StopCardProps) {
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={onPress}>
       <View style={styles.iconContainer}>
         <Image
           source={require("@/assets/icons/bus_yellow.png")}
@@ -48,16 +54,22 @@ export default function StopCard({
         </AppText>
         <AppText
           size={14}
+          style={styles.title_en}
+        >
+          {road_mm}
+        </AppText>
+        <AppText
+          size={14}
           style={styles.description}
         >
-          {description}
+          ({lat}, {lng})
         </AppText>
       </View>
       <View style={[styles.iconContainer, styles.heartIconContainer]}>
         {isFavourite ? (
-            <FontAwesome name="heart" size={24} color={Colors.primary} />
-        ): (
-            <FontAwesome name="heart-o" size={20} color={Colors.text.disabled} />
+          <FontAwesome name="heart" size={24} color={Colors.primary} />
+        ) : (
+          <FontAwesome name="heart-o" size={20} color={Colors.text.disabled} />
         )}
       </View>
       {/* <Pressable
@@ -71,7 +83,7 @@ export default function StopCard({
           color={isFavourite ? Colors.primary : Colors.text.disabled}
         />
       </Pressable> */}
-    </View>
+    </Pressable>
   );
 }
 

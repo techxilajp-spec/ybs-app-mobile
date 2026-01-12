@@ -17,7 +17,9 @@ import RouteFilterModal from "@/src/components/home/RouteFilterModal";
 import DirectionSelector from "@/src/components/home/routeSearch/DirectionSelector";
 
 // stores
+import { TripPlannerService } from "@/src/services/TripPlannerService";
 import { useRouteSearchResultsStore } from "@/src/stores/useRouteSearchResultsStore";
+import { useTripPlannerStore } from "@/src/stores/useTripPlannerStore";
 
 // utils
 import { getPublicUrl } from "@/src/utils/supabase";
@@ -138,7 +140,7 @@ export default function RouteSearchView() {
     visible: false,
     mode: null,
   });
-  
+
   // fetch ads
   const { data: adsData } = useGetAds();
   const ads = adsData?.map((ad) => {
@@ -152,6 +154,13 @@ export default function RouteSearchView() {
       image: adImageUrl,
     };
   });
+
+  const [isSearching, setIsSearching] = useState(false);
+
+  // const [startStop, setStartStop] = useState<any>(null); // Replaced by store
+  // const [endStop, setEndStop] = useState<any>(null); // Replaced by store
+
+  const { startLocation: startStop, endLocation: endStop, setStartLocation, setEndLocation } = useTripPlannerStore();
 
   const setRoutes = useRouteSearchResultsStore((s) => s.setRoutes);
 
@@ -177,14 +186,69 @@ export default function RouteSearchView() {
   };
 
   /**
+   * Handles the selection of a bus stop.
+   * @param stop The selected bus stop.
+   */
+  const handleSelect = (stop: any) => {
+    if (showDirectionModal.mode === "start") {
+      setStartLocation(stop);
+    } else if (showDirectionModal.mode === "end") {
+      setEndLocation(stop);
+    }
+  };
+
+  /**
    * Searches available routes between the selected start and end destinations and
    * makes the results accessible across screens.
    *
    */
-  const searchRoutes = () => {
-    const searchResults = fetchData();
-    setRoutes(searchResults);
-    router.push("/routeSearchResults");
+  /**
+   * Searches available routes between the selected start and end destinations and
+   * makes the results accessible across screens.
+   *
+   */
+  const searchRoutes = async () => {
+    // Current location fallback logic
+    let startLoc;
+    if (!startStop) {
+      alert("Please select a start destination.");
+      return;
+    }
+
+    if (!endStop && showDirectionModal.mode !== 'end') {
+      alert("Please select a destination.");
+      return;
+    }
+
+    // Safety check if endStop might be null (though UI suggests selecting it)
+    if (!endStop) {
+      // Just for safety
+      alert("Please select a destination.");
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      // Show loading indicator if possible (omitted for brevity, can add state)
+      const startCoord = {
+        latitude: startStop.lat || startStop.coordinate?.latitude || 0,
+        longitude: startStop.lng || startStop.coordinate?.longitude || 0
+      };
+      const endCoord = {
+        latitude: endStop.lat || endStop.coordinate?.latitude || 0,
+        longitude: endStop.lng || endStop.coordinate?.longitude || 0
+      };
+
+      console.log("Searching routes from:", startCoord, "to:", endCoord);
+      const results = await TripPlannerService.planTrip(startCoord, endCoord);
+      setRoutes(results);
+      router.push("/routeSearchResults");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to plan trip. Please try again.");
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   return (
@@ -197,6 +261,7 @@ export default function RouteSearchView() {
             : "သွားရောက်လိုသည့်နေရာ"
         }
         onClose={closeDirectionModal}
+        onSelect={handleSelect}
       />
       <View style={styles.container}>
         <View style={styles.selectorContainer}>
@@ -204,7 +269,8 @@ export default function RouteSearchView() {
           <DirectionSelector
             icon={<View style={styles.circleIcon}></View>}
             title="မှ"
-            description="လက်ရှိတည်နေရာ"
+            description={startStop ? startStop.name_mm : "လက်ရှိတည်နေရာ"}
+            subtitle={startStop ? `${(startStop.lat || startStop.coordinate?.latitude || 0).toFixed(5)}, ${(startStop.lng || startStop.coordinate?.longitude || 0).toFixed(5)}` : undefined}
             value=""
             onPress={() => openDirectionModal("start")}
             showIndicator={true}
@@ -220,13 +286,15 @@ export default function RouteSearchView() {
               />
             }
             title="သို"
-            description="သွားရောက်လိုသည့်နေရာ"
+            description={endStop ? endStop.name_mm : "သွားရောက်လိုသည့်နေရာ"}
+            subtitle={endStop ? `${(endStop.lat || endStop.coordinate?.latitude || 0).toFixed(5)}, ${(endStop.lng || endStop.coordinate?.longitude || 0).toFixed(5)}` : undefined}
             onPress={() => openDirectionModal("end")}
           />
         </View>
         <AppButton
           title="Bus ကားလမ်းကြောင်းကြည့်မယ်"
           onPress={searchRoutes}
+          loading={isSearching}
           textStyle={styles.buttonText}
         />
 

@@ -9,11 +9,13 @@ import { Stop } from "@/src/types/bus";
 type StopsListViewProps = {
   style?: ViewStyle,
   data: Stop[];
+  onToggleFavourite: (stopId: string) => void;
 }
 
 export default function StopsListView({
   style,
-  data
+  data,
+  onToggleFavourite
 }: StopsListViewProps) {
   return (
     <FlatList
@@ -23,12 +25,13 @@ export default function StopsListView({
         <StopCard
           title_mm={item.name_mm}
           title_en={item.name_en}
-          description={item.description}
-          isFavourite={item.is_favourite}
-          // onToggleFavourite={() => { console.log("onToggleFavourite in stop view") }}
+          road_mm={item.road_mm}
+          lat={item.lat}
+          lng={item.lng}
+          isFavourite={item.isFavourite}
         />
       )}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item, index) => index + item.name_en}
       showsVerticalScrollIndicator={false}
     />
   );

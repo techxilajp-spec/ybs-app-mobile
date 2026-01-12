@@ -28,7 +28,7 @@ export default function RouteSearchResultScreen() {
   const activeTabKey = TABS[activeTabIndex].key;
 
   // read store once; used only for passing data between screens
-  const routeData = useRouteSearchResultsStore.getState().routes;
+  const routeData = useRouteSearchResultsStore.getState().routes || [];
 
   /**
    * Flatten all routes from search results into a single list
@@ -36,13 +36,17 @@ export default function RouteSearchResultScreen() {
    */
   const flattenedRoutes = useMemo(() => {
     console.log("calculated once");
-    return routeData.flatMap((item) =>
+    console.log(routeData)
+    if (!routeData || routeData.length === 0) return [];
+
+    return routeData?.flatMap((item) =>
       item.routes.map((route) => ({
-        id: route.id,
+        id: String(route.id),
         no: route.no,
         name: route.name,
         description: route.description,
         color: route.color,
+        isYps: false, // TODO: implement isYps
       }))
     );
   }, []);

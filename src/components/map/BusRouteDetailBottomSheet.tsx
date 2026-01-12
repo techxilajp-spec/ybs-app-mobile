@@ -31,8 +31,8 @@ export default function BusRouteDetailBottomSheet({
   snapPoints,
   maxHeight,
   activeRouteIndex,
-  onChangeIndex = (index) => {},
-  onChangeRouteIndex = (index) => {},
+  onChangeIndex = (index) => { },
+  onChangeRouteIndex = (index) => { },
 }: BusRouteDetailSheetProps) {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const TAB_CONFIGS = [

@@ -11,10 +11,15 @@ export type Stop = {
   id: string;
   name_mm: string;
   name_en: string;
-  lat: string;
-  lng: string;
-  description: string;
-  is_favourite: boolean;
+  road_mm: string;
+  road_en: string;
+  lat: number;
+  lng: number;
+  coordinate?: {
+    latitude: number;
+    longitude: number;
+  };
+  isFavourite: boolean;
 };
 
 export type StopDetailResponse = {

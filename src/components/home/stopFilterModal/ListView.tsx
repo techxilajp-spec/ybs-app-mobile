@@ -1,4 +1,4 @@
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 
 // constants
 import { Colors } from "@/src/constants/color";
@@ -9,10 +9,10 @@ import StopCard from "@/src/components/StopCard";
 
 type ListViewProps = {
   data: any[];
-  onItemPress?: (item: any) => void;
+  onPress?: (item: any) => void;
 };
 
-export default function ListView({ data, onItemPress }: ListViewProps) {
+export default function ListView({ data, onPress }: ListViewProps) {
   return (
     <View style={styles.container}>
       {data.length > 0 ? (
@@ -20,23 +20,23 @@ export default function ListView({ data, onItemPress }: ListViewProps) {
           style={styles.container}
           data={data}
           renderItem={({ item }) => (
-            <Pressable onPress={() => onItemPress?.(item)}>
-              <StopCard
-                title_mm={item.name_mm ?? ""}
-                title_en={item.name_en ?? ""}
-                description={
-                  item.description ?? (item.lat && item.lng ? `${item.lat}, ${item.lng}` : "")
-                }
-                isFavourite={item.is_favourite ?? false}
-              />
-            </Pressable>
+            <StopCard
+              title_mm={item.name_mm}
+              title_en={item.name_en}
+              road_mm={item.road_mm} // TODO' select road name
+              lat={item.lat}
+              lng={item.lng}
+              isFavourite={item.isFavourite}
+              onPress={() => onPress && onPress(item)}
+              onToggleFavourite={() => { }}
+            />
           )}
-          keyExtractor={(item) => String(item.id)}
+          keyExtractor={(item, index) => index + item.title_en}
           showsVerticalScrollIndicator={false}
         />
       ) : (
         <View style={[styles.container, styles.noDataContainer]}>
-          <AppText size={16} style={styles.noDataText}>Data များမရှိသေးပါ</AppText>
+          <AppText size={16} style={styles.noDataText}>ဘတ်စ်ကား ရှာမတွေ့ပါ</AppText>
         </View>
       )}
     </View>

@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
         height: 32
     },
     text: {
+        flex: 1,
         color: Colors.text.primary,
         fontWeight: 600
     }

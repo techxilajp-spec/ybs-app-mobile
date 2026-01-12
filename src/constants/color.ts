@@ -9,7 +9,8 @@ export const Colors = {
         quaternary: '#667085',
         placeholder: {
             subtitle: '#D0D5DD'
-        }
+        },
+        description: '#667085'
     },
     border: {
         primary: '#D0D5DD',

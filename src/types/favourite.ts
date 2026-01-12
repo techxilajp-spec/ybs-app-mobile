@@ -8,3 +8,15 @@ export interface favouriteRouteRequest {
   color: string;
   isYps: boolean;
 }
+
+export const FAVORITE_STOP_KEY = "favorite_stops";
+
+export interface FavouriteStopRequest {
+  stopId: number;
+  stopNameEn: string;
+  stopNameMm: string;
+  roadEn?: string;
+  roadMm?: string;
+  lat: number;
+  lng: number;
+}

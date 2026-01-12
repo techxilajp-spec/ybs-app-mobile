@@ -51,6 +51,8 @@ export default function StopSearchResults() {
         stopName={stopName}
         roadName={roadName}
         townshipName={townshipName}
+        lat={16.80528}
+        lng={96.15611}
         style={styles.stopInformation}
       />
       <AvailableRoutes style={styles.routeListContainer} routes={availableRoutes} />
