@@ -84,7 +84,7 @@ export default function StopCard({
           color={isFavourite ? Colors.primary : Colors.text.disabled}
         />
       </Pressable>
-    </View>
+    </Pressable>
   );
 }
 

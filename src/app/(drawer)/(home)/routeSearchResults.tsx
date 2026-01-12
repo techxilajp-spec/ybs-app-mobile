@@ -41,7 +41,7 @@ export default function RouteSearchResultScreen() {
 
     return routeData?.flatMap((item) =>
       item.routes.map((route) => ({
-        id: route.id,
+        id: String(route.id),
         no: route.no,
         name: route.name,
         description: route.description,

@@ -1,4 +1,4 @@
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 
 // constants
 import { Colors } from "@/src/constants/color";
@@ -21,13 +21,14 @@ export default function ListView({ data, onPress }: ListViewProps) {
           data={data}
           renderItem={({ item }) => (
             <StopCard
-              title_mm={item.title_mm}
-              title_en={item.title_en}
-              road_mm={item.road_mm}
+              title_mm={item.name_mm}
+              title_en={item.name_en}
+              road_mm={item.road_mm} // TODO' select road name
               lat={item.lat}
               lng={item.lng}
               isFavourite={item.isFavourite}
               onPress={() => onPress && onPress(item)}
+              onToggleFavourite={() => { }}
             />
           )}
           keyExtractor={(item, index) => index + item.title_en}

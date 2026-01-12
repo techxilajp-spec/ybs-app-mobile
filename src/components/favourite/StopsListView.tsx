@@ -23,15 +23,16 @@ export default function StopsListView({
       style={[styles.listContainer, style]}
       renderItem={({ item }) => (
         <StopCard
-          title_mm={item.title_mm}
-          title_en={item.title_en}
+          title_mm={item.name_mm}
+          title_en={item.name_en}
+          road_mm={item.road_mm}
           lat={item.lat}
           lng={item.lng}
           isFavourite={item.isFavourite}
           onToggleFavourite={() => onToggleFavourite(item.id)}
         />
       )}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item, index) => index + item.name_en}
       showsVerticalScrollIndicator={false}
     />
   );

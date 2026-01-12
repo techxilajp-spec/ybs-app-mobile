@@ -140,7 +140,7 @@ export default function RouteSearchView() {
     visible: false,
     mode: null,
   });
-  
+
   // fetch ads
   const { data: adsData } = useGetAds();
   const ads = adsData?.map((ad) => {
@@ -269,7 +269,7 @@ export default function RouteSearchView() {
           <DirectionSelector
             icon={<View style={styles.circleIcon}></View>}
             title="မှ"
-            description={startStop ? startStop.title_mm : "လက်ရှိတည်နေရာ"}
+            description={startStop ? startStop.name_mm : "လက်ရှိတည်နေရာ"}
             subtitle={startStop ? `${(startStop.lat || startStop.coordinate?.latitude || 0).toFixed(5)}, ${(startStop.lng || startStop.coordinate?.longitude || 0).toFixed(5)}` : undefined}
             value=""
             onPress={() => openDirectionModal("start")}
@@ -286,7 +286,7 @@ export default function RouteSearchView() {
               />
             }
             title="သို"
-            description={endStop ? endStop.title_mm : "သွားရောက်လိုသည့်နေရာ"}
+            description={endStop ? endStop.name_mm : "သွားရောက်လိုသည့်နေရာ"}
             subtitle={endStop ? `${(endStop.lat || endStop.coordinate?.latitude || 0).toFixed(5)}, ${(endStop.lng || endStop.coordinate?.longitude || 0).toFixed(5)}` : undefined}
             onPress={() => openDirectionModal("end")}
           />

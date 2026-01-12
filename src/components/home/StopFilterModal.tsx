@@ -41,6 +41,8 @@ import { useSearchBusStops } from "@/src/hooks/bus-stop";
 
 // data
 import { useGetStops } from "@/src/hooks/bus-stop";
+import { getStopLocalFavorites } from "@/src/services/stopFav";
+import { Stop } from "@/src/types/bus";
 
 type StopFilterModalProps = {
   visible: boolean;
@@ -156,6 +158,7 @@ export default function StopFilterModal({
       });
 
       setStopsList(searchData);
+      console.log("searchData", searchData);
       return;
     }
 

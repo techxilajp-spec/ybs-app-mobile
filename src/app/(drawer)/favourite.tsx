@@ -45,13 +45,14 @@ export default function FavouriteScreen() {
   useEffect(() => {
     if (activeTab === "stops") {
       getFavoriteStops(undefined, {
-        onSuccess: (data) => {
+        onSuccess: (data: Stop[]) => {
           setBusStops(
             data.map((stop) => ({
               id: stop.id,
-              title_mm: stop.name_mm,
-              title_en: stop.name_en,
-              description: stop.road_mm ?? stop.road_en,
+              name_mm: stop.name_mm,
+              name_en: stop.name_en,
+              road_mm: stop.road_mm,
+              road_en: stop.road_en,
               lat: stop.lat,
               lng: stop.lng,
               isFavourite: true,
@@ -89,9 +90,10 @@ export default function FavouriteScreen() {
 
       const mapped: Stop[] = data.map((stop) => ({
         id: stop.id,
-        title_mm: stop.name_mm,
-        title_en: stop.name_en,
-        description: stop.road_mm ?? stop.road_en,
+        name_mm: stop.name_mm,
+        name_en: stop.name_en,
+        road_mm: stop.road_mm,
+        road_en: stop.road_en,
         lat: stop.lat,
         lng: stop.lng,
         isFavourite: true,
