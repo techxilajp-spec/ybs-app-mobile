@@ -35,6 +35,7 @@ export default function AvailableRoutes({ routes, style }: AvailableRoutesProps)
             routeTitle={item.name}
             routeDescription={item.description}
             color={item.color}
+            isYps={item.isYps}
             onPress={onPressRouteCard}
           />
         )}

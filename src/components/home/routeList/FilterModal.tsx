@@ -26,7 +26,8 @@ export default function FilterModal({
   return (
     <Modal
       visible={visible}
-      backdropColor="#0000004D"
+      // backdropColor="#0000004D"
+      backdropColor="#00000000"
       statusBarTranslucent={true}
       animationType="slide"
       onRequestClose={onClose}

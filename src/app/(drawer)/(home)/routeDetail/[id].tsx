@@ -1,5 +1,5 @@
 // react native
-import { Dimensions, StyleSheet, View } from "react-native";
+import { Alert, Dimensions, StyleSheet, View } from "react-native";
 
 // react
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -8,11 +8,20 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 
 // react-native-map
-import MapView, { MapMarker, PROVIDER_GOOGLE, Region } from "react-native-maps";
+import MapView, {
+  LatLng,
+  MapMarker,
+  PROVIDER_GOOGLE,
+  Region,
+} from "react-native-maps";
+
+// expo location
+import * as Location from "expo-location";
 
 // icons
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 // custom components
@@ -21,6 +30,7 @@ import BusPin from "@/src/components/map/BusPin";
 import BusPolyLine from "@/src/components/map/BusPolyLine";
 import BusRouteDetailBottomSheet from "@/src/components/map/BusRouteDetailBottomSheet";
 import EdgePin from "@/src/components/map/EdgePin";
+import UserLocationPin from "@/src/components/map/UserLocationPin";
 import Button from "@/src/components/routeDetail/Button";
 
 // constants
@@ -42,10 +52,13 @@ export default function RouteDetail() {
   const { YANGON } = MAP_LOCATIONS;
 
   const [region, setRegion] = useState<Region>(YANGON);
+  const [userLocation, setUserLocation] =
+    useState<Location.LocationObject | null>(null);
 
   const bottomSheetHeight = useRef<number>(100);
   const mapRef = useRef<InstanceType<typeof MapView> | null>(null);
   const markersRef = useRef<Record<string, MapMarker | null>>({});
+  const userMarkerRef = useRef<MapMarker | null>(null);
 
   const { height: screenHeight } = Dimensions.get("screen");
   const bottomSheetMaxHeight = screenHeight * 0.65;
@@ -86,12 +99,44 @@ export default function RouteDetail() {
   }, [routeData]);
 
   useEffect(() => {
+    // set initial region
     setRegion({
       ...YANGON,
       latitudeDelta: MAP_DELTA.INITIAL.LATITUDE,
       longitudeDelta: MAP_DELTA.INITIAL.LONGITUDE,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    let locationSubscriber: Location.LocationSubscription | null = null;
+
+    // request location permission
+    async function watchUserLocation() {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission denied!",
+          "Permission to access location was denied"
+        );
+        return;
+      }
+
+      locationSubscriber = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.Balanced,
+          distanceInterval: 40,
+        },
+        (newLocation) => {
+          setUserLocation(newLocation);
+        }
+      );
+    }
+
+    watchUserLocation();
+
+    return () => {
+      if (locationSubscriber) {
+        locationSubscriber.remove();
+      }
+    };
   }, []);
 
   /**
@@ -137,18 +182,19 @@ export default function RouteDetail() {
   };
 
   /**
-   * Animates the map to focus on a specific bus stop
-   * @param stop
+   * Animates the map to focus on a specific location
+   * @param coordinates
    */
-  const animateToStop = (stop: Stop) => {
+  const animateToLocation = (coordinates: LatLng) => {
+    const { latitude, longitude } = coordinates;
     const offsetRatio = bottomSheetHeight.current / screenHeight;
     const adjustedLatitude =
-      stop.coordinate.latitude - offsetRatio * MAP_DELTA.DEFAULT.LATITUDE;
+      latitude - offsetRatio * MAP_DELTA.DEFAULT.LATITUDE;
 
     mapRef.current?.animateToRegion(
       {
         latitude: adjustedLatitude,
-        longitude: stop.coordinate.longitude,
+        longitude: longitude,
         latitudeDelta: MAP_DELTA.DEFAULT.LATITUDE,
         longitudeDelta: MAP_DELTA.DEFAULT.LONGITUDE,
       },
@@ -165,7 +211,7 @@ export default function RouteDetail() {
     Object.values(markersRef.current).forEach((ref) => ref?.hideCallout());
     // show selected stop callout
     markersRef.current[busStop.id]?.showCallout();
-    animateToStop(busStop);
+    animateToLocation(busStop.coordinate);
   };
 
   /**
@@ -176,7 +222,16 @@ export default function RouteDetail() {
    */
   const onPressBusPin = (busStop: Stop) => {
     markersRef?.current[busStop.id]?.showCallout();
-    animateToStop(busStop);
+    animateToLocation(busStop.coordinate);
+  };
+
+  const showsUserLocation = () => {
+    if (!userLocation || !userMarkerRef.current) return;
+    const userCoordinate = {
+      latitude: userLocation.coords.latitude,
+      longitude: userLocation.coords.longitude,
+    };
+    animateToLocation(userCoordinate);
   };
 
   /**
@@ -208,7 +263,18 @@ export default function RouteDetail() {
           loadingEnabled={true}
           loadingIndicatorColor="#666666"
           loadingBackgroundColor="#eeeeee"
+          showsUserLocation={true}
+          showsMyLocationButton={false}
         >
+          {userLocation && (
+            <UserLocationPin
+              ref={userMarkerRef}
+              coordinate={{
+                latitude: userLocation.coords.latitude,
+                longitude: userLocation.coords.longitude,
+              }}
+            />
+          )}
           {route && (
             <>
               <BusPolyLine
@@ -235,13 +301,24 @@ export default function RouteDetail() {
         </MapView>
         <Button
           style={styles.backButton}
-          icon={<Ionicons name="arrow-back-sharp" size={20} color="blue" />}
+          icon={<Ionicons name="arrow-back-sharp" size={20} color="#1C274C" />}
           onPress={onBackPress}
         />
         <Button
           style={styles.favouriteIcon}
           icon={heartIcon}
           onPress={onAddFavourite}
+        />
+        <Button
+          style={styles.showUserLocationButton}
+          icon={
+            <FontAwesome6
+              name="location-crosshairs"
+              size={20}
+              color="#007AFF"
+            />
+          }
+          onPress={showsUserLocation}
         />
         {route && (
           <BusRouteDetailBottomSheet
@@ -275,5 +352,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 15,
     right: 20,
+  },
+  showUserLocationButton: {
+    position: "absolute",
+    top: 65,
+    right: 20,
+    borderRadius: 0,
   },
 });
