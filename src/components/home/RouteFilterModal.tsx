@@ -1,11 +1,11 @@
 // react native
 import {
-  Image,
-  Modal,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
+    Image,
+    Modal,
+    Pressable,
+    StyleSheet,
+    TextInput,
+    View,
 } from "react-native";
 
 // react
@@ -108,14 +108,14 @@ export default function StopFilterModal({
     setSelectedFilterOptions([]);
   };
 
-  // async function applyStopFavorites(stops: Stop[]) {
-  //   const favoriteIds = await getStopLocalFavorites();
+//   async function applyStopFavorites(stops: Stop[]) {
+//     const favoriteIds = await getStopLocalFavorites();
 
-  //   return stops.map(stop => ({
-  //     ...stop,
-  //     isFavourite: favoriteIds.includes(stop.id.toString()),
-  //   }));
-  // }
+//     return stops.map(stop => ({
+//       ...stop,
+//       isFavourite: favoriteIds.includes(stop.id.toString()),
+//     }));
+//   }
 
   useEffect(() => {
     if (canSearch) {

@@ -13,7 +13,7 @@ import { Colors } from "@/src/constants/color";
 // custom component
 import AppButton from "@/src/components/AppButton";
 import AppSlider from "@/src/components/AppSlider";
-import StopFilterModal from "@/src/components/home/StopFilterModal";
+import RouteFilterModal from "@/src/components/home/RouteFilterModal";
 import DirectionSelector from "@/src/components/home/routeSearch/DirectionSelector";
 
 // stores
@@ -189,7 +189,7 @@ export default function RouteSearchView() {
 
   return (
     <>
-      <StopFilterModal
+      <RouteFilterModal
         visible={showDirectionModal.visible}
         title={
           showDirectionModal.mode === "start"

@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleSheet, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 
 // constants
 import { Colors } from "@/src/constants/color";
@@ -14,7 +14,7 @@ type StopCardProps = {
   title_en: string;
   description: string;
   isFavourite?: boolean;
-  onToggleFavourite: () => void;
+  // onToggleFavourite: () => void;
 }
 
 export default function StopCard({
@@ -22,7 +22,6 @@ export default function StopCard({
   title_en,
   description,
   isFavourite = false,
-  onToggleFavourite,
 }: StopCardProps) {
   return (
     <View style={styles.container}>
@@ -54,14 +53,14 @@ export default function StopCard({
           {description}
         </AppText>
       </View>
-      {/* <View style={[styles.iconContainer, styles.heartIconContainer]}>
+      <View style={[styles.iconContainer, styles.heartIconContainer]}>
         {isFavourite ? (
             <FontAwesome name="heart" size={24} color={Colors.primary} />
         ): (
             <FontAwesome name="heart-o" size={20} color={Colors.text.disabled} />
         )}
-      </View> */}
-      <Pressable
+      </View>
+      {/* <Pressable
         onPress={onToggleFavourite}
         hitSlop={10}
         style={[styles.iconContainer, styles.heartIconContainer]}
@@ -71,7 +70,7 @@ export default function StopCard({
           size={isFavourite ? 24 : 20}
           color={isFavourite ? Colors.primary : Colors.text.disabled}
         />
-      </Pressable>
+      </Pressable> */}
     </View>
   );
 }

@@ -21,11 +21,11 @@ export default function StopsListView({
       style={[styles.listContainer, style]}
       renderItem={({ item }) => (
         <StopCard
-          title_mm={item.title_mm}
-          title_en={item.title_en}
+          title_mm={item.name_mm}
+          title_en={item.name_en}
           description={item.description}
-          isFavourite={item.isFavourite}
-          onToggleFavourite={() => { console.log("onToggleFavourite in stop view") }}
+          isFavourite={item.is_favourite}
+          // onToggleFavourite={() => { console.log("onToggleFavourite in stop view") }}
         />
       )}
       keyExtractor={(item) => item.id}

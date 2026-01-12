@@ -13,7 +13,7 @@ export type Stop = {
   name_en: string;
   lat: string;
   lng: string;
-  // description: string;
+  description: string;
   is_favourite: boolean;
 };
 
