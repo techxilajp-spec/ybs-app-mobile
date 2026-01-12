@@ -5,7 +5,6 @@ import {
   Dimensions,
   FlatList,
   ImageBackground,
-  ImageSourcePropType,
   NativeScrollEvent,
   NativeSyntheticEvent,
   StyleSheet,
@@ -16,8 +15,8 @@ import {
 const { width } = Dimensions.get("window");
 
 type SliderItem = {
-  id: string;
-  image: ImageSourcePropType;
+  id: number | string;
+  image: string;
 };
 
 type Props = {
@@ -41,7 +40,7 @@ export default function ({
 
   // Auto slide
   useEffect(() => {
-    if (!autoPlay) return;
+    if (!autoPlay || data.length === 0) return;
 
     const timer = setInterval(() => {
       if (isUserScrolling.current) return;
@@ -61,7 +60,7 @@ export default function ({
 
   /**
    * update acitve index after scrolling slide
-   * @param event 
+   * @param event
    */
   const onMomentumScrollEnd = (
     event: NativeSyntheticEvent<NativeScrollEvent>
@@ -71,12 +70,16 @@ export default function ({
     isUserScrolling.current = false;
   };
 
+  if (data.length === 0) {
+    return null;
+  }
+
   return (
     <View style={[styles.container, style]}>
       <Animated.FlatList
         ref={flatListRef}
         data={data}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: SliderItem) => item.id.toString()}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -89,21 +92,23 @@ export default function ({
           { useNativeDriver: false }
         )}
         renderItem={({ item }) => (
-          <ImageBackground style={{ flex: 1 }} source={item.image}>
+          <ImageBackground style={{ flex: 1 }} source={{ uri: item.image }}>
             <View style={styles.slide} />
           </ImageBackground>
         )}
       />
 
       {/* Pagination dots */}
-      <View style={styles.dotsContainer}>
-        {data.map((_, index) => (
-          <View
-            key={index}
-            style={[styles.dot, currentIndex === index && styles.activeDot]}
-          />
-        ))}
-      </View>
+      {data.length > 0 && (
+        <View style={styles.dotsContainer}>
+          {data.map((_, index) => (
+            <View
+              key={index}
+              style={[styles.dot, currentIndex === index && styles.activeDot]}
+            />
+          ))}
+        </View>
+      )}
     </View>
   );
 }

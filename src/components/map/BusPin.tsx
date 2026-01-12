@@ -1,19 +1,14 @@
 import React, { ComponentRef, forwardRef } from "react";
-import { MapMarkerProps, Marker } from "react-native-maps";
-
-type Coordinate = {
-  latitude: number;
-  longitude: number;
-};
+import { LatLng, MapMarkerProps, Marker } from "react-native-maps";
 
 type BusPinProps = {
-  coordinate: Coordinate;
+  coordinate: LatLng;
   title: string;
-  onPress?: () => void
+  onPress: () => void
 } & MapMarkerProps;
 
 const BusPin = forwardRef<ComponentRef<typeof Marker>, BusPinProps>(
-  ({ coordinate, title, onPress = () => { console.log("marker pressed"); } }, ref) => {
+  ({ coordinate, title, onPress }, ref) => {
     return (
       <Marker
         ref={ref}
@@ -22,7 +17,6 @@ const BusPin = forwardRef<ComponentRef<typeof Marker>, BusPinProps>(
         tracksViewChanges={false}
         title={title}
         onPress={onPress}
-        tappable={false}
       />
     );
   }

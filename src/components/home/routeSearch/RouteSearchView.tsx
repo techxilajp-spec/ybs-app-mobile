@@ -19,6 +19,9 @@ import DirectionSelector from "@/src/components/home/routeSearch/DirectionSelect
 // stores
 import { useRouteSearchResultsStore } from "@/src/stores/useRouteSearchResultsStore";
 
+// utils
+import { getPublicUrl } from "@/src/utils/supabase";
+
 // types
 import {
   BusInstruction,
@@ -31,6 +34,7 @@ import {
 // data
 import route32 from "@/src/data/route32.json";
 import route62 from "@/src/data/route62.json";
+import { useGetAds } from "@/src/hooks/ads";
 
 const fetchData = (): RouteSearchResult[] => {
   const stops62: Stop[] = route62.shape.geometry.coordinates
@@ -134,6 +138,20 @@ export default function RouteSearchView() {
     visible: false,
     mode: null,
   });
+  
+  // fetch ads
+  const { data: adsData } = useGetAds();
+  const ads = adsData?.map((ad) => {
+    const firstImage = ad.ads_images?.[0];
+    const adImageUrl = firstImage?.image_url
+      ? getPublicUrl(firstImage.image_url)
+      : "";
+
+    return {
+      id: ad.id,
+      image: adImageUrl,
+    };
+  });
 
   const setRoutes = useRouteSearchResultsStore((s) => s.setRoutes);
 
@@ -213,11 +231,7 @@ export default function RouteSearchView() {
         />
 
         <AppSlider
-          data={[
-            { id: "1", image: require("@/assets/images/tmp/ad_1.jpg") },
-            { id: "2", image: require("@/assets/images/tmp/ad_2.jpg") },
-            { id: "3", image: require("@/assets/images/tmp/ad_3.jpg") },
-          ]}
+          data={ads ?? []}
           autoPlay
           interval={2000}
           style={styles.advertisementContainer}
@@ -260,6 +274,6 @@ const styles = StyleSheet.create({
     fontFamily: "MiSansMyanmar-Medium",
   },
   advertisementContainer: {
-    marginTop: 30
-  }
+    marginTop: 30,
+  },
 });

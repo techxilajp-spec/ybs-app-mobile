@@ -108,6 +108,15 @@ export default function StopFilterModal({
     setSelectedFilterOptions([]);
   };
 
+  async function applyStopFavorites(stops: Stop[]) {
+    const favoriteIds = await getStopLocalFavorites();
+
+    return stops.map(stop => ({
+      ...stop,
+      isFavourite: favoriteIds.includes(stop.id.toString()),
+    }));
+  }
+
   useEffect(() => {
     if (canSearch) {
       // perform combined search and township filter over fetched stops

@@ -5,10 +5,17 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { syncFavoritesFromSupabase, syncFavoritesToSupabase } from "../services/routeFav";
 
 SplashScreen.preventAutoHideAsync();
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000
+    }
+  }
+});
 
 export default function RootLayout() {
   useReactQueryDevTools(queryClient);
@@ -28,6 +35,8 @@ export default function RootLayout() {
   useEffect(() => {
     async function loadInitialData() {
       try {
+        await syncFavoritesFromSupabase();
+        await syncFavoritesToSupabase();
       } catch (e) {
         console.warn(e);
       } finally {

@@ -36,7 +36,7 @@ export default function ListView({ data, onItemPress }: ListViewProps) {
         />
       ) : (
         <View style={[styles.container, styles.noDataContainer]}>
-            <AppText size={16} style={styles.noDataText}>Data များမရှိသေးပါ</AppText>
+          <AppText size={16} style={styles.noDataText}>Data များမရှိသေးပါ</AppText>
         </View>
       )}
     </View>
