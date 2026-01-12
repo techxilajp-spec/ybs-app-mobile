@@ -11,7 +11,7 @@ import { router } from "expo-router";
 import FilterModal from "@/src/components/home/routeList/FilterModal";
 import RouteListFilter from "@/src/components/home/routeList/RouteListFilter";
 import RouteCard from "@/src/components/RouteCard";
-import SkeletonCard from "@/src/components/SkeletonCard";
+import SkeletonCard from "@/src/components/RouteSkeletonCard";
 
 // type
 import { RouteFilters } from "@/src/types/filter";
@@ -86,13 +86,14 @@ export default function RouteListView() {
         {isRoutesLoading ? (
           // skeleton view
           <ScrollView
+            showsVerticalScrollIndicator={false}
             style={{
               marginTop: 20,
               flex: 1,
             }}
           >
-            {new Array(5).fill(0).map((_, index) => (
-              <SkeletonCard key={index}/>
+            {new Array(4).fill(0).map((_, index) => (
+              <SkeletonCard key={index} />
             ))}
           </ScrollView>
         ) : (
