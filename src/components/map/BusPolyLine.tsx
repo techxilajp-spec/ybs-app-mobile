@@ -1,13 +1,8 @@
-import { Polyline } from "react-native-maps";
-
-type Coordinate = {
-  latitude: number;
-  longitude: number;
-};
+import { LatLng, Polyline } from "react-native-maps";
 
 type BusPolyLineProps = {
   color: string;
-  coordinates: Coordinate[];
+  coordinates: LatLng[];
 };
 
 export default function BusPolyLine({ color, coordinates }: BusPolyLineProps) {

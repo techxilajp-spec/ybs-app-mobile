@@ -1,10 +1,14 @@
 import { Image, Pressable, StyleSheet, TextInput, View } from "react-native";
 
 type RouteListFilterProps = {
+  busNumber: string;
+  onChangeBusNumber: (value: string) => void;
   onPressFilterButton: () => void
 }
 
 export default function RouteListFilter({
+  busNumber,
+  onChangeBusNumber,
   onPressFilterButton
 }: RouteListFilterProps) {
   return (
@@ -20,6 +24,8 @@ export default function RouteListFilter({
           style={styles.input}
           placeholder="ဘက်စကားနံပါတ်အားရိုက်ထည့်ပါ"
           placeholderTextColor="#667085"
+          value={busNumber}
+          onChangeText={onChangeBusNumber}
         />
       </View>
       <Pressable style={styles.filterButton} onPress={onPressFilterButton}>

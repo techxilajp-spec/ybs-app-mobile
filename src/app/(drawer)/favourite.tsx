@@ -1,30 +1,34 @@
 import { StyleSheet } from "react-native";
 
 // react
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // custom components
 import AppHeader from "@/src/components/AppHeader";
 import AppNavigationTabs from "@/src/components/AppNavigationTabs";
 import AppScreenLayout from "@/src/components/AppScreenLayout";
-import RouteListView from "@/src/components/favourite/RouteListView";
 import StopsListView from "@/src/components/favourite/StopsListView";
 
-// data
-import ROUTE_LIST from "@/src/data/routes.json";
-import STOP_LIST from "@/src/data/stops.json";
-
 // types
+import api from "@/src/api";
+import RouteListView from "@/src/components/favourite/RouteListView";
+import {
+  useGetFavoriteRoutes,
+  useRemoveFavoriteRoute,
+} from "@/src/hooks/favourite";
+import { useGetFavoriteStops, useRemoveFavoriteStop } from "@/src/hooks/favouriteStops";
 import { Route, Stop } from "@/src/types/bus";
+import { useFocusEffect } from "@react-navigation/native";
+
 type TabKey = "stops" | "routes";
 
 const TAB_CONFIG: {
   key: TabKey;
   label: string;
 }[] = [
-  { key: "stops", label: "မှတ်တိုင်များ" },
-  { key: "routes", label: "ယာဉ်လိုင်းများ" },
-];
+    { key: "stops", label: "မှတ်တိုင်များ" },
+    { key: "routes", label: "ယာဉ်လိုင်းများ" },
+  ];
 
 export default function FavouriteScreen() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -33,10 +37,120 @@ export default function FavouriteScreen() {
 
   const activeTab = TAB_CONFIG[activeIndex].key;
 
+  const { mutate: getFavoriteRoutes } = useGetFavoriteRoutes();
+  const { mutate: removeFavoriteRoute } = useRemoveFavoriteRoute();
+  const { mutate: getFavoriteStops } = useGetFavoriteStops();
+  const { mutate: removeFavoriteStop } = useRemoveFavoriteStop();
+
   useEffect(() => {
-    setBusStops(STOP_LIST);
-    setRoutes(ROUTE_LIST);
-  }, [])
+    if (activeTab === "stops") {
+      getFavoriteStops(undefined, {
+        onSuccess: (data: Stop[]) => {
+          setBusStops(
+            data.map((stop) => ({
+              id: stop.id,
+              name_mm: stop.name_mm,
+              name_en: stop.name_en,
+              road_mm: stop.road_mm,
+              road_en: stop.road_en,
+              lat: stop.lat,
+              lng: stop.lng,
+              isFavourite: true,
+            }))
+          );
+        },
+        onError: () => {
+          setBusStops([]);
+        },
+      });
+    }
+  }, [activeTab, getFavoriteStops]);
+
+
+  const handleToggleFavoriteStop = (stopId: string) => {
+    const stopIdNum = Number(stopId);
+    setBusStops((prev) => prev.filter((s) => s.id !== stopId));
+
+    removeFavoriteStop(stopIdNum, {
+      onError: () => {
+        console.warn("Failed to remove favorite stop");
+      },
+    });
+  };
+
+  useEffect(() => {
+    if (activeTab === "stops") {
+      loadFavouriteStops();
+    }
+  }, [activeTab]);
+
+  async function loadFavouriteStops() {
+    try {
+      const data = await api.favouriteStopsApi.getFavoriteStops();
+
+      const mapped: Stop[] = data.map((stop) => ({
+        id: stop.id,
+        name_mm: stop.name_mm,
+        name_en: stop.name_en,
+        road_mm: stop.road_mm,
+        road_en: stop.road_en,
+        lat: stop.lat,
+        lng: stop.lng,
+        isFavourite: true,
+      }));
+
+      setBusStops(mapped);
+    } catch (error) {
+      console.warn("Failed to load favorite stops", error);
+      setBusStops([]);
+    }
+  }
+
+
+  const handleRemoveFavoriteRoute = (routeId: number) => {
+    removeFavoriteRoute(routeId, {
+      onSuccess: () => {
+        getFavoriteRoutes(undefined, {
+          onSuccess: (data) => {
+            setRoutes(
+              data.map((da) => ({
+                id: da.id,
+                no: da.number_en,
+                name: da.name,
+                description: da.number_mm,
+                color: da.color,
+                isYps: da.is_yps,
+              }))
+            );
+          },
+        });
+      },
+      onError: (error) => {
+        console.log("Failed to remove favorite route", error);
+      },
+    });
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (activeTab === "routes") {
+        getFavoriteRoutes(undefined, {
+          onSuccess: (data) => {
+            setRoutes(
+              data.map((da) => ({
+                id: da.id,
+                no: da.number_en,
+                name: da.name,
+                description: da.number_mm,
+                color: da.color,
+                isYps: da.is_yps,
+              }))
+            );
+          },
+        });
+      }
+    }, [activeTab, getFavoriteRoutes])
+  );
 
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
@@ -57,8 +171,17 @@ export default function FavouriteScreen() {
         navigationTabStyle={styles.navigation}
         onNavigationTabPress={setActiveIndex}
       />
-      {activeTab === "stops" && <StopsListView data={busStops} />}
-      {activeTab === "routes" && <RouteListView data={routes} style={{ marginTop: 20 }} />}
+      {activeTab === "stops" && <StopsListView
+        data={busStops}
+        onToggleFavourite={handleToggleFavoriteStop}
+      />}
+      {activeTab === "routes" && (
+        <RouteListView
+          data={routes}
+          style={{ marginTop: 20 }}
+          onPressRemoveFavoriteRoute={handleRemoveFavoriteRoute}
+        />
+      )}
     </AppScreenLayout>
   );
 }

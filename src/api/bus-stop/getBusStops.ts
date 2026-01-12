@@ -7,8 +7,8 @@ import { supabase } from "@/src/utils/supabase";
 const getBusStops = async (name?: string) => {
     let query = supabase.from("stops").select(`
     id,
-    title_mm:name_mm,
-    title_en:name_en,
+    name_mm,
+    name_en,
     road_mm,
     road_en,
     lat,

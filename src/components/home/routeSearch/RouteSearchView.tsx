@@ -21,6 +21,9 @@ import { TripPlannerService } from "@/src/services/TripPlannerService";
 import { useRouteSearchResultsStore } from "@/src/stores/useRouteSearchResultsStore";
 import { useTripPlannerStore } from "@/src/stores/useTripPlannerStore";
 
+// utils
+import { getPublicUrl } from "@/src/utils/supabase";
+
 // types
 import {
   BusInstruction,
@@ -33,6 +36,7 @@ import {
 // data
 import route32 from "@/src/data/route32.json";
 import route62 from "@/src/data/route62.json";
+import { useGetAds } from "@/src/hooks/ads";
 
 const fetchData = (): RouteSearchResult[] => {
   const stops62: Stop[] = route62.shape.geometry.coordinates
@@ -135,6 +139,20 @@ export default function RouteSearchView() {
   }>({
     visible: false,
     mode: null,
+  });
+
+  // fetch ads
+  const { data: adsData } = useGetAds();
+  const ads = adsData?.map((ad) => {
+    const firstImage = ad.ads_images?.[0];
+    const adImageUrl = firstImage?.image_url
+      ? getPublicUrl(firstImage.image_url)
+      : "";
+
+    return {
+      id: ad.id,
+      image: adImageUrl,
+    };
   });
 
   const [isSearching, setIsSearching] = useState(false);
@@ -251,7 +269,7 @@ export default function RouteSearchView() {
           <DirectionSelector
             icon={<View style={styles.circleIcon}></View>}
             title="မှ"
-            description={startStop ? startStop.title_mm : "လက်ရှိတည်နေရာ"}
+            description={startStop ? startStop.name_mm : "လက်ရှိတည်နေရာ"}
             subtitle={startStop ? `${(startStop.lat || startStop.coordinate?.latitude || 0).toFixed(5)}, ${(startStop.lng || startStop.coordinate?.longitude || 0).toFixed(5)}` : undefined}
             value=""
             onPress={() => openDirectionModal("start")}
@@ -268,7 +286,7 @@ export default function RouteSearchView() {
               />
             }
             title="သို"
-            description={endStop ? endStop.title_mm : "သွားရောက်လိုသည့်နေရာ"}
+            description={endStop ? endStop.name_mm : "သွားရောက်လိုသည့်နေရာ"}
             subtitle={endStop ? `${(endStop.lat || endStop.coordinate?.latitude || 0).toFixed(5)}, ${(endStop.lng || endStop.coordinate?.longitude || 0).toFixed(5)}` : undefined}
             onPress={() => openDirectionModal("end")}
           />
@@ -281,11 +299,7 @@ export default function RouteSearchView() {
         />
 
         <AppSlider
-          data={[
-            { id: "1", image: require("@/assets/images/tmp/ad_1.jpg") },
-            { id: "2", image: require("@/assets/images/tmp/ad_2.jpg") },
-            { id: "3", image: require("@/assets/images/tmp/ad_3.jpg") },
-          ]}
+          data={ads ?? []}
           autoPlay
           interval={2000}
           style={styles.advertisementContainer}
@@ -328,6 +342,6 @@ const styles = StyleSheet.create({
     fontFamily: "MiSansMyanmar-Medium",
   },
   advertisementContainer: {
-    marginTop: 30
-  }
+    marginTop: 30,
+  },
 });
