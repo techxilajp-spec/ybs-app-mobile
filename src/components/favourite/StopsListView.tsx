@@ -29,7 +29,6 @@ export default function StopsListView({
           lat={item.lat}
           lng={item.lng}
           isFavourite={item.isFavourite}
-          onToggleFavourite={() => onToggleFavourite(item.id)}
         />
       )}
       keyExtractor={(item, index) => index + item.name_en}

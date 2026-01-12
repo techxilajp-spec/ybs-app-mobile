@@ -1,24 +1,18 @@
 // react native
 import {
-  Image,
-  Modal,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View
+    Image,
+    Modal,
+    Pressable,
+    StyleSheet,
+    TextInput,
+    View,
 } from "react-native";
 
 // react
 import { useEffect, useState } from "react";
 
-// use-debounce
-import { useDebounce } from "use-debounce";
-
 // expo icons
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-
-// expo router
-import { router } from "expo-router";
 
 // custom components
 import NavigationTabs from "@/src/components/AppNavigationTabs";
@@ -33,23 +27,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 // type
 import { Accordian, Option } from "@/src/types/accordian";
 
-// constants
-import { Colors } from "@/src/constants/color";
-
-// hooks
-import { useSearchBusStops } from "@/src/hooks/bus-stop";
-
 // data
 import { useGetStops } from "@/src/hooks/bus-stop";
-import { getStopLocalFavorites } from "@/src/services/stopFav";
-import { Stop } from "@/src/types/bus";
 
 type StopFilterModalProps = {
   visible: boolean;
   title: string;
   showCurrentLocation?: boolean;
   onClose: () => void;
-  onSelect?: (stop: any) => void;
+  onSelectStop?: (stop: any) => void;
 };
 
 const TABS = ["လတ်တလော", "နှစ်သက်မှု"];
@@ -59,7 +45,7 @@ export default function StopFilterModal({
   showCurrentLocation = false,
   title,
   onClose,
-  onSelect,
+  onSelectStop,
 }: StopFilterModalProps) {
   const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
   const [stopsList, setStopsList] = useState<any[]>([]);
@@ -69,8 +55,6 @@ export default function StopFilterModal({
   const areas = data?.areas ?? [];
 
   const [searchText, setSearchText] = useState<string>("");
-  const [debouncedSearchText] = useDebounce(searchText, 500);
-
   const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
     []
   );
@@ -78,11 +62,8 @@ export default function StopFilterModal({
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false);
 
-  // useSearchBusStops hook
-  const { data: searchResults, isLoading } = useSearchBusStops(debouncedSearchText);
-
   const hasSelectedOptions = selectedFilterOptions.length > 0;
-  const isValidSearchText = debouncedSearchText.trim() !== "";
+  const isValidSearchText = searchText.trim() !== "";
   const canSearch = hasSelectedOptions || isValidSearchText;
 
 
@@ -107,7 +88,7 @@ export default function StopFilterModal({
    */
   const onOptionListSelect = (selectedOptionList: Option[]) => {
     setSelectedFilterOptions(selectedOptionList);
-  };
+  }; 
 
   /**
    * Removes a selected option from the options list.
@@ -127,14 +108,14 @@ export default function StopFilterModal({
     setSelectedFilterOptions([]);
   };
 
-  // async function applyStopFavorites(stops: Stop[]) {
-  //   const favoriteIds = await getStopLocalFavorites();
+//   async function applyStopFavorites(stops: Stop[]) {
+//     const favoriteIds = await getStopLocalFavorites();
 
-  //   return stops.map(stop => ({
-  //     ...stop,
-  //     isFavourite: favoriteIds.includes(stop.id.toString()),
-  //   }));
-  // }
+//     return stops.map(stop => ({
+//       ...stop,
+//       isFavourite: favoriteIds.includes(stop.id.toString()),
+//     }));
+//   }
 
   useEffect(() => {
     if (canSearch) {
@@ -158,7 +139,6 @@ export default function StopFilterModal({
       });
 
       setStopsList(searchData);
-      console.log("searchData", searchData);
       return;
     }
 
@@ -181,7 +161,7 @@ export default function StopFilterModal({
       animationType="slide"
       statusBarTranslucent={true}
     >
-      <SafeAreaView style={[styles.container, { paddingTop: 0 }]}>
+      <SafeAreaView style={styles.container}>
         {isFilterVisible ? (
           <FilterView
             onClose={hileFilters}
@@ -227,26 +207,6 @@ export default function StopFilterModal({
             </View>
 
             <View style={{ flex: 1 }}>
-              <Pressable
-                style={styles.mapSelectionButton}
-                onPress={() => {
-                  // Navigate to map selection
-                  if (onClose) onClose();
-                  const mode = title.includes("စထွက်") ? "start" : "end";
-                  // Using router.push with relative path since we are in (home) group
-                  // Or absolute path
-                  const params = { mode };
-                  // @ts-ignore
-                  router.push({ pathname: "/mapSelection", params });
-                }}
-              >
-                <View style={styles.mapIconCircle}>
-                  <MaterialIcons name="map" size={20} color="#FFF" />
-                </View>
-                <AppText style={styles.mapSelectionText}>မြေပုံမှရွေးချယ်မည်</AppText>
-                <MaterialIcons name="chevron-right" size={24} color={Colors.text.secondary} />
-              </Pressable>
-
               {selectedFilterOptions.length > 0 && (
                 <AppliedFilterSummary
                   filters={selectedFilterOptions}
@@ -277,10 +237,11 @@ export default function StopFilterModal({
               )}
               <ListView
                 data={stopsList}
-                onPress={(stop) => {
-                  if (onSelect) {
-                    onSelect(stop);
-                  }
+                onItemPress={(item) => {
+                  // pass the selected stop back to parent
+                  onSelectStop?.(item);
+
+                  // close modal
                   onClose();
                 }}
               />
@@ -311,7 +272,6 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 15,
     borderRadius: 8,
-    height: 40,
 
     flexDirection: "row",
     alignItems: "center",
@@ -373,28 +333,4 @@ const styles = StyleSheet.create({
   filterSummary: {
     marginBottom: 18,
   },
-  mapSelectionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F9FAFB",
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#EAECF0",
-    marginBottom: 15,
-  },
-  mapIconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 10
-  },
-  mapSelectionText: {
-    flex: 1,
-    color: Colors.text.primary,
-    fontWeight: "600"
-  }
 });

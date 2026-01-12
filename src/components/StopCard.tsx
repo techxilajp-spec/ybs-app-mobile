@@ -17,7 +17,7 @@ type StopCardProps = {
   lng: number;
   onPress?: () => void;
   isFavourite?: boolean;
-  onToggleFavourite: () => void;
+  // onToggleFavourite: () => void;
 }
 
 export default function StopCard({
@@ -28,7 +28,6 @@ export default function StopCard({
   lng,
   onPress,
   isFavourite = false,
-  onToggleFavourite,
 }: StopCardProps) {
   return (
     <Pressable style={styles.container} onPress={onPress}>
@@ -66,14 +65,14 @@ export default function StopCard({
           ({lat}, {lng})
         </AppText>
       </View>
-      {/* <View style={[styles.iconContainer, styles.heartIconContainer]}>
+      <View style={[styles.iconContainer, styles.heartIconContainer]}>
         {isFavourite ? (
           <FontAwesome name="heart" size={24} color={Colors.primary} />
         ) : (
           <FontAwesome name="heart-o" size={20} color={Colors.text.disabled} />
         )}
-      </View> */}
-      <Pressable
+      </View>
+      {/* <Pressable
         onPress={onToggleFavourite}
         hitSlop={10}
         style={[styles.iconContainer, styles.heartIconContainer]}
@@ -83,7 +82,7 @@ export default function StopCard({
           size={isFavourite ? 24 : 20}
           color={isFavourite ? Colors.primary : Colors.text.disabled}
         />
-      </Pressable>
+      </Pressable> */}
     </Pressable>
   );
 }
