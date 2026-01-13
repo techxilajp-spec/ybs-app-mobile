@@ -15,8 +15,6 @@ import { useDebounce } from "use-debounce";
 
 // expo icons
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-// expo router
-import { router } from "expo-router";
 // custom components
 import NavigationTabs from "@/src/components/AppNavigationTabs";
 import AppText from "@/src/components/AppText";
@@ -212,6 +210,7 @@ export default function RouteFilterModal({
             </View>
 
             <View style={{ flex: 1 }}>
+              {/* 
               <Pressable
                 style={styles.mapSelectionButton}
                 onPress={() => {
@@ -231,6 +230,7 @@ export default function RouteFilterModal({
                 <AppText style={styles.mapSelectionText}>မြေပုံမှရွေးချယ်မည်</AppText>
                 <MaterialIcons name="chevron-right" size={24} color={Colors.text.secondary} />
               </Pressable>
+              */}
 
               {selectedFilterOptions.length > 0 && (
                 <AppliedFilterSummary
