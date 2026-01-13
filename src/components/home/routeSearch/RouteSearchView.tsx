@@ -227,9 +227,17 @@ export default function RouteSearchView() {
       return;
     }
 
+    // STRICT ID CHECK
+    if (!startStop.id || !endStop.id) {
+      alert("Please select valid bus stops from the list.");
+      return;
+    }
+
     setIsSearching(true);
     try {
       // Show loading indicator if possible (omitted for brevity, can add state)
+      /* 
+      // Coordinate based search - COMMENTED OUT
       const startCoord = {
         latitude: startStop.lat || startStop.coordinate?.latitude || 0,
         longitude: startStop.lng || startStop.coordinate?.longitude || 0
@@ -241,6 +249,11 @@ export default function RouteSearchView() {
 
       console.log("Searching routes from:", startCoord, "to:", endCoord);
       const results = await TripPlannerService.planTrip(startCoord, endCoord);
+      */
+
+      console.log("Searching routes by ID:", startStop.id, "to:", endStop.id);
+      const results = await TripPlannerService.planTripById(startStop.id.toString(), endStop.id.toString());
+
       setRoutes(results);
       router.push("/routeSearchResults");
     } catch (e) {
@@ -269,7 +282,7 @@ export default function RouteSearchView() {
           <DirectionSelector
             icon={<View style={styles.circleIcon}></View>}
             title="မှ"
-            description={startStop ? startStop.name_mm : "လက်ရှိတည်နေရာ"}
+            description={startStop ? startStop.name_mm : "မှတ်တိုင်ရွေးချယ်ပါ"}
             subtitle={startStop ? `${(startStop.lat || startStop.coordinate?.latitude || 0).toFixed(5)}, ${(startStop.lng || startStop.coordinate?.longitude || 0).toFixed(5)}` : undefined}
             value=""
             onPress={() => openDirectionModal("start")}
