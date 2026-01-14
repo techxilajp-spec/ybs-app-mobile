@@ -7,20 +7,28 @@ import { SafeAreaView } from "react-native-safe-area-context";
 // custom components
 import AppText from "@/src/components/AppText";
 
+type Advertisement = {
+  duration: number;
+  img_url: string;
+}
+
 type AdvertisementModalProps = {
   visible: boolean;
   onClose: () => void;
+  data: Advertisement;
 };
 
 export default function AdvertisementModal({
   visible,
   onClose,
+  data
 }: AdvertisementModalProps) {
-  const [skipCounter, setSkipCounter] = useState<number>(5);
+  const { duration, img_url } = data;
+  const [skipCounter, setSkipCounter] = useState<number>(duration);
 
   useEffect(() => {
     if (!visible) return;
-    setSkipCounter(5);
+    setSkipCounter(duration);
     const interval = setInterval(() => {
       setSkipCounter((prev) => {
         if (prev <= 1) {
@@ -54,7 +62,7 @@ export default function AdvertisementModal({
       <ImageBackground
         style={styles.backgroundContainer}
         resizeMode="cover"
-        source={require("@/assets/images/advertisement.png")}
+        source={{ uri: img_url }}
       >
         <SafeAreaView style={styles.safeContainer}>
           <Pressable style={styles.skipButton} onPress={closeModal}>

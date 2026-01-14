@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
-import 'react-native-get-random-values';
+import "react-native-get-random-values";
 
 // custom component`
 import NavigationTabs from "@/src/components/AppNavigationTabs";
@@ -35,25 +35,29 @@ const TAB_CONFIG = [
 export default function HomeScreen() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
-  const hasSeenAdvertisement = useAdvertisementStore((s) => s.hasSeenAdvertisement);
-  const setHasSeenAdvertisement = useAdvertisementStore((s) => s.setHasSeenAdvertisement);
-
-  // Show only if not seen yet
-  const [isAdvertisementVisible, setIsAdvertisementVisible] = useState<boolean>(!hasSeenAdvertisement);
+  const advertisement = useAdvertisementStore((s) => s.advertisement);
+  const hasSeenAdvertisement = useAdvertisementStore(
+    (s) => s.hasSeenAdvertisement
+  );
+  const setHasSeenAdvertisement = useAdvertisementStore(
+    (s) => s.setHasSeenAdvertisement
+  );
 
   const { component: ActiveView } = TAB_CONFIG[activeIndex];
 
   const hideAdvertisement = () => {
-    setIsAdvertisementVisible(false);
     setHasSeenAdvertisement(true);
   };
 
   return (
     <>
-      <AdvertisementModal
-        visible={isAdvertisementVisible && !hasSeenAdvertisement}
-        onClose={hideAdvertisement}
-      />
+      {advertisement && (
+        <AdvertisementModal
+          visible={!hasSeenAdvertisement}
+          onClose={hideAdvertisement}
+          data={advertisement}
+        />
+      )}
       <ImageBackground
         style={{ flex: 1 }}
         resizeMode="cover"
