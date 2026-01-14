@@ -25,112 +25,103 @@ import { useTripPlannerStore } from "@/src/stores/useTripPlannerStore";
 import { getPublicUrl } from "@/src/utils/supabase";
 
 // types
-import {
-  BusInstruction,
-  Route,
-  RouteSearchResult,
-  Stop,
-  WalkInstruction,
-} from "@/src/types/map";
 
 // data
-import route32 from "@/src/data/route32.json";
-import route62 from "@/src/data/route62.json";
 import { useGetAds } from "@/src/hooks/ads";
 
-const fetchData = (): RouteSearchResult[] => {
-  const stops62: Stop[] = route62.shape.geometry.coordinates
-    .map(([longitude, latitude]) => ({
-      id: Math.random().toString(),
-      name: `${latitude}~${longitude}`,
-      road: Math.random().toString(),
-      coordinate: {
-        latitude,
-        longitude,
-      },
-    }))
-    // take every 5th stop
-    .filter((_, index) => index % 5 === 0);
+// const fetchData = (): RouteSearchResult[] => {
+//   const stops62: Stop[] = route62.shape.geometry.coordinates
+//     .map(([longitude, latitude]) => ({
+//       id: Math.random().toString(),
+//       name: `${latitude}~${longitude}`,
+//       road: Math.random().toString(),
+//       coordinate: {
+//         latitude,
+//         longitude,
+//       },
+//     }))
+//     // take every 5th stop
+//     .filter((_, index) => index % 5 === 0);
 
-  const stops32: Stop[] = route32.shape.geometry.coordinates
-    .map(([longitude, latitude]) => ({
-      id: Math.random().toString(),
-      name: `${latitude}~${longitude}`,
-      road: Math.random().toString(),
-      coordinate: {
-        latitude,
-        longitude,
-      },
-    }))
-    // take every 5th stop
-    .filter((_, index) => index % 5 === 0);
+//   const stops32: Stop[] = route32.shape.geometry.coordinates
+//     .map(([longitude, latitude]) => ({
+//       id: Math.random().toString(),
+//       name: `${latitude}~${longitude}`,
+//       road: Math.random().toString(),
+//       coordinate: {
+//         latitude,
+//         longitude,
+//       },
+//     }))
+//     // take every 5th stop
+//     .filter((_, index) => index % 5 === 0);
 
-  const route62Info: Route = {
-    id: route62.route_id,
-    no: route62.route_id,
-    name: route62.name,
-    color: route62.color,
-    description: "",
-    coordinates: route62.shape.geometry.coordinates.map(
-      ([longitude, latitude]) => ({
-        latitude,
-        longitude,
-      })
-    ),
-    stops: stops62,
-  };
+//   const route62Info: Route = {
+//     id: route62.route_id,
+//     no: route62.route_id,
+//     name: route62.name,
+//     color: route62.color,
+//     description: "",
+//     coordinates: route62.shape.geometry.coordinates.map(
+//       ([longitude, latitude]) => ({
+//         latitude,
+//         longitude,
+//       })
+//     ),
+//     stops: stops62,
+//   };
 
-  const route32Info: Route = {
-    id: route32.route_id,
-    no: route32.route_id,
-    name: route32.name,
-    color: route32.color,
-    description: "",
-    coordinates: route32.shape.geometry.coordinates.map(
-      ([longitude, latitude]) => ({
-        latitude,
-        longitude,
-      })
-    ),
-    stops: stops32,
-  };
+//   const route32Info: Route = {
+//     id: route32.route_id,
+//     no: route32.route_id,
+//     name: route32.name,
+//     color: route32.color,
+//     description: "",
+//     coordinates: route32.shape.geometry.coordinates.map(
+//       ([longitude, latitude]) => ({
+//         latitude,
+//         longitude,
+//       })
+//     ),
+//     stops: stops32,
+//   };
 
-  const searchResults = [
-    {
-      id: Math.random(),
-      isFastest: true,
-      totalBusStop: 22,
-      estimatedTime: 35,
-      routes: [route62Info, route32Info],
-      instructions: [
-        {
-          type: "walk",
-          description: "Walk 200 meters to the bus stop",
-        } as WalkInstruction,
-        {
-          type: "bus",
-          busNo: "45B",
-          busTitle: "Downtown Express",
-          startStop: "Central Station",
-          endStop: "Main Street",
-        } as BusInstruction,
-        {
-          type: "walk",
-          description: "Walk 100 meters to your destination",
-        } as WalkInstruction,
-        {
-          type: "bus",
-          busNo: "12A",
-          busTitle: "City Loop",
-          startStop: "Main Street",
-          endStop: "Park Avenue",
-        } as BusInstruction,
-      ],
-    },
-  ];
+//   const searchResults = [
+//     {
+//       id: Math.random(),
+//       isFastest: true,
+//       totalBusStop: 22,
+//       estimatedTime: 35,
+//       routes: [route62Info, route32Info],
+//       instructions: [
+//         {
+//           type: "walk",
+//           description: "Walk 200 meters to the bus stop",
+//         } as WalkInstruction,
+//         {
+//           type: "bus",
+//           busNo: "45B",
+//           busTitle: "Downtown Express",
+//           startStop: "Central Station",
+//           endStop: "Main Street",
+//         } as BusInstruction,
+//         {
+//           type: "walk",
+//           description: "Walk 100 meters to your destination",
+//         } as WalkInstruction,
+//         {
+//           type: "bus",
+//           busNo: "12A",
+//           busTitle: "City Loop",
+//           startStop: "Main Street",
+//           endStop: "Park Avenue",
+//         } as BusInstruction,
+//       ],
+//     },
+//   ];
 
-  return searchResults;
-};
+//   return searchResults;
+// };
 
 export default function RouteSearchView() {
   const [showDirectionModal, setShowDirectionModal] = useState<{
@@ -209,7 +200,6 @@ export default function RouteSearchView() {
    */
   const searchRoutes = async () => {
     // Current location fallback logic
-    let startLoc;
     if (!startStop) {
       alert("Please select a start destination.");
       return;
@@ -250,8 +240,7 @@ export default function RouteSearchView() {
       console.log("Searching routes from:", startCoord, "to:", endCoord);
       const results = await TripPlannerService.planTrip(startCoord, endCoord);
       */
-
-      console.log("Searching routes by ID:", startStop.id, "to:", endStop.id);
+     
       const results = await TripPlannerService.planTripById(startStop.id.toString(), endStop.id.toString());
 
       setRoutes(results);
