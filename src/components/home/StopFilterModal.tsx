@@ -54,10 +54,6 @@ type StopFilterModalProps = {
 
 const TABS = ["လတ်တလော", "နှစ်သက်မှု"];
 
-const fetchStops = () => {
-  return stopList.searchResult;
-};
-
 export default function StopFilterModal({
   visible,
   showCurrentLocation = false,
@@ -79,7 +75,7 @@ export default function StopFilterModal({
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false);
 
   // useSearchBusStops hook
-  const { data: searchResults, isLoading } = useSearchBusStops(debouncedSearchText);
+  const { data: searchResults } = useSearchBusStops(debouncedSearchText);
 
   const hasSelectedOptions = selectedFilterOptions.length > 0;
   const isValidSearchText = debouncedSearchText.trim() !== "";
@@ -128,6 +124,7 @@ export default function StopFilterModal({
 
   useEffect(() => {
     if (canSearch && searchResults) {
+      console.log("searchResults", searchResults);
       setStopsList(searchResults as any);
       return;
     }

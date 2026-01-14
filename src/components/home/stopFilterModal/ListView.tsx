@@ -29,6 +29,7 @@ export default function ListView({ data, onPress }: ListViewProps) {
               lng={item.lng}
               isFavourite={item.isFavourite}
               onPress={() => onPress && onPress(item)}
+              busNumbers={item.bus_numbers}
               // onToggleFavourite={() => { }}
             />
           )}

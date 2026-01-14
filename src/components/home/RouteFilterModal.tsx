@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 // react
-import { useEffect, useState } from "react"; // use-debounce
+import { useEffect, useMemo, useState } from "react"; // use-debounce
 // use-debounce
 import { useDebounce } from "use-debounce";
 
@@ -53,8 +53,8 @@ export default function RouteFilterModal({
   const [stopsList, setStopsList] = useState<Stop[]>([]);
 
   const { data } = useGetStops();
-  const stops = data?.stops ?? [];
-  const areas = data?.areas ?? [];
+  const stops = useMemo(() => data?.stops ?? [], [data]);
+  const areas = useMemo(() => data?.areas ?? [], [data]);
 
   const [searchText, setSearchText] = useState<string>("");
   const [debouncedSearchText] = useDebounce(searchText, 500);
@@ -64,11 +64,9 @@ export default function RouteFilterModal({
 
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false);
-
   const hasSelectedOptions = selectedFilterOptions.length > 0;
   const isValidSearchText = debouncedSearchText.trim() !== "";
   const canSearch = hasSelectedOptions || isValidSearchText;
-
 
   /**
    * Shows the filter panel.
@@ -293,11 +291,9 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     backgroundColor: "#F2F4F7",
-    paddingVertical: 5,
     paddingHorizontal: 15,
     borderRadius: 8,
     height: 40,
-
     flexDirection: "row",
     alignItems: "center",
   },
@@ -320,12 +316,12 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: "MiSansMyanmar-Regular",
     backgroundColor: "#F2F4F7",
-    paddingLeft: 10,
+    paddingLeft: 10
   },
   filterButton: {
     position: "relative",
     backgroundColor: "#FFFFFF",
-    padding: 12,
+    padding: 10,
     borderRadius: 8,
     borderColor: "#D0D5DD",
     borderWidth: 1,
