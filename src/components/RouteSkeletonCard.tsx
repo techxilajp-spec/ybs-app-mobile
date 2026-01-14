@@ -5,15 +5,15 @@ import { Animated, StyleSheet, View, ViewStyle } from "react-native";
 // constants
 import { Colors } from "../constants/color";
 
-type SkeletonCardProps = {
+type RouteSkeletonCardProps = {
   style ?: ViewStyle
 }
 
 const AnimatedGradient = Animated.createAnimatedComponent(LinearGradient);
 
-export default function SkeletonCard({
+export default function RouteSkeletonCard({
   style
-}: SkeletonCardProps) {
+}: RouteSkeletonCardProps) {
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {

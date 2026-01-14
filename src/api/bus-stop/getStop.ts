@@ -15,6 +15,8 @@ const getStops = async () => {
       id,
       name_mm,
       name_en,
+      road_mm,
+      road_en,
       lat,
       lng,
       township:township_id (

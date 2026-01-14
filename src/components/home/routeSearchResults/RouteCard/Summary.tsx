@@ -28,7 +28,11 @@ export default function Summary({
                     <AppText size={12} style={styles.buttonText}>Total Bus Stop : {totalBusStops}</AppText>
                 </View>
                 <View style={styles.button}>
-                    <AppText size={12} style={styles.buttonText}>Est : {estimatedTime} minutes</AppText>
+                    <AppText size={12} style={styles.buttonText}>Est : {
+                        estimatedTime >= 60
+                            ? `${Math.floor(estimatedTime / 60)} hr ${estimatedTime % 60 > 0 ? `${estimatedTime % 60} min` : ''}`
+                            : `${estimatedTime} min`
+                    }</AppText>
                 </View>
             </View>
         </View>

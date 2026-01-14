@@ -54,8 +54,8 @@ export default function MapSelectionScreen() {
         // Create a pseudo-stop object from the coordinate
         const locationStop = {
             id: "custom-location",
-            title_mm: "မြေပုံမှရွေးချယ်ထားသောနေရာ",
-            title_en: "Selected Location",
+            name_mm: "မြေပုံမှရွေးချယ်ထားသောနေရာ",
+            name_en: "Selected Location",
             road_mm: "",
             road_en: "",
             lat: selectedCoordinate.latitude,

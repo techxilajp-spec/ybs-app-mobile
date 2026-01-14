@@ -7,11 +7,14 @@ import { useState } from "react";
 //expo router
 import { router } from "expo-router";
 
+// debounce
+import { useDebounce } from "use-debounce";
+
 // custom component
 import FilterModal from "@/src/components/home/routeList/FilterModal";
 import RouteListFilter from "@/src/components/home/routeList/RouteListFilter";
 import RouteCard from "@/src/components/RouteCard";
-import SkeletonCard from "@/src/components/SkeletonCard";
+import SkeletonCard from "@/src/components/RouteSkeletonCard";
 
 // type
 import { RouteFilters } from "@/src/types/filter";
@@ -26,15 +29,21 @@ export default function RouteListView() {
     routeFilterOptions[0]
   );
   const [busNumber, setBusNumber] = useState<string>("");
+  const [debouncedBusNumber] = useDebounce(busNumber, 1000);
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
 
   const isYpsServiceRoutes = activeOption.id === "YBS_SERVICE_ROUTES";
   const {
-    isPending: isRoutesLoading,
-    isError: isRoutesError,
-    data: routes,
+    data: routeDatas,
     error: routesError,
-  } = useGetRoutes(isYpsServiceRoutes, busNumber);
+    isLoading: isRoutesLoading,
+    isError: isRoutesError,
+    fetchNextPage: fextNextRoutes,
+    hasNextPage: hasNextRoutes,
+    isFetching: isFetchingRoutes,
+    isFetchingNextPage: isFetchingNextRoutes,
+  } = useGetRoutes(isYpsServiceRoutes, debouncedBusNumber);
+  const routes = routeDatas?.pages.flatMap((page) => page.data) ?? [];
 
   /**
    * Opens the filter modal
@@ -86,20 +95,25 @@ export default function RouteListView() {
         {isRoutesLoading ? (
           // skeleton view
           <ScrollView
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={false}
             style={{
               marginTop: 20,
               flex: 1,
             }}
           >
-            {new Array(5).fill(0).map((_, index) => (
-              <SkeletonCard key={index}/>
+            {new Array(4).fill(0).map((_, index) => (
+              <SkeletonCard key={index} />
             ))}
           </ScrollView>
+        ) : isRoutesError ? (
+          <View></View>
         ) : (
-          // route list view
           <FlatList
             style={{ marginTop: 20 }}
-            data={routes ?? []}
+            data={routes}
+            keyExtractor={(item) => item.routeId.toString()}
+            showsVerticalScrollIndicator={false}
             renderItem={({ item }) => (
               <RouteCard
                 routeNo={item.routeNumberEn}
@@ -110,8 +124,14 @@ export default function RouteListView() {
                 isYps={item.isYps}
               />
             )}
-            keyExtractor={(item) => item.routeId.toString()}
-            showsVerticalScrollIndicator={false}
+            onEndReached={() => {
+              if (hasNextRoutes && !isFetchingNextRoutes) {
+                fextNextRoutes();
+              }
+            }}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={isFetchingNextRoutes ? <SkeletonCard /> : null}
+            ListEmptyComponent={!isRoutesLoading ? <View /> : null}
           />
         )}
       </View>

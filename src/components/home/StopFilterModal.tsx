@@ -5,7 +5,7 @@ import {
   Pressable,
   StyleSheet,
   TextInput,
-  View
+  View,
 } from "react-native";
 
 // react
@@ -32,6 +32,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 // type
 import { Accordian, Option } from "@/src/types/accordian";
+import { Stop } from "@/src/types/bus";
 
 // constants
 import { Colors } from "@/src/constants/color";
@@ -40,7 +41,8 @@ import { Colors } from "@/src/constants/color";
 import { useSearchBusStops } from "@/src/hooks/bus-stop";
 
 // data
-import { useGetStops } from "@/src/hooks/bus-stop";
+import stopList from "@/src/data/stop_filter_data.json";
+import yangonAreasBurmese from "@/src/data/yangon_areas.json";
 
 type StopFilterModalProps = {
   visible: boolean;
@@ -52,6 +54,10 @@ type StopFilterModalProps = {
 
 const TABS = ["လတ်တလော", "နှစ်သက်မှု"];
 
+const fetchStops = () => {
+  return stopList.searchResult;
+};
+
 export default function StopFilterModal({
   visible,
   showCurrentLocation = false,
@@ -60,11 +66,7 @@ export default function StopFilterModal({
   onSelect,
 }: StopFilterModalProps) {
   const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
-  const [stopsList, setStopsList] = useState<any[]>([]);
-
-  const { data } = useGetStops();
-  const stops = data?.stops ?? [];
-  const areas = data?.areas ?? [];
+  const [stopsList, setStopsList] = useState<Stop[]>([]);
 
   const [searchText, setSearchText] = useState<string>("");
   const [debouncedSearchText] = useDebounce(searchText, 500);
@@ -82,7 +84,6 @@ export default function StopFilterModal({
   const hasSelectedOptions = selectedFilterOptions.length > 0;
   const isValidSearchText = debouncedSearchText.trim() !== "";
   const canSearch = hasSelectedOptions || isValidSearchText;
-
 
   /**
    * Shows the filter panel.
@@ -125,51 +126,22 @@ export default function StopFilterModal({
     setSelectedFilterOptions([]);
   };
 
-  // async function applyStopFavorites(stops: Stop[]) {
-  //   const favoriteIds = await getStopLocalFavorites();
-
-  //   return stops.map(stop => ({
-  //     ...stop,
-  //     isFavourite: favoriteIds.includes(stop.id.toString()),
-  //   }));
-  // }
-
   useEffect(() => {
-    if (canSearch) {
-      // perform combined search and township filter over fetched stops
-      const searchLower = searchText.trim().toLowerCase();
-      const selectedTownshipIds = selectedFilterOptions.map((o) => String(o.id));
-
-      const searchData = stops.filter((s: any) => {
-        // match search text
-        const nameMm = (s.name_mm || "").toLowerCase();
-        const nameEn = (s.name_en || "").toLowerCase();
-        const matchesSearch =
-          !searchLower || nameMm.includes(searchLower) || nameEn.includes(searchLower);
-
-        // match township filter
-        const townshipId = s?.township?.id;
-        const matchesTownship =
-          selectedTownshipIds.length === 0 || (townshipId && selectedTownshipIds.includes(String(townshipId)));
-
-        return matchesSearch && matchesTownship;
-      });
-
-      setStopsList(searchData);
-      console.log("searchData", searchData);
+    if (canSearch && searchResults) {
+      setStopsList(searchResults as any);
       return;
     }
 
-    // default view: recent shows all stops, favourite shows only favourites
-    const list = activeIndex === 0 ? stops : stops.filter((s: any) => s.is_favourite);
-    setStopsList(list);
-  }, [activeIndex, canSearch, searchText, stops, selectedFilterOptions]);
+    if (!canSearch) {
+      const source = activeIndex === 0 ? "recent" : "favourite";
+      setStopsList(stopList[source] as any);
+    }
+  }, [activeIndex, canSearch, searchResults]);
 
   useEffect(() => {
-    if (areas && areas.length > 0) {
-      setAreaFilters(areas);
-    }
-  }, [areas]);
+    // dummy initialization
+    setAreaFilters(yangonAreasBurmese);
+  }, []);
 
   return (
     <Modal
@@ -179,7 +151,7 @@ export default function StopFilterModal({
       animationType="slide"
       statusBarTranslucent={true}
     >
-      <SafeAreaView style={[styles.container, { paddingTop: 0 }]}>
+      <SafeAreaView style={styles.container}>
         {isFilterVisible ? (
           <FilterView
             onClose={hileFilters}

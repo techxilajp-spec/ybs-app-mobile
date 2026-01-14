@@ -1,11 +1,25 @@
-import { useReactQueryDevTools } from "@dev-plugins/react-query";
+// react
+import { useEffect, useState } from "react";
+
+// react native related
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
+// react query
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// expo related
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { syncFavoritesFromSupabase, syncFavoritesToSupabase } from "../services/routeFav";
+
+// dev tools
+import { useReactQueryDevTools } from "@dev-plugins/react-query";
+
+// api
+import getSplahAd from "../api/ads/getSplashAd";
+
+// stores
+import { useAdvertisementStore } from "../stores/useAdvertisementStore";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -18,6 +32,7 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
+  const setAdvertisement = useAdvertisementStore((s) => s.setAdvertisement);
   useReactQueryDevTools(queryClient);
   const [fontsLoaded] = useFonts({
     "MiSansMyanmar-Normal": require("@/assets/fonts/MiSansMyanmar/ttf/MiSansMyanmar-Normal.ttf"),
@@ -35,8 +50,8 @@ export default function RootLayout() {
   useEffect(() => {
     async function loadInitialData() {
       try {
-        await syncFavoritesFromSupabase();
-        await syncFavoritesToSupabase();
+        const data = await getSplahAd();
+        if(data) setAdvertisement(data);
       } catch (e) {
         console.warn(e);
       } finally {
