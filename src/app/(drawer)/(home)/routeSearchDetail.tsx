@@ -6,21 +6,17 @@ import { Dimensions, StyleSheet, View } from "react-native";
 
 // expo map
 import MapView, {
-  LatLng,
   MapMarker,
   PROVIDER_GOOGLE,
-  Region,
+  Region
 } from "react-native-maps";
 
 // expo router
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 // icons
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
-
-// expo router
-import { useLocalSearchParams } from "expo-router";
 
 // custom components
 import AppScreenLayout from "@/src/components/AppScreenLayout";
@@ -44,12 +40,7 @@ import {
   setLocalFavorites,
 } from '@/src/services/routeFav';
 
-type Stop = {
-  id: string;
-  name: string;
-  road: string;
-  coordinate: LatLng;
-};
+import { Stop } from "@/src/types/map";
 
 export default function RouteSearchDetail() {
   const { YANGON } = MAP_LOCATIONS;
