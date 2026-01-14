@@ -17,6 +17,7 @@ type StopCardProps = {
   lng: number;
   onPress?: () => void;
   isFavourite?: boolean;
+  busNumbers?: string[];
   // onToggleFavourite: () => void;
 }
 
@@ -28,6 +29,7 @@ export default function StopCard({
   lng,
   onPress,
   isFavourite = false,
+  busNumbers = [],
 }: StopCardProps) {
   return (
     <Pressable style={styles.container} onPress={onPress}>
@@ -62,7 +64,7 @@ export default function StopCard({
           size={14}
           style={styles.description}
         >
-          ({lat}, {lng})
+          ရောက်ရှိသောကားများ - {busNumbers?.join(", ")}
         </AppText>
       </View>
       <View style={[styles.iconContainer, styles.heartIconContainer]}>

@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 type AreasGroup = {
   id: string;
   title: string;
-  options: Array<{ id: string; name: string }>;
+  options: { id: string; name: string }[];
 };
 
 type StopsResponse = {
