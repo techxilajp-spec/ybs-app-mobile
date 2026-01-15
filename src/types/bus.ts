@@ -23,6 +23,12 @@ export type Stop = {
   bus_numbers: string[];
 };
 
+export type AreasGroup = {
+  id: string;
+  title: string;
+  options: { id: string; name: string }[];
+};
+
 export type StopDetailResponse = {
   id: string;
   nameMm: string;
