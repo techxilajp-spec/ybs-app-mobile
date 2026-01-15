@@ -20,6 +20,13 @@ export type Stop = {
     longitude: number;
   };
   isFavourite: boolean;
+  bus_numbers: string[];
+};
+
+export type AreasGroup = {
+  id: string;
+  title: string;
+  options: { id: string; name: string }[];
 };
 
 export type StopDetailResponse = {
@@ -41,6 +48,6 @@ export type RouteResponse = {
   routeNumberEn: string;
   routeNumberMm: string;
   isYps: boolean;
-  coordinates: Array<[number, number]>;
+  coordinates: [number, number][];
   color: string;
 };

@@ -6,41 +6,77 @@ import { Colors } from "@/src/constants/color";
 // customComponent
 import AppText from "@/src/components/AppText";
 import StopCard from "@/src/components/StopCard";
+import SkeletonCard from "@/src/components/StopSkeletonCard";
 import { Stop } from "@/src/types/bus";
+import { ScrollView } from "react-native-gesture-handler";
 
 type ListViewProps = {
   data: Stop[];
   onPress?: (item: any) => void;
+  hasNextStops : boolean;
+  isFetchingNextStops : boolean;
+  isStopsLoading : boolean;
+  fetchNextPage: () => void;
+  isStopsError : boolean;
 };
 
-export default function ListView({ data, onPress }: ListViewProps) {
+export default function ListView({ data, onPress, hasNextStops, isFetchingNextStops, fetchNextPage, isStopsLoading, isStopsError}: ListViewProps) {
   return (
-    <View style={styles.container}>
-      {data.length > 0 ? (
-        <FlatList
-          style={styles.container}
-          data={data}
-          renderItem={({ item }) => (
-            <StopCard
-              title_mm={item.name_mm}
-              title_en={item.name_en}
-              road_mm={item.road_mm} // TODO' select road name
-              lat={item.lat}
-              lng={item.lng}
-              isFavourite={item.isFavourite}
-              onPress={() => onPress && onPress(item)}
-              // onToggleFavourite={() => { }}
-            />
-          )}
-          keyExtractor={(item, index) => index + item.name_en}
+    <>
+    {isStopsLoading ? (
+        // skeleton view
+        <ScrollView
           showsVerticalScrollIndicator={false}
-        />
+          scrollEnabled={false}
+          style={{
+            marginTop: 20,
+            flex: 1,
+          }}
+        >
+          {new Array(4).fill(0).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </ScrollView>
+      ) : isStopsError ? (
+        <View></View>
+      ) : (
+        <View style={styles.container}>
+        {data.length > 0 ? (
+          <FlatList
+            style={styles.container}
+            data={data}
+            renderItem={({ item }) => (
+              <StopCard
+                title_mm={item.name_mm}
+                title_en={item.name_en}
+                road_mm={item.road_mm} // TODO' select road name
+                lat={item.lat}
+                lng={item.lng}
+                isFavourite={item.isFavourite}
+                onPress={() => onPress && onPress(item)}
+                busNumbers={item.bus_numbers}
+                // onToggleFavourite={() => { }}
+              />
+            )}
+            keyExtractor={(item, index) => index + item.name_en}
+            showsVerticalScrollIndicator={false}
+            onEndReached={() => { 
+              if(hasNextStops && !isFetchingNextStops) {
+                fetchNextPage();
+              }
+            }}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={isFetchingNextStops ? <SkeletonCard/> : null}
+          />
       ) : (
         <View style={[styles.container, styles.noDataContainer]}>
-          <AppText size={16} style={styles.noDataText}>ဘတ်စ်ကား ရှာမတွေ့ပါ</AppText>
+          <AppText size={16} style={styles.noDataText}>မှတ်တိုင်ရှာမတွေ့ပါ</AppText>
         </View>
       )}
     </View>
+    )}
+
+    </>
   );
 }
 

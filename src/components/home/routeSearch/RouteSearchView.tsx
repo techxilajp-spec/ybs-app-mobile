@@ -24,10 +24,11 @@ import { useTripPlannerStore } from "@/src/stores/useTripPlannerStore";
 // utils
 import { getPublicUrl } from "@/src/utils/supabase";
 
-// types
-
 // data
 import { useGetAds } from "@/src/hooks/ads";
+
+// constants
+import { AD_HEIGHT } from "@/src/constants/ad";
 
 // const fetchData = (): RouteSearchResult[] => {
 //   const stops62: Stop[] = route62.shape.geometry.coordinates
@@ -132,6 +133,16 @@ export default function RouteSearchView() {
     mode: null,
   });
 
+  const [availableHeight, setAvailableHeight] = useState<number>(0);
+  const [usedHeight, setUsedHeight] = useState<number>(0);
+
+  // calculate dynamic height for ad slider
+  const remainingHeight = availableHeight - usedHeight;
+  const dynamicAdHeight = Math.min(
+    AD_HEIGHT.max,
+    Math.max(AD_HEIGHT.min, remainingHeight - AD_HEIGHT.buffer)
+  );
+
   // fetch ads
   const { data: adsData } = useGetAds();
   const ads = adsData?.map((ad) => {
@@ -151,7 +162,12 @@ export default function RouteSearchView() {
   // const [startStop, setStartStop] = useState<any>(null); // Replaced by store
   // const [endStop, setEndStop] = useState<any>(null); // Replaced by store
 
-  const { startLocation: startStop, endLocation: endStop, setStartLocation, setEndLocation } = useTripPlannerStore();
+  const {
+    startLocation: startStop,
+    endLocation: endStop,
+    setStartLocation,
+    setEndLocation,
+  } = useTripPlannerStore();
 
   const setRoutes = useRouteSearchResultsStore((s) => s.setRoutes);
 
@@ -205,7 +221,7 @@ export default function RouteSearchView() {
       return;
     }
 
-    if (!endStop && showDirectionModal.mode !== 'end') {
+    if (!endStop && showDirectionModal.mode !== "end") {
       alert("Please select a destination.");
       return;
     }
@@ -240,8 +256,10 @@ export default function RouteSearchView() {
       console.log("Searching routes from:", startCoord, "to:", endCoord);
       const results = await TripPlannerService.planTrip(startCoord, endCoord);
       */
-     
-      const results = await TripPlannerService.planTripById(startStop.id.toString(), endStop.id.toString());
+      const results = await TripPlannerService.planTripById(
+        startStop.id.toString(),
+        endStop.id.toString()
+      );
 
       setRoutes(results);
       router.push("/routeSearchResults");
@@ -265,46 +283,91 @@ export default function RouteSearchView() {
         onClose={closeDirectionModal}
         onSelect={handleSelect}
       />
-      <View style={styles.container}>
-        <View style={styles.selectorContainer}>
-          {/* start point */}
-          <DirectionSelector
-            icon={<View style={styles.circleIcon}></View>}
-            title="မှ"
-            description={startStop ? startStop.name_mm : "မှတ်တိုင်ရွေးချယ်ပါ"}
-            subtitle={startStop ? `${(startStop.lat || startStop.coordinate?.latitude || 0).toFixed(5)}, ${(startStop.lng || startStop.coordinate?.longitude || 0).toFixed(5)}` : undefined}
-            value=""
-            onPress={() => openDirectionModal("start")}
-            showIndicator={true}
-            style={{ marginBottom: 8 }}
-          />
+      <View
+        style={styles.container}
+        onLayout={(event) => {
+          const { height } = event.nativeEvent.layout;
+          setAvailableHeight(height);
+        }}
+      >
+        <View
+          onLayout={(event) => {
+            const { height } = event.nativeEvent.layout;
+            setUsedHeight(height);
+          }}
+        >
+          <View style={styles.selectorContainer}>
+            {/* start point */}
+            <DirectionSelector
+              icon={<View style={styles.circleIcon}></View>}
+              title="မှ"
+              description={
+                startStop ? startStop.name_mm : "မှတ်တိုင်ရွေးချယ်ပါ"
+              }
+              subtitle={
+                startStop
+                  ? `${(
+                      startStop.lat ||
+                      startStop.coordinate?.latitude ||
+                      0
+                    ).toFixed(5)}, ${(
+                      startStop.lng ||
+                      startStop.coordinate?.longitude ||
+                      0
+                    ).toFixed(5)}`
+                  : undefined
+              }
+              value=""
+              onPress={() => openDirectionModal("start")}
+              showIndicator={true}
+              style={{ marginBottom: 8 }}
+            />
 
-          {/* end point */}
-          <DirectionSelector
-            icon={
-              <Image
-                source={require("@/assets/icons/bus.png")}
-                style={styles.busIcon}
-              />
-            }
-            title="သို"
-            description={endStop ? endStop.name_mm : "သွားရောက်လိုသည့်နေရာ"}
-            subtitle={endStop ? `${(endStop.lat || endStop.coordinate?.latitude || 0).toFixed(5)}, ${(endStop.lng || endStop.coordinate?.longitude || 0).toFixed(5)}` : undefined}
-            onPress={() => openDirectionModal("end")}
+            {/* end point */}
+            <DirectionSelector
+              icon={
+                <Image
+                  source={require("@/assets/icons/bus.png")}
+                  style={styles.busIcon}
+                />
+              }
+              title="သို"
+              description={endStop ? endStop.name_mm : "သွားရောက်လိုသည့်နေရာ"}
+              subtitle={
+                endStop
+                  ? `${(
+                      endStop.lat ||
+                      endStop.coordinate?.latitude ||
+                      0
+                    ).toFixed(5)}, ${(
+                      endStop.lng ||
+                      endStop.coordinate?.longitude ||
+                      0
+                    ).toFixed(5)}`
+                  : undefined
+              }
+              onPress={() => openDirectionModal("end")}
+            />
+          </View>
+          <AppButton
+            title="Bus ကားလမ်းကြောင်းကြည့်မယ်"
+            onPress={searchRoutes}
+            loading={isSearching}
+            textStyle={styles.buttonText}
           />
         </View>
-        <AppButton
-          title="Bus ကားလမ်းကြောင်းကြည့်မယ်"
-          onPress={searchRoutes}
-          loading={isSearching}
-          textStyle={styles.buttonText}
-        />
 
         <AppSlider
           data={ads ?? []}
           autoPlay
           interval={2000}
-          style={styles.advertisementContainer}
+          style={{
+            width: "100%",
+            height: dynamicAdHeight,
+            position: "absolute",
+            bottom: 20,
+            marginTop: 40,
+          }}
         />
       </View>
     </>
@@ -342,8 +405,5 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontFamily: "MiSansMyanmar-Medium",
-  },
-  advertisementContainer: {
-    marginTop: 30,
   },
 });

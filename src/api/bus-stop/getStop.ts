@@ -1,17 +1,25 @@
+import { AreasGroup, Stop } from "@/src/types/bus";
 import { supabase } from "@/src/utils/supabase";
 
-const getStops = async () => {
-  const pageSize = 1000;
-  let from = 0;
-  let allRows: any[] = [];
-  // fetch stops with related township and district data
+interface PaginatedStopsResponse {
+  data: Stop[];
+  area: AreasGroup[];
+  nextPage: number | null;
+}
+const getStops = async (
+  page: number = 1,
+  limit: number = 50
+): Promise<PaginatedStopsResponse> => {
+  let stops: any[] = [];
+  if (page < 1) return { data: [], area: [], nextPage: null };
 
-  while (true) {
-    const to = from + pageSize - 1;
-    const { data, error } = await supabase
-      .from("stops")
-      .select(
-        `
+  const from = (page - 1) * limit;
+
+  const to = from + limit - 1;
+  const { data, error } = await supabase
+    .from("v_stops_with_bus_numbers")
+    .select(
+      `
       id,
       name_mm,
       name_en,
@@ -19,6 +27,7 @@ const getStops = async () => {
       road_en,
       lat,
       lng,
+      bus_numbers,
       township:township_id (
         id,
         township_mm,
@@ -29,63 +38,61 @@ const getStops = async () => {
         )
       )
     `
-      )
-      .order("id", { ascending: true })
-      .range(from, to);
-    if (error) throw error;
+    )
+    .order("id", { ascending: true })
+    .range(from, to);
 
-    allRows.push(...(data || []));
-
-    // if fewer than pageSize returned, we are done
-    if (!data || data.length < pageSize) break;
-
-    from += pageSize;
+  if (error) {
+    throw new Error(error.message);
   }
 
-  // build area grouping from township -> district using sorted data
+  stops.push(...(data || []));
+
+  // --- build area grouping ---
   const areasMap: Record<
     string,
-    { id: string; title: string; options: Array<{ id: string; name: string }> }
+    { id: string; title: string; options: { id: string; name: string }[] }
   > = {};
 
-  (allRows || []).forEach((s: any) => {
+  stops.forEach((s: any) => {
     const township = s?.township;
     const district = township?.district;
     if (!township || !district) return;
 
-    const districtId = String(district.id ?? "");
-    const districtTitle = district.name ?? "";
-
+    const districtId = String(district.id);
     if (!areasMap[districtId]) {
       areasMap[districtId] = {
         id: districtId,
-        title: districtTitle,
+        title: district.name,
         options: [],
       };
     }
 
-    const townshipId = String(township.id ?? "");
+    const townshipId = String(township.id);
     const townshipName = township.township_mm || township.township_en || "";
 
-    // avoid duplicates
     if (
       !areasMap[districtId].options.some((opt) => String(opt.id) === townshipId)
     ) {
-      areasMap[districtId].options.push({ id: townshipId, name: townshipName });
+      areasMap[districtId].options.push({
+        id: townshipId,
+        name: townshipName,
+      });
     }
   });
 
-  let areas = Object.values(areasMap);
+  const areas = Object.values(areasMap);
 
-  // sort options inside each area and sort areas by title
-  areas.forEach((a) => {
-    a.options.sort((x, y) => String(x.name).localeCompare(String(y.name)));
-  });
-  areas.sort((a, b) => String(a.title).localeCompare(String(b.title)));
+  areas.forEach((a) => a.options.sort((x, y) => x.name.localeCompare(y.name)));
+  areas.sort((a, b) => a.title.localeCompare(b.title));
 
+  // Since we're fetching exactly limit rows (no +1), check if we got fewer rows
+  // If we got fewer than limit, we're at the last page
+  const nextPage = stops.length === limit ? page + 1 : null;
   return {
-    data: allRows,
-    areas,
+    data: stops,
+    area: areas,
+    nextPage,
   };
 };
 

@@ -1,12 +1,6 @@
 import api from "@/src/api";
-import { Stop, StopDetailResponse } from "@/src/types/bus";
-import { useQuery } from "@tanstack/react-query";
-
-type AreasGroup = {
-  id: string;
-  title: string;
-  options: Array<{ id: string; name: string }>;
-};
+import { AreasGroup, Stop, StopDetailResponse } from "@/src/types/bus";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 type StopsResponse = {
   stops: Stop[] | any[]; // Stop rows (may have name_mm/name_en from API)
@@ -18,24 +12,24 @@ type StopsResponse = {
  * @param name Search string
  */
 export const useSearchBusStops = (name: string) => {
-    return useQuery({
-        queryKey: ['bus-stops', name],
-        queryFn: () => api.busStopApi.getBusStops(name),
-        enabled: name.trim().length > 0, // Only fetch if there's a search term
-        select: (data) => data.data ?? [],
-    })
-}
+  return useQuery({
+    queryKey: ["bus-stops", name],
+    queryFn: () => api.busStopApi.getBusStops(name),
+    enabled: name.trim().length > 0, // Only fetch if there's a search term
+    select: (data) => data.data ?? [],
+  });
+};
 
-// --- Get Bus Stops ---
+/**
+ * --- Get Bus Stops ---
+ * @returns
+ */
 export const useGetStops = () => {
-  return useQuery<any, Error, StopsResponse>({
+  return useInfiniteQuery({
     queryKey: ["stops"],
-    queryFn: api.busStopsApi.getStops,
-    // the API returns { data, areas }
-    select: (res) => ({
-      stops: res?.data ?? [],
-      areas: res?.areas ?? [],
-    }),
+    queryFn: ({ pageParam }) => api.busStopsApi.getStops(pageParam),
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 1,
   });
 };
 
