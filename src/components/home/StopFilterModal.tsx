@@ -27,7 +27,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Accordian, Option } from "@/src/types/accordian";
 
 // data
-import { useGetStops } from "@/src/hooks/bus-stop";
+import { useGetAreas, useGetStops } from "@/src/hooks/bus-stop";
 
 type StopFilterModalProps = {
   visible: boolean;
@@ -48,6 +48,7 @@ export default function StopFilterModal({
 }: StopFilterModalProps) {
   const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
   const [stopsList, setStopsList] = useState<any[]>([]);
+  const [selectedTownshipId, setSelectedTownshipId] = useState<number | undefined>(undefined);
 
   const { 
     data : stopDatas,
@@ -58,10 +59,12 @@ export default function StopFilterModal({
     hasNextPage : hasNextStops,
     isFetching : isFetchingStops,
     isFetchingNextPage : isFetchingNextStops,
-   } = useGetStops();
+   } = useGetStops(selectedTownshipId);
+
+  const { data: areasData } = useGetAreas();
 
   const stops = stopDatas?.pages.flatMap((page) => page.data) ?? [];
-  const areas = stopDatas?.pages.flatMap((page) => page.area) ?? [];
+  const areas = areasData;
 
   const [searchText, setSearchText] = useState<string>("");
   const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
@@ -97,6 +100,9 @@ export default function StopFilterModal({
    */
   const onOptionListSelect = (selectedOptionList: Option[]) => {
     setSelectedFilterOptions(selectedOptionList);
+    // Set township_id from first selected option (if available)
+    const firstTownshipId = selectedOptionList.length > 0 ? Number(selectedOptionList[0].id) : undefined;
+    setSelectedTownshipId(firstTownshipId);
   }; 
 
   /**
@@ -115,13 +121,13 @@ export default function StopFilterModal({
    */
   const clearOptions = () => {
     setSelectedFilterOptions([]);
+    setSelectedTownshipId(undefined);
   };
 
   useEffect(() => {
     if (canSearch) {
-      // perform combined search and township filter over fetched stops
+      // perform search filtering on fetched stops
       const searchLower = searchText.trim().toLowerCase();
-      const selectedTownshipIds = selectedFilterOptions.map((o) => String(o.id));
 
       const searchData = stops.filter((s: any) => {
         // match search text
@@ -130,12 +136,7 @@ export default function StopFilterModal({
         const matchesSearch =
           !searchLower || nameMm.includes(searchLower) || nameEn.includes(searchLower);
 
-        // match township filter
-        const townshipId = s?.township?.id;
-        const matchesTownship =
-          selectedTownshipIds.length === 0 || (townshipId && selectedTownshipIds.includes(String(townshipId)));
-
-        return matchesSearch && matchesTownship;
+        return matchesSearch;
       });
 
       setStopsList(searchData);
@@ -145,7 +146,7 @@ export default function StopFilterModal({
     // default view: recent shows all stops, favourite shows only favourites
     const list = activeIndex === 0 ? stops : stops.filter((s: any) => s.isFavourite);
     setStopsList(list);
-  }, [activeIndex, canSearch, searchText, stops, selectedFilterOptions]);
+  }, [activeIndex, canSearch, searchText, stops]);
 
   useEffect(() => {
     if (areas && areas.length > 0) {

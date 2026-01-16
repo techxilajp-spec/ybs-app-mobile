@@ -1,11 +1,6 @@
 import api from "@/src/api";
-import { AreasGroup, Stop, StopDetailResponse } from "@/src/types/bus";
+import { AreasGroupResponse, StopDetailResponse } from "@/src/types/bus";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-
-type StopsResponse = {
-  stops: Stop[] | any[]; // Stop rows (may have name_mm/name_en from API)
-  areas: AreasGroup[];
-};
 
 /**
  * Hook for searching bus stops by name.
@@ -22,14 +17,23 @@ export const useSearchBusStops = (name: string) => {
 
 /**
  * --- Get Bus Stops ---
+ * @param townshipId - Optional township ID to filter stops
  * @returns
  */
-export const useGetStops = () => {
+export const useGetStops = (townshipId?: number) => {
   return useInfiniteQuery({
-    queryKey: ["stops"],
-    queryFn: ({ pageParam }) => api.busStopsApi.getStops(pageParam),
+    queryKey: ["stops", townshipId],
+    queryFn: ({ pageParam }) =>
+      api.busStopsApi.getStops(pageParam, 50, townshipId),
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 1,
+  });
+};
+
+export const useGetAreas = () => {
+  return useQuery<any, Error, AreasGroupResponse[]>({
+    queryKey: ["area"],
+    queryFn: () => api.busStopApi.getAreas(),
   });
 };
 
