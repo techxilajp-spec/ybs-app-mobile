@@ -1,6 +1,11 @@
-import { useState } from "react";
-import { ImageBackground, StyleSheet } from "react-native";
-import "react-native-get-random-values";
+import { useRef, useState } from "react";
+import {
+  Animated,
+  Dimensions,
+  ImageBackground,
+  StyleSheet,
+  View,
+} from "react-native";
 
 // custom component`
 import NavigationTabs from "@/src/components/AppNavigationTabs";
@@ -32,8 +37,14 @@ const TAB_CONFIG = [
   },
 ];
 
+const HORIZONTAL_PADDING = 20;
+
 export default function HomeScreen() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
+  const translateX = useRef(new Animated.Value(0)).current;
+
+  const { width: screenWidth } = Dimensions.get("window");
+  const contentViewWidth = screenWidth - HORIZONTAL_PADDING * 2;
 
   const advertisement = useAdvertisementStore((s) => s.advertisement);
   const hasSeenAdvertisement = useAdvertisementStore(
@@ -42,11 +53,17 @@ export default function HomeScreen() {
   const setHasSeenAdvertisement = useAdvertisementStore(
     (s) => s.setHasSeenAdvertisement
   );
-
-  const { component: ActiveView } = TAB_CONFIG[activeIndex];
-
   const hideAdvertisement = () => {
     setHasSeenAdvertisement(true);
+  };
+
+  const onTabPress = (index: number) => {
+    setActiveIndex(index);
+    Animated.timing(translateX, {
+      toValue: -index * contentViewWidth,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
   };
 
   return (
@@ -82,9 +99,45 @@ export default function HomeScreen() {
               marginTop: 30,
               marginBottom: 18,
             }}
-            onNavigationTabPress={setActiveIndex}
+            onNavigationTabPress={onTabPress}
           />
-          <ActiveView />
+          {/* <ActiveView /> */}
+          <View style={styles.sliderContainer}>
+            <Animated.View
+              style={[
+                styles.slider,
+                {
+                  width: contentViewWidth * TAB_CONFIG.length,
+                  transform: [{ translateX }],
+                },
+              ]}
+            >
+              {TAB_CONFIG.map(({ component: Component }, index) => {
+                const opacity = translateX.interpolate({
+                  inputRange: [
+                    -(index + 1) * contentViewWidth,
+                    -index * contentViewWidth,
+                    -(index - 1) * contentViewWidth,
+                  ],
+                  outputRange: [0, 1, 0],
+                  extrapolate: "clamp",
+                });
+
+                return (
+                  <Animated.View
+                    key={index}
+                    style={{
+                      width: contentViewWidth,
+                      flex: 1,
+                      opacity,
+                    }}
+                  >
+                    <Component />
+                  </Animated.View>
+                );
+              })}
+            </Animated.View>
+          </View>
         </AppScreenLayout>
       </ImageBackground>
     </>
@@ -93,6 +146,14 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
+    paddingHorizontal: HORIZONTAL_PADDING,
+  },
+  sliderContainer: {
+    flex: 1,
+    overflow: "hidden",
+  },
+  slider: {
+    flexDirection: "row",
+    flex: 1,
   },
 });
