@@ -4,7 +4,7 @@ export type Option = {
 };
 
 export type Accordian = {
-  id: string;
+  id: string | number;
   title: string;
   options: Option[];
 };

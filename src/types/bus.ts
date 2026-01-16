@@ -19,12 +19,13 @@ export type Stop = {
     latitude: number;
     longitude: number;
   };
+  township_id: number;
   isFavourite: boolean;
   bus_numbers: string[];
 };
 
-export type AreasGroup = {
-  id: string;
+export type AreasGroupResponse = {
+  id: number;
   title: string;
   options: { id: string; name: string }[];
 };
