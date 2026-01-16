@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 // react
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 // expo icons
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -52,18 +52,17 @@ export default function StopFilterModal({
 
   const { 
     data : stopDatas,
-    error : error,
     isLoading : isStopsLoading,
     isError : isStopsError,
     fetchNextPage : fextNextStops,
     hasNextPage : hasNextStops,
-    isFetching : isFetchingStops,
     isFetchingNextPage : isFetchingNextStops,
    } = useGetStops(selectedTownshipId);
 
   const { data: areasData } = useGetAreas();
 
-  const stops = stopDatas?.pages.flatMap((page) => page.data) ?? [];
+  const stops = useMemo(() => stopDatas?.pages.flatMap((page) => page.data) ?? [], [stopDatas]);
+
   const areas = areasData;
 
   const [searchText, setSearchText] = useState<string>("");
