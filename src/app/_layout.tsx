@@ -15,8 +15,14 @@ import * as SplashScreen from "expo-splash-screen";
 // dev tools
 import { useReactQueryDevTools } from "@dev-plugins/react-query";
 
+// toast
+import Toast from 'react-native-toast-message';
+
 // api
 import getSplahAd from "../api/ads/getSplashAd";
+
+// config
+import { toastConfig } from "../config/toast.config";
 
 // stores
 import { useAdvertisementStore } from "../stores/useAdvertisementStore";
@@ -77,6 +83,7 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(drawer)" />
         </Stack>
+        <Toast config={toastConfig}/>
       </SafeAreaProvider>
     </QueryClientProvider>
   );

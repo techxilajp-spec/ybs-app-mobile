@@ -2,7 +2,7 @@
 import { FlatList, ScrollView, StyleSheet, View } from "react-native";
 
 // react
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 //expo router
 import { router } from "expo-router";
@@ -22,6 +22,9 @@ import { RouteFilters } from "@/src/types/filter";
 // data
 import { Filters } from "@/src/constants/filters";
 import { useGetRoutes } from "@/src/hooks/bus-route";
+
+// util
+import { showErrorToast } from "@/src/utils/toast";
 
 export default function RouteListView() {
   const { routes: routeFilterOptions } = Filters;
@@ -83,6 +86,12 @@ export default function RouteListView() {
     setActiveOption(selectedOption);
     closeFilterModal();
   };
+
+  useEffect(() => {
+    if (isRoutesError && routesError) {
+      showErrorToast("Something Went Wrong!", routesError.message);
+    }
+  }, [isRoutesError, routesError]);
 
   return (
     <>
