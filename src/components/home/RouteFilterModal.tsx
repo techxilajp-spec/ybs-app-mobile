@@ -26,7 +26,7 @@ import ListView from "@/src/components/home/routeFilterModal/ListView";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // type
-import { Accordian, Option } from "@/src/types/accordian";
+import { Option } from "@/src/types/accordian";
 import { Stop } from "@/src/types/bus";
 // data
 import { Colors } from "@/src/constants/color";
@@ -49,12 +49,11 @@ export default function RouteFilterModal({
   onClose,
   onSelect,
 }: RouteFilterModalProps) {
-  const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
+  // const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
   const [stopsList, setStopsList] = useState<Stop[]>([]);
 
   const { data } = useGetStops();
-  const stops = useMemo(() => data?.stops ?? [], [data]);
-  const areas = useMemo(() => data?.areas ?? [], [data]);
+  const stops = useMemo(() => data?.pages.flatMap((page) => page.data) ?? [], [data]);
 
   const [searchText, setSearchText] = useState<string>("");
   const [debouncedSearchText] = useDebounce(searchText, 500);
@@ -148,11 +147,11 @@ export default function RouteFilterModal({
     setStopsList(list);
   }, [activeIndex, canSearch, searchText, stops, selectedFilterOptions]);
 
-  useEffect(() => {
-    if (areas && areas.length > 0) {
-      setAreaFilters(areas);
-    }
-  }, [areas]);
+  // useEffect(() => {
+  //   if (areas && areas.length > 0) {
+  //     setAreaFilters(areas);
+  //   }
+  // }, [areas]);
 
   return (
     <Modal
@@ -166,7 +165,7 @@ export default function RouteFilterModal({
         {isFilterVisible ? (
           <FilterView
             onClose={hileFilters}
-            data={areaFilters}
+            data={[]} // TODO: implement township filter
             selectedOptions={selectedFilterOptions}
             onOptionListSelect={onOptionListSelect}
           />

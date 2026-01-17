@@ -1,5 +1,5 @@
 export const AD_HEIGHT = {
-    max: 200,
+    max: 150,
     min: 125,
     buffer: 50
 }

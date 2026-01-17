@@ -2,7 +2,7 @@
 import { Image, StyleSheet, View } from "react-native";
 
 // react
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // expo router
 import { router } from "expo-router";
@@ -27,102 +27,12 @@ import { getPublicUrl } from "@/src/utils/supabase";
 // data
 import { useGetAds } from "@/src/hooks/ads";
 
+
+// utils
+import { showErrorToast } from "@/src/utils/toast";
+
 // constants
 import { AD_HEIGHT } from "@/src/constants/ad";
-
-// const fetchData = (): RouteSearchResult[] => {
-//   const stops62: Stop[] = route62.shape.geometry.coordinates
-//     .map(([longitude, latitude]) => ({
-//       id: Math.random().toString(),
-//       name: `${latitude}~${longitude}`,
-//       road: Math.random().toString(),
-//       coordinate: {
-//         latitude,
-//         longitude,
-//       },
-//     }))
-//     // take every 5th stop
-//     .filter((_, index) => index % 5 === 0);
-
-//   const stops32: Stop[] = route32.shape.geometry.coordinates
-//     .map(([longitude, latitude]) => ({
-//       id: Math.random().toString(),
-//       name: `${latitude}~${longitude}`,
-//       road: Math.random().toString(),
-//       coordinate: {
-//         latitude,
-//         longitude,
-//       },
-//     }))
-//     // take every 5th stop
-//     .filter((_, index) => index % 5 === 0);
-
-//   const route62Info: Route = {
-//     id: route62.route_id,
-//     no: route62.route_id,
-//     name: route62.name,
-//     color: route62.color,
-//     description: "",
-//     coordinates: route62.shape.geometry.coordinates.map(
-//       ([longitude, latitude]) => ({
-//         latitude,
-//         longitude,
-//       })
-//     ),
-//     stops: stops62,
-//   };
-
-//   const route32Info: Route = {
-//     id: route32.route_id,
-//     no: route32.route_id,
-//     name: route32.name,
-//     color: route32.color,
-//     description: "",
-//     coordinates: route32.shape.geometry.coordinates.map(
-//       ([longitude, latitude]) => ({
-//         latitude,
-//         longitude,
-//       })
-//     ),
-//     stops: stops32,
-//   };
-
-//   const searchResults = [
-//     {
-//       id: Math.random(),
-//       isFastest: true,
-//       totalBusStop: 22,
-//       estimatedTime: 35,
-//       routes: [route62Info, route32Info],
-//       instructions: [
-//         {
-//           type: "walk",
-//           description: "Walk 200 meters to the bus stop",
-//         } as WalkInstruction,
-//         {
-//           type: "bus",
-//           busNo: "45B",
-//           busTitle: "Downtown Express",
-//           startStop: "Central Station",
-//           endStop: "Main Street",
-//         } as BusInstruction,
-//         {
-//           type: "walk",
-//           description: "Walk 100 meters to your destination",
-//         } as WalkInstruction,
-//         {
-//           type: "bus",
-//           busNo: "12A",
-//           busTitle: "City Loop",
-//           startStop: "Main Street",
-//           endStop: "Park Avenue",
-//         } as BusInstruction,
-//       ],
-//     },
-//   ];
-
-//   return searchResults;
-// };
 
 export default function RouteSearchView() {
   const [showDirectionModal, setShowDirectionModal] = useState<{
@@ -144,7 +54,7 @@ export default function RouteSearchView() {
   );
 
   // fetch ads
-  const { data: adsData } = useGetAds();
+  const { data: adsData, isError: isAdError, error: adError } = useGetAds();
   const ads = adsData?.map((ad) => {
     const firstImage = ad.ads_images?.[0];
     const adImageUrl = firstImage?.image_url
@@ -158,9 +68,6 @@ export default function RouteSearchView() {
   });
 
   const [isSearching, setIsSearching] = useState(false);
-
-  // const [startStop, setStartStop] = useState<any>(null); // Replaced by store
-  // const [endStop, setEndStop] = useState<any>(null); // Replaced by store
 
   const {
     startLocation: startStop,
@@ -204,11 +111,6 @@ export default function RouteSearchView() {
     }
   };
 
-  /**
-   * Searches available routes between the selected start and end destinations and
-   * makes the results accessible across screens.
-   *
-   */
   /**
    * Searches available routes between the selected start and end destinations and
    * makes the results accessible across screens.
@@ -270,6 +172,15 @@ export default function RouteSearchView() {
       setIsSearching(false);
     }
   };
+
+  useEffect(() => {
+    if (isAdError && adError) {
+      showErrorToast(
+        "Something Went Wrong!",
+        adError.message
+      );
+    }
+  }, [isAdError, adError]);
 
   return (
     <>
