@@ -33,7 +33,8 @@ export const useAddFavoriteStop = () => {
 export const useRemoveFavoriteStop = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (stopId: number) => api.favouriteStopsApi.removeFavorite(stopId),
+    mutationFn: (stopId: number) =>
+      api.favouriteStopsApi.removeFavorite(stopId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorite_stops"] });
     },

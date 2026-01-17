@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 // react
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 // custom components
 import AppHeader from "@/src/components/AppHeader";
@@ -10,7 +10,6 @@ import AppScreenLayout from "@/src/components/AppScreenLayout";
 import StopsListView from "@/src/components/favourite/StopsListView";
 
 // types
-import api from "@/src/api";
 import RouteListView from "@/src/components/favourite/RouteListView";
 import {
   useGetFavoriteRoutes,
@@ -42,32 +41,37 @@ export default function FavouriteScreen() {
   const { mutate: getFavoriteStops } = useGetFavoriteStops();
   const { mutate: removeFavoriteStop } = useRemoveFavoriteStop();
 
-  useEffect(() => {
-    if (activeTab === "stops") {
-      getFavoriteStops(undefined, {
-        onSuccess: (data: Stop[]) => {
-          setBusStops(
-            data.map((stop) => ({
-              id: stop.id,
-              name_mm: stop.name_mm,
-              name_en: stop.name_en,
-              road_mm: stop.road_mm,
-              road_en: stop.road_en,
-              lat: stop.lat,
-              lng: stop.lng,
-              isFavourite: true,
-            }))
-          );
-        },
-        onError: () => {
-          setBusStops([]);
-        },
-      });
-    }
-  }, [activeTab, getFavoriteStops]);
+  useFocusEffect(
+    useCallback(() => {
+      if (activeTab === "stops") {
+        getFavoriteStops(undefined, {
+          onSuccess: (data: Stop[]) => {
+            setBusStops(
+              data.map((stop) => ({
+                id: stop.id,
+                name_mm: stop.name_mm,
+                name_en: stop.name_en,
+                road_mm: stop.road_mm,
+                road_en: stop.road_en,
+                lat: stop.lat,
+                lng: stop.lng,
+                township_id : stop.township_id,
+                bus_numbers : stop.bus_numbers,
+                isFavourite: true,
+              }))
+            );
+          },
+          onError: () => {
+            setBusStops([]);
+          },
+        });
+      }
+    }, [activeTab, getFavoriteStops])
+  )
 
 
-  const handleToggleFavoriteStop = (stopId: string) => {
+
+  const handleToggleFavoriteStop = (stopId: number) => {
     const stopIdNum = Number(stopId);
     setBusStops((prev) => prev.filter((s) => s.id !== stopId));
 
@@ -78,33 +82,38 @@ export default function FavouriteScreen() {
     });
   };
 
-  useEffect(() => {
-    if (activeTab === "stops") {
-      loadFavouriteStops();
-    }
-  }, [activeTab]);
+  // Load favorite stops when screen is focused
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (activeTab === "stops") {
+  //       loadFavouriteStops();
+  //     }
+  //   }, [activeTab])
+  // );
 
-  async function loadFavouriteStops() {
-    try {
-      const data = await api.favouriteStopsApi.getFavoriteStops();
+  // async function loadFavouriteStops() {
+  //   try {
+  //     const data = await api.favouriteStopsApi.getFavoriteStops();
 
-      const mapped: Stop[] = data.map((stop) => ({
-        id: stop.id,
-        name_mm: stop.name_mm,
-        name_en: stop.name_en,
-        road_mm: stop.road_mm,
-        road_en: stop.road_en,
-        lat: stop.lat,
-        lng: stop.lng,
-        isFavourite: true,
-      }));
+  //     console.log('data',data)
+  //     const mapped: Stop[] = data.map((stop : Stop) => ({
+  //       id: stop.id,
+  //       name_mm: stop.name_mm,
+  //       name_en: stop.name_en,
+  //       road_mm: stop.road_mm,
+  //       road_en: stop.road_en,
+  //       lat: stop.lat,
+  //       lng: stop.lng,
+  //       isFavourite: true,
+  //       bus_numbers : stop.bus_numbers
+  //     }));
 
-      setBusStops(mapped);
-    } catch (error) {
-      console.warn("Failed to load favorite stops", error);
-      setBusStops([]);
-    }
-  }
+  //     setBusStops(mapped);
+  //   } catch (error) {
+  //     console.warn("Failed to load favorite stops", error);
+  //     setBusStops([]);
+  //   }
+  // }
 
 
   const handleRemoveFavoriteRoute = (routeId: number) => {

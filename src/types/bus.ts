@@ -8,7 +8,7 @@ export type Route = {
 };
 
 export type Stop = {
-  id: string;
+  id: number;
   name_mm: string;
   name_en: string;
   road_mm: string;
@@ -20,7 +20,6 @@ export type Stop = {
     longitude: number;
   };
   township_id: number;
-  isFavourite: boolean;
   bus_numbers: string[];
 };
 

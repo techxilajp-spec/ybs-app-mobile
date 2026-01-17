@@ -34,7 +34,7 @@ type StopFilterModalProps = {
   title: string;
   showCurrentLocation?: boolean;
   onClose: () => void;
-  onSelect?: (stop: any) => void;
+  onSelect?: (stopId: number) => void;
 };
 
 const TABS = ["လတ်တလော", "နှစ်သက်မှု"];
