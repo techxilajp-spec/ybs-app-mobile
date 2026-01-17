@@ -13,8 +13,8 @@ const BusPin = forwardRef<ComponentRef<typeof Marker>, BusPinProps>(
       <Marker
         ref={ref}
         coordinate={coordinate}
-        image={require("@/assets/icons/pin.png")}
-        tracksViewChanges={false}
+        image={require("@/assets/icons/pin_2x.png")}
+        tracksViewChanges={true}
         title={title}
         onPress={onPress}
       />

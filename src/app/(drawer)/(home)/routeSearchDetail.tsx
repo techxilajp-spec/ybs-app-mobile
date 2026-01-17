@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Alert, Dimensions, StyleSheet, View } from "react-native";
 
 // expo map
-import MapView, { MapMarker, PROVIDER_GOOGLE, Region } from "react-native-maps";
+import MapView, { LatLng, MapMarker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 
 // expo location
 import * as Location from "expo-location";
@@ -96,15 +96,16 @@ export default function RouteSearchDetail() {
    * Animates the map to focus on a specific bus stop
    * @param stop
    */
-  const animateToStop = (stop: Stop) => {
+  const animateToLocation = (coordinates: LatLng) => {
+    const { latitude, longitude } = coordinates;
     const offsetRatio = bottomSheetHeight.current / screenHeight;
     const adjustedLatitude =
-      stop.coordinate.latitude - offsetRatio * MAP_DELTA.DEFAULT.LATITUDE;
+      latitude - offsetRatio * MAP_DELTA.DEFAULT.LATITUDE;
 
     mapRef.current?.animateToRegion(
       {
         latitude: adjustedLatitude,
-        longitude: stop.coordinate.longitude,
+        longitude: longitude,
         latitudeDelta: MAP_DELTA.DEFAULT.LATITUDE,
         longitudeDelta: MAP_DELTA.DEFAULT.LONGITUDE,
       },
@@ -122,7 +123,7 @@ export default function RouteSearchDetail() {
     Object.values(markersRef.current).forEach((ref) => ref?.hideCallout());
     // show selected stop callout
     markersRef.current[busStop.id]?.showCallout();
-    animateToStop(busStop);
+    animateToLocation(busStop.coordinate);
   };
 
   /**
@@ -133,7 +134,7 @@ export default function RouteSearchDetail() {
    */
   const onPressBusPin = (busStop: Stop) => {
     markersRef?.current[busStop.id]?.showCallout();
-    animateToStop(busStop);
+    animateToLocation(busStop.coordinate);
   };
 
   if (!searchedRoute) {

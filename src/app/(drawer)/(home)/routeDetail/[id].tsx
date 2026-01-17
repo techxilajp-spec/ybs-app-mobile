@@ -56,6 +56,7 @@ export default function RouteDetail() {
   const bottomSheetHeight = useRef<number>(100);
   const mapRef = useRef<InstanceType<typeof MapView> | null>(null);
   const markersRef = useRef<Record<string, MapMarker | null>>({});
+  const hasFitted = useRef<boolean>(false);
   // const userMarkerRef = useRef<MapMarker | null>(null);
 
   const { height: screenHeight } = Dimensions.get("screen");
@@ -71,7 +72,7 @@ export default function RouteDetail() {
 
   const { mutate : increaseRoute } = useIncreaseRouteView();
 
-  const { data: routeData } = useGetRouteDetail(routeId);
+  const { data: routeData, isSuccess : isRouteDataSuccess } = useGetRouteDetail(routeId);
   // parsed data
   const route = useMemo(() => {
     if (!routeData) return null;
@@ -99,13 +100,21 @@ export default function RouteDetail() {
   }, [routeData]);
 
   useEffect(() => {
-    // set initial region
-    setRegion({
-      ...YANGON,
-      latitudeDelta: MAP_DELTA.INITIAL.LATITUDE,
-      longitudeDelta: MAP_DELTA.INITIAL.LONGITUDE,
-    });
+    if(!isRouteDataSuccess) return;
+    if(hasFitted.current) return;
+    if(!route?.coordinates?.length) return;
+    mapRef?.current?.fitToCoordinates(route.coordinates, {
+      edgePadding: {
+        top: 80,
+        right: 40,
+        bottom: bottomSheetMaxHeight + 40,
+        left: 40
+      }
+    })
+    hasFitted.current = true;
+  }, [routeData, isRouteDataSuccess])
 
+  useEffect(() => {
     let locationSubscriber: Location.LocationSubscription | null = null;
 
     // request location permission
@@ -195,14 +204,14 @@ export default function RouteDetail() {
     const { latitude, longitude } = coordinates;
     const offsetRatio = bottomSheetHeight.current / screenHeight;
     const adjustedLatitude =
-      latitude - offsetRatio * MAP_DELTA.DEFAULT.LATITUDE;
+      latitude - offsetRatio * MAP_DELTA.CLOSE.LATITUDE;
 
     mapRef.current?.animateToRegion(
       {
         latitude: adjustedLatitude,
         longitude: longitude,
-        latitudeDelta: MAP_DELTA.DEFAULT.LATITUDE,
-        longitudeDelta: MAP_DELTA.DEFAULT.LONGITUDE,
+        latitudeDelta: MAP_DELTA.CLOSE.LATITUDE,
+        longitudeDelta: MAP_DELTA.CLOSE.LONGITUDE,
       },
       500
     );
@@ -271,6 +280,9 @@ export default function RouteDetail() {
           loadingBackgroundColor="#eeeeee"
           showsUserLocation={true}
           showsMyLocationButton={false}
+          onMapReady={() => {
+
+          }}
         >
           {/* {userLocation && (
             <UserLocationPin

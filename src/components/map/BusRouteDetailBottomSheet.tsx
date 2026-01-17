@@ -57,6 +57,7 @@ export default function BusRouteDetailBottomSheet({
       snapPoints={snapPoints}
       maxDynamicContentSize={maxHeight}
       onChange={onChangeIndex}
+      index={snapPoints.length - 1}
     >
       <View style={styles.headerContainer}>
         <NoticeMessage message="မှတ်တိုင်များကိုမြင်နိုင်ရန်မြေပုံကိုအနီးကပ်ဆွဲပါ" />
