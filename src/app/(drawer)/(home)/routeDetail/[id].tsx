@@ -36,7 +36,7 @@ import Button from "@/src/components/routeDetail/Button";
 import { MAP_DELTA, MAP_LOCATIONS } from "@/src/constants/map";
 
 // data
-import { useGetRouteDetail } from "@/src/hooks/bus-route";
+import { useGetRouteDetail, useIncreaseRouteView } from "@/src/hooks/bus-route";
 
 // types
 import {
@@ -68,6 +68,8 @@ export default function RouteDetail() {
   const { mutate: addFavoriteRoute } = useAddFavoriteRoute();
   const { mutate: isFavoriteRoute } = useIsFavoriteRoute();
   const { mutate: removeFavoriteRoute } = useRemoveFavoriteRoute();
+
+  const { mutate : increaseRoute } = useIncreaseRouteView();
 
   const { data: routeData } = useGetRouteDetail(routeId);
   // parsed data
@@ -136,6 +138,12 @@ export default function RouteDetail() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if(!routeId) return;
+    // increase route view
+    increaseRoute(Number(routeId));
+  }, [routeId])
 
   /**
    * Navigates back to the previous screen
