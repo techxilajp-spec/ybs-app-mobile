@@ -30,14 +30,13 @@ import BusPin from "@/src/components/map/BusPin";
 import BusPolyLine from "@/src/components/map/BusPolyLine";
 import BusRouteDetailBottomSheet from "@/src/components/map/BusRouteDetailBottomSheet";
 import EdgePin from "@/src/components/map/EdgePin";
-import UserLocationPin from "@/src/components/map/UserLocationPin";
 import Button from "@/src/components/routeDetail/Button";
 
 // constants
 import { MAP_DELTA, MAP_LOCATIONS } from "@/src/constants/map";
 
 // data
-import { useGetRouteDetail } from "@/src/hooks/bus-route";
+import { useGetRouteDetail, useIncreaseRouteView } from "@/src/hooks/bus-route";
 
 // types
 import {
@@ -48,7 +47,6 @@ import {
 import { Stop } from "@/src/types/map";
 
 export default function RouteDetail() {
-  const ACTIVE_ROUTE_INDEX = 0;
   const { YANGON } = MAP_LOCATIONS;
 
   const [region, setRegion] = useState<Region>(YANGON);
@@ -58,7 +56,7 @@ export default function RouteDetail() {
   const bottomSheetHeight = useRef<number>(100);
   const mapRef = useRef<InstanceType<typeof MapView> | null>(null);
   const markersRef = useRef<Record<string, MapMarker | null>>({});
-  const userMarkerRef = useRef<MapMarker | null>(null);
+  // const userMarkerRef = useRef<MapMarker | null>(null);
 
   const { height: screenHeight } = Dimensions.get("screen");
   const bottomSheetMaxHeight = screenHeight * 0.65;
@@ -70,6 +68,8 @@ export default function RouteDetail() {
   const { mutate: addFavoriteRoute } = useAddFavoriteRoute();
   const { mutate: isFavoriteRoute } = useIsFavoriteRoute();
   const { mutate: removeFavoriteRoute } = useRemoveFavoriteRoute();
+
+  const { mutate : increaseRoute } = useIncreaseRouteView();
 
   const { data: routeData } = useGetRouteDetail(routeId);
   // parsed data
@@ -121,8 +121,8 @@ export default function RouteDetail() {
 
       locationSubscriber = await Location.watchPositionAsync(
         {
-          accuracy: Location.Accuracy.Balanced,
-          distanceInterval: 40,
+          accuracy: Location.Accuracy.High,
+          distanceInterval: 20,
         },
         (newLocation) => {
           setUserLocation(newLocation);
@@ -138,6 +138,12 @@ export default function RouteDetail() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if(!routeId) return;
+    // increase route view
+    increaseRoute(Number(routeId));
+  }, [routeId])
 
   /**
    * Navigates back to the previous screen
@@ -226,7 +232,7 @@ export default function RouteDetail() {
   };
 
   const showsUserLocation = () => {
-    if (!userLocation || !userMarkerRef.current) return;
+    if (!userLocation) return;
     const userCoordinate = {
       latitude: userLocation.coords.latitude,
       longitude: userLocation.coords.longitude,
@@ -266,7 +272,7 @@ export default function RouteDetail() {
           showsUserLocation={true}
           showsMyLocationButton={false}
         >
-          {userLocation && (
+          {/* {userLocation && (
             <UserLocationPin
               ref={userMarkerRef}
               coordinate={{
@@ -274,7 +280,7 @@ export default function RouteDetail() {
                 longitude: userLocation.coords.longitude,
               }}
             />
-          )}
+          )} */}
           {route && (
             <>
               <BusPolyLine
@@ -327,7 +333,6 @@ export default function RouteDetail() {
             maxHeight={bottomSheetMaxHeight}
             snapPoints={bottomSheetSnapPoints}
             onChangeIndex={onChangeRouteDetailBottomSheetIndex}
-            activeRouteIndex={ACTIVE_ROUTE_INDEX}
           />
         )}
       </View>

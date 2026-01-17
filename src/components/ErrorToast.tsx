@@ -36,11 +36,11 @@ export default function ErrorToast({
                     <Entypo name="cross" size={14} color="#FFF" />
                 </View>
             </View>
-            <View style={{ flex: 1}}>
+            <View style={{ paddingRight: 20}}>
                 <AppText size={16} style={styles.title}>{title}</AppText>
                 <AppText size={14} style={styles.message}>{message}</AppText>
             </View>
-            <Pressable onPress={hideToast}>
+            <Pressable onPress={hideToast} style={styles.dismissButton}>
                 <Entypo name="cross" size={24} color="#EF4444" />
             </Pressable>
         </View>
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     },
     dismissButton: {
         position: "absolute",
-        right: 0,
+        right: 12,
         top: 18
     }
 })

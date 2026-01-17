@@ -1,5 +1,5 @@
-import api from '@/src/api';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import api from "@/src/api";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 
 // --- Get Paginated Routes ---
 export const useGetRoutes = (
@@ -9,21 +9,23 @@ export const useGetRoutes = (
   return useInfiniteQuery({
     queryKey: ["routes", is_yps, bus_number],
     queryFn: ({ pageParam }) =>
-      api.busRouteApi.getRoutes(
-        { is_yps, bus_number },
-        pageParam
-      ),
+      api.busRouteApi.getRoutes({ is_yps, bus_number }, pageParam),
     getNextPageParam: (lastPage) => lastPage.nextPage, // to indicate for next page
-    initialPageParam: 1
+    initialPageParam: 1,
   });
 };
 
 // --- Get Route Detail ---
-export const useGetRouteDetail = (
-  id: string
-) => {
-  return  useQuery({
+export const useGetRouteDetail = (id: string) => {
+  return useQuery({
     queryKey: ["route_detail", id],
-    queryFn: () => api.busRouteApi.getRouteDetail(id)
+    queryFn: () => api.busRouteApi.getRouteDetail(id),
+  });
+};
+
+// --- Increase Route View ---
+export const useIncreaseRouteView = () => {
+  return useMutation({
+    mutationFn: (routeId : number) => api.busRouteApi.increaseRouteView(routeId)
   })
-}
+};

@@ -26,6 +26,9 @@ import { useGetRoutes } from "@/src/hooks/bus-route";
 // util
 import { showErrorToast } from "@/src/utils/toast";
 
+// constants
+import { Message } from "@/src/constants/message";
+
 export default function RouteListView() {
   const { routes: routeFilterOptions } = Filters;
   const [activeOption, setActiveOption] = useState<RouteFilters>(
@@ -34,6 +37,8 @@ export default function RouteListView() {
   const [busNumber, setBusNumber] = useState<string>("");
   const [debouncedBusNumber] = useDebounce(busNumber, 1000);
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
+
+  const errorMessage = Message.error;
 
   const isYpsServiceRoutes = activeOption.id === "YBS_SERVICE_ROUTES";
   const {
@@ -89,7 +94,7 @@ export default function RouteListView() {
 
   useEffect(() => {
     if (isRoutesError && routesError) {
-      showErrorToast("Something Went Wrong!", routesError.message);
+      showErrorToast(errorMessage.something_wrong, errorMessage.route_list);
     }
   }, [isRoutesError, routesError]);
 

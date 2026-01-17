@@ -35,8 +35,6 @@ export default function RouteSearchResultScreen() {
    * for rendering available lines. Calculated once.
    */
   const flattenedRoutes = useMemo(() => {
-    console.log("calculated once");
-    console.log(routeData)
     if (!routeData || routeData.length === 0) return [];
 
     return routeData?.flatMap((item) =>

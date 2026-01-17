@@ -2,20 +2,18 @@
 import { useEffect, useRef, useState } from "react";
 
 // react native
-import { Dimensions, StyleSheet, View } from "react-native";
+import { Alert, Dimensions, StyleSheet, View } from "react-native";
 
 // expo map
-import MapView, {
-  MapMarker,
-  PROVIDER_GOOGLE,
-  Region
-} from "react-native-maps";
+import MapView, { MapMarker, PROVIDER_GOOGLE, Region } from "react-native-maps";
+
+// expo location
+import * as Location from "expo-location";
 
 // expo router
 import { router, useLocalSearchParams } from "expo-router";
 
 // icons
-import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 // custom components
@@ -32,21 +30,12 @@ import { useRouteSearchResultsStore } from "@/src/stores/useRouteSearchResultsSt
 // constants
 import { MAP_DELTA, MAP_LOCATIONS } from "@/src/constants/map";
 
-// Favorites
-import {
-  addFavoriteRemote,
-  getRouteLocalFavorites,
-  removeFavoriteRemote,
-  setLocalFavorites,
-} from '@/src/services/routeFav';
-
 import { Stop } from "@/src/types/map";
 
 export default function RouteSearchDetail() {
   const { YANGON } = MAP_LOCATIONS;
 
   const [region, setRegion] = useState<Region>(YANGON);
-  const [activeRouteIndex, setActiveRouteIndex] = useState<number>(0);
 
   const bottomSheetHeight = useRef<number>(100);
   const mapRef = useRef<InstanceType<typeof MapView> | null>(null);
@@ -61,12 +50,8 @@ export default function RouteSearchDetail() {
   const searchedRoute = searchedResults.find(
     (route) => route.id.toString() === routeId
   );
-
   const routeList = searchedRoute ? searchedRoute.routes : [];
-
-  const activeRoute = searchedRoute
-    ? searchedRoute.routes[activeRouteIndex]
-    : null;
+  const stops = routeList.flatMap((route) => route.stops);
 
   useEffect(() => {
     setRegion({
@@ -74,11 +59,22 @@ export default function RouteSearchDetail() {
       latitudeDelta: MAP_DELTA.INITIAL.LATITUDE,
       longitudeDelta: MAP_DELTA.INITIAL.LONGITUDE,
     });
-  }, []);
+    handleSelectBusStop(stops[0]);
 
-  useEffect(() => {
-    handleSelectBusStop(activeRoute?.stops[0]);
-  }, [activeRouteIndex]);
+    // ask location permission
+    async function requestPremission() {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission denied!",
+          "Permission to access location was denied"
+        );
+        return;
+      }
+    }
+
+    requestPremission();
+  }, []);
 
   /**
    * Navigates back to the previous screen
@@ -86,43 +82,6 @@ export default function RouteSearchDetail() {
   const onBackPress = () => {
     router.back();
   };
-
-  const [isFavourite, setIsFavourite] = useState(false);
-  const onAddFavourite = async () => {
-    if (!activeRoute) return;
-
-    const routeIdStr = activeRoute.id.toString(); // AsyncStorage
-    const routeIdNum = Number(activeRoute.id);    // Supabase
-
-    const favorites = await getRouteLocalFavorites();
-
-    if (favorites.includes(routeIdStr)) {
-      // REMOVE (offline-first)
-      await setLocalFavorites(favorites.filter(id => id !== routeIdStr));
-      setIsFavourite(false);
-      console.log('onAddFavourite removed');
-
-      // Remote sync (best effort)
-      removeFavoriteRemote(routeIdNum).catch(console.warn);
-    } else {
-      // ADD
-      await setLocalFavorites([...favorites, routeIdStr]);
-      setIsFavourite(true);
-      console.log('onAddFavourite added');
-
-      addFavoriteRemote(routeIdNum).catch(console.warn);
-    }
-    console.log('onAddFavourite ended');
-  };
-
-  useEffect(() => {
-    if (!activeRoute) return;
-
-    (async () => {
-      const favorites = await getRouteLocalFavorites();
-      setIsFavourite(favorites.includes(activeRoute.id.toString()));
-    })();
-  }, [activeRoute?.id]);
 
   /**
    * Updates the bottom sheet height based on its current index.
@@ -155,7 +114,7 @@ export default function RouteSearchDetail() {
 
   /**
    * Selects a bus stop by showing its callout on the map
-   * @param busStop 
+   * @param busStop
    */
   const handleSelectBusStop = (busStop: Stop | null | undefined) => {
     if (!busStop) return;
@@ -169,17 +128,12 @@ export default function RouteSearchDetail() {
   /**
    *  Handles tapping a bus stop pin by showing its callout
    * and centering the map on the stop.
-   * 
-   * @param busStop 
+   *
+   * @param busStop
    */
   const onPressBusPin = (busStop: Stop) => {
     markersRef?.current[busStop.id]?.showCallout();
     animateToStop(busStop);
-  };
-
-  const onChangeRoute = (index: number) => {
-    setActiveRouteIndex(index);
-    markersRef.current = {};
   };
 
   if (!searchedRoute) {
@@ -202,59 +156,43 @@ export default function RouteSearchDetail() {
           loadingEnabled={true}
           loadingIndicatorColor="#666666"
           loadingBackgroundColor="#eeeeee"
+          showsUserLocation={true}
+          showsMyLocationButton={true}
         >
-          {activeRoute && (
+          {routeList.map((route) => (
             <>
               <BusPolyLine
-                coordinates={activeRoute.coordinates}
-                color={activeRoute.color}
+                coordinates={route.coordinates}
+                color={route.color}
               />
-              {activeRoute.stops.map((stop, index) => {
-                const isEdge =
-                  index === 0 || index === activeRoute.stops.length - 1;
-                const PinComponent = isEdge ? EdgePin : BusPin;
-                return (
-                  <PinComponent
-                    ref={(ref: MapMarker | null) => {
-                      markersRef.current[stop.id] = ref;
-                    }}
-                    key={`${stop.id}-${stop.coordinate.latitude}-${stop.coordinate.longitude}`}
-                    coordinate={stop.coordinate}
-                    title={`${index}-${stop.name}`}
-                    onPress={() => onPressBusPin(stop)}
-                  />
-                );
-              })}
             </>
-          )}
+          ))}
+          {stops.map((stop, index) => {
+            const isEdge = index === 0 || index === stops.length - 1;
+            const PinComponent = isEdge ? EdgePin : BusPin;
+            return (
+              <PinComponent
+                ref={(ref: MapMarker | null) => {
+                  markersRef.current[stop.id] = ref;
+                }}
+                key={`${stop.id}-${stop.coordinate.latitude}-${stop.coordinate.longitude}`}
+                coordinate={stop.coordinate}
+                title={`${index}-${stop.name}`}
+                onPress={() => onPressBusPin(stop)}
+              />
+            );
+          })}
         </MapView>
         <Button
           style={styles.backButton}
           icon={<Ionicons name="arrow-back-sharp" size={20} color="#101828" />}
           onPress={onBackPress}
         />
-        <Button
-          style={[
-            styles.favouriteIcon,
-            isFavourite && styles.favouriteIconActive,
-          ]}
-          icon={
-            <Feather
-              name="heart"
-              size={20}
-              color={isFavourite ? '#fff' : 'red'}
-            />
-          }
-          onPress={onAddFavourite}
-        />
-
         <BusRouteDetailBottomSheet
           routes={routeList}
           maxHeight={bottomSheetMaxHeight}
           snapPoints={bottomSheetSnapPoints}
           handleSelectBusStop={handleSelectBusStop}
-          activeRouteIndex={activeRouteIndex}
-          onChangeRouteIndex={onChangeRoute}
           onChangeIndex={onChangeRouteDetailBottomSheetIndex}
         />
       </View>
@@ -272,7 +210,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: 15,
+    top: 8,
     left: 20,
   },
   favouriteIcon: {

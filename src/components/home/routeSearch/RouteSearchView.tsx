@@ -27,12 +27,12 @@ import { getPublicUrl } from "@/src/utils/supabase";
 // data
 import { useGetAds } from "@/src/hooks/ads";
 
-
 // utils
 import { showErrorToast } from "@/src/utils/toast";
 
 // constants
 import { AD_HEIGHT } from "@/src/constants/ad";
+import { Message } from "@/src/constants/message";
 
 export default function RouteSearchView() {
   const [showDirectionModal, setShowDirectionModal] = useState<{
@@ -42,9 +42,13 @@ export default function RouteSearchView() {
     visible: false,
     mode: null,
   });
-
   const [availableHeight, setAvailableHeight] = useState<number>(0);
   const [usedHeight, setUsedHeight] = useState<number>(0);
+  const [isSearching, setIsSearching] = useState(false);
+  const [tripPlannerError, setTripPlannerError] = useState<unknown | null>(null);
+
+  // error message
+  const errorMessage = Message.error;
 
   // calculate dynamic height for ad slider
   const remainingHeight = availableHeight - usedHeight;
@@ -54,7 +58,7 @@ export default function RouteSearchView() {
   );
 
   // fetch ads
-  const { data: adsData, isError: isAdError, error: adError } = useGetAds();
+  const { data: adsData } = useGetAds();
   const ads = adsData?.map((ad) => {
     const firstImage = ad.ads_images?.[0];
     const adImageUrl = firstImage?.image_url
@@ -66,8 +70,6 @@ export default function RouteSearchView() {
       image: adImageUrl,
     };
   });
-
-  const [isSearching, setIsSearching] = useState(false);
 
   const {
     startLocation: startStop,
@@ -117,26 +119,24 @@ export default function RouteSearchView() {
    *
    */
   const searchRoutes = async () => {
-    // Current location fallback logic
-    if (!startStop) {
-      alert("Please select a start destination.");
-      return;
+    setTripPlannerError(null);
+    
+    let errorMessage;
+    if (!startStop && !endStop) {
+      errorMessage = "စထွက်မည့်နေရာ နှင့် သွားရောက်လိုသည့်နေရာ အားရွေးချယ်ပါ။";
+    } else if (!startStop) {
+      errorMessage = "စထွက်မည့်နေရာ အားရွေးချယ်ပါ။";
+    } else if (!endStop) {
+      errorMessage = "သွားရောက်လိုသည့်နေရာ အားရွေးချယ်ပါ။";
     }
 
-    if (!endStop && showDirectionModal.mode !== "end") {
-      alert("Please select a destination.");
-      return;
-    }
-
-    // Safety check if endStop might be null (though UI suggests selecting it)
-    if (!endStop) {
-      // Just for safety
-      alert("Please select a destination.");
+    if (errorMessage) {
+      alert(errorMessage);
       return;
     }
 
     // STRICT ID CHECK
-    if (!startStop.id || !endStop.id) {
+    if (!startStop?.id || !endStop?.id) {
       alert("Please select valid bus stops from the list.");
       return;
     }
@@ -166,21 +166,17 @@ export default function RouteSearchView() {
       setRoutes(results);
       router.push("/routeSearchResults");
     } catch (e) {
-      console.error(e);
-      alert("Failed to plan trip. Please try again.");
+      setTripPlannerError(e);
     } finally {
       setIsSearching(false);
     }
   };
 
   useEffect(() => {
-    if (isAdError && adError) {
-      showErrorToast(
-        "Something Went Wrong!",
-        adError.message
-      );
+    if(tripPlannerError) {
+      showErrorToast(errorMessage.something_wrong, errorMessage.trip_planner);
     }
-  }, [isAdError, adError]);
+  }, [tripPlannerError])
 
   return (
     <>
@@ -212,9 +208,7 @@ export default function RouteSearchView() {
             <DirectionSelector
               icon={<View style={styles.circleIcon}></View>}
               title="မှ"
-              description={
-                startStop ? startStop.name_mm : "မှတ်တိုင်ရွေးချယ်ပါ"
-              }
+              description="မှတ်တိုင်ရွေးချယ်ပါ"
               subtitle={
                 startStop
                   ? `${(
@@ -228,7 +222,7 @@ export default function RouteSearchView() {
                     ).toFixed(5)}`
                   : undefined
               }
-              value=""
+              value={startStop ? startStop.name_mm : ""}
               onPress={() => openDirectionModal("start")}
               showIndicator={true}
               style={{ marginBottom: 8 }}
@@ -243,7 +237,7 @@ export default function RouteSearchView() {
                 />
               }
               title="သို"
-              description={endStop ? endStop.name_mm : "သွားရောက်လိုသည့်နေရာ"}
+              description="သွားရောက်လိုသည့်နေရာ"
               subtitle={
                 endStop
                   ? `${(
@@ -257,6 +251,7 @@ export default function RouteSearchView() {
                     ).toFixed(5)}`
                   : undefined
               }
+              value={endStop ? endStop.name_mm : ""}
               onPress={() => openDirectionModal("end")}
             />
           </View>
