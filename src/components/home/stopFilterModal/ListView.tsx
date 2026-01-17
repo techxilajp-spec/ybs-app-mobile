@@ -47,15 +47,14 @@ export default function ListView({ data, onPress, hasNextStops, isFetchingNextSt
             data={data}
             renderItem={({ item }) => (
               <StopCard
+                id={item.id}
                 title_mm={item.name_mm}
                 title_en={item.name_en}
                 road_mm={item.road_mm} // TODO' select road name
                 lat={item.lat}
                 lng={item.lng}
-                isFavourite={item.isFavourite}
                 onPress={() => onPress && onPress(item)}
                 busNumbers={item.bus_numbers}
-                // onToggleFavourite={() => { }}
               />
             )}
             keyExtractor={(item, index) => index + item.name_en}

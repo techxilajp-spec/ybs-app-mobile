@@ -34,15 +34,13 @@ const getFavoriteStops = async () => {
   const stopIds = await getFavorites();
   if (stopIds.length === 0) return [];
 
-  const { data, error } = await supabase.rpc(
-    "get_stops_by_ids",
-    { stop_ids: stopIds }
-  );
+  const { data, error } = await supabase.rpc("get_stops_by_ids", {
+    stop_ids: stopIds,
+  });
 
   if (error) throw error;
   return data ?? [];
 };
-
 
 /**
  * Adds a favorite stop to AsyncStorage.
@@ -79,7 +77,7 @@ const removeFavorite = async (stopId: number) => {
  */
 const isFavorite = async (stopId: number): Promise<boolean> => {
   const favorites = await getFavorites();
-  return favorites.some((fav) => fav.toString() === stopId.toString());
+  return favorites.some((fav) => Number(fav) === stopId);
 };
 
 /**
@@ -99,5 +97,3 @@ export default {
   clearFavorites,
   getFavoriteStops,
 };
-
-

@@ -9,7 +9,7 @@ import { Stop } from "@/src/types/bus";
 type StopsListViewProps = {
   style?: ViewStyle,
   data: Stop[];
-  onToggleFavourite: (stopId: string) => void;
+  onToggleFavourite: (stopId: number) => void;
 }
 
 export default function StopsListView({
@@ -23,12 +23,13 @@ export default function StopsListView({
       style={[styles.listContainer, style]}
       renderItem={({ item }) => (
         <StopCard
+          id={item.id}
           title_mm={item.name_mm}
           title_en={item.name_en}
           road_mm={item.road_mm}
           lat={item.lat}
           lng={item.lng}
-          isFavourite={item.isFavourite}
+          busNumbers={item.bus_numbers}
         />
       )}
       keyExtractor={(item, index) => index + item.name_en}
