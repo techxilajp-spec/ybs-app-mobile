@@ -19,9 +19,7 @@ type BusRouteDetailSheetProps = {
   handleSelectBusStop: (busStop: Stop) => void;
   maxHeight: number;
   snapPoints: number[];
-  activeRouteIndex: number;
   onChangeIndex?: (index: number) => void;
-  onChangeRouteIndex?: (index: number) => void;
 };
 
 export default function BusRouteDetailBottomSheet({
@@ -30,9 +28,7 @@ export default function BusRouteDetailBottomSheet({
   handleSelectBusStop,
   snapPoints,
   maxHeight,
-  activeRouteIndex,
-  onChangeIndex = (index) => { },
-  onChangeRouteIndex = (index) => { },
+  onChangeIndex = (index) => { }
 }: BusRouteDetailSheetProps) {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const TAB_CONFIGS = [
@@ -85,10 +81,8 @@ export default function BusRouteDetailBottomSheet({
         <InstructionListView />
       ) : (
         <RouteListView
-          activeRouteIndex={activeRouteIndex}
           routes={routes}
           handleSelectBusStop={handleSelectBusStop}
-          onChangeRouteIndex={onChangeRouteIndex}
         />
       )}
     </AppBottomSheet>
