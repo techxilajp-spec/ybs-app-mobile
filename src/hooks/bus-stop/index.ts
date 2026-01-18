@@ -30,6 +30,19 @@ export const useGetStops = (townshipId?: number, name?: string) => {
   });
 };
 
+export const useGetStopsWithBusNumber = (
+  townshipId?: number,
+  name?: string,
+) => {
+  return useInfiniteQuery({
+    queryKey: ["stops", townshipId, name],
+    queryFn: ({ pageParam }) =>
+      api.busStopApi.getStopsWithBusNumber(pageParam, 500, townshipId),
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 1,
+  });
+};
+
 export const useGetAreas = () => {
   return useQuery<any, Error, AreasGroupResponse[]>({
     queryKey: ["area"],

@@ -1,11 +1,11 @@
 // react native
 import {
-  Image,
-  Modal,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
+    Image,
+    Modal,
+    Pressable,
+    StyleSheet,
+    TextInput,
+    View,
 } from "react-native";
 
 // react
@@ -42,7 +42,7 @@ type StopFilterModalProps = {
 
 const TABS = ["လတ်တလော", "နှစ်သက်မှု"];
 
-export default function StopFilterModal({
+export default function StopFilterModalBox({
   visible,
   showCurrentLocation = false,
   title,

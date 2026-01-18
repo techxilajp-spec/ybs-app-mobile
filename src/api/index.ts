@@ -4,6 +4,7 @@ import busStopApi from "./bus-stop";
 import busStopsApi from "./bus-stop/indes";
 import favouriteApi from "./favourite";
 import favouriteStopsApi from "./favouriteStops";
+import recent from "./recent";
 
 const api = {
   adsApi,
@@ -12,6 +13,7 @@ const api = {
   busStopsApi,
   favouriteApi,
   favouriteStopsApi,
+  recent,
 };
 
 export default api;
