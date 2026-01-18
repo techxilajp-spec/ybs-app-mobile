@@ -15,7 +15,7 @@ import { Colors } from "@/src/constants/color";
 import { Route } from "@/src/types/bus";
 
 type AvailableRoutesProps = {
-  routes: Route[],
+  routes: Route[];
   style?: ViewStyle;
 };
 
