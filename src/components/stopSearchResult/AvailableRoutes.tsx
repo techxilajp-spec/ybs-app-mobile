@@ -20,8 +20,14 @@ type AvailableRoutesProps = {
 };
 
 export default function AvailableRoutes({ routes, style }: AvailableRoutesProps) {
-  const onPressRouteCard = () => {
-    router.push("/routeDetail");
+  const onPressRouteCard = (routeId : string) => {
+    router.push({
+
+      pathname: "/(drawer)/(home)/routeDetail/[id]",
+
+      params: { id: routeId },
+
+    });
   };
   return (
     <View style={[styles.container, style]}>
@@ -36,8 +42,7 @@ export default function AvailableRoutes({ routes, style }: AvailableRoutesProps)
             routeDescription={item.description}
             color={item.color}
             isYps={item.isYps}
-            onPress={onPressRouteCard}
-            isYps={item.isYps}
+            onPress={() => onPressRouteCard(item.id.toString())}
           />
         )}
         keyExtractor={(item) => item.id}
