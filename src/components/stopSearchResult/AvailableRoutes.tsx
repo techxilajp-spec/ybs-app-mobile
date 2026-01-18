@@ -15,13 +15,19 @@ import { Colors } from "@/src/constants/color";
 import { Route } from "@/src/types/bus";
 
 type AvailableRoutesProps = {
-  routes: Route[],
+  routes: Route[];
   style?: ViewStyle;
 };
 
-export default function AvailableRoutes({ routes, style }: AvailableRoutesProps) {
-  const onPressRouteCard = () => {
-    router.push("/routeDetail");
+export default function AvailableRoutes({
+  routes,
+  style,
+}: AvailableRoutesProps) {
+  const onPressRouteCard = (routeId: string) => {
+    router.push({
+      pathname: "/routeDetail/[id]",
+      params: { id: routeId },
+    });
   };
   return (
     <View style={[styles.container, style]}>
@@ -36,8 +42,7 @@ export default function AvailableRoutes({ routes, style }: AvailableRoutesProps)
             routeDescription={item.description}
             color={item.color}
             isYps={item.isYps}
-            onPress={onPressRouteCard}
-            isYps={item.isYps}
+            onPress={() => onPressRouteCard(item.id)}
           />
         )}
         keyExtractor={(item) => item.id}

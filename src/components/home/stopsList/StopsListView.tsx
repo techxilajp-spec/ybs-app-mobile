@@ -1,5 +1,5 @@
 // react native
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 
 // react
 import { useState } from "react";
@@ -13,9 +13,14 @@ import NoticeMessage from "@/src/components/home/NoticeMessage";
 import StopFilterModal from "@/src/components/home/StopFilterModal";
 import SearchInput from "@/src/components/home/stopsList/SearchInput";
 
+// message
+import { Message } from "@/src/constants/message";
+
 export default function StopsListView() {
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
   const [selectedStop, setSelectedStop] = useState<any | null>(null);
+
+  const { error : errorMessage } = Message;
 
   /**
    * Opens the stop filter modal
@@ -36,13 +41,18 @@ export default function StopsListView() {
    */
   const searchBusStops = () => {
     const stopId = selectedStop?.id;
-    if (stopId) {
-      router.push(`/stopSearchResults?stopId=${encodeURIComponent(stopId)}`);
+    const hasSelectedStop = selectedStop && stopId;
+    if(!hasSelectedStop) {
+      Alert.alert("Invalid Input", errorMessage.empty_stop_name);
       return;
     }
 
-    // fallback: go to search results without specific stop
-    router.push("/stopSearchResults");
+    router.push({
+      pathname: "/stopSearchResults",
+      params: {
+        stopId: encodeURIComponent(stopId)
+      }
+    })
   };
 
   return (

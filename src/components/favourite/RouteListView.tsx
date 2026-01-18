@@ -3,6 +3,9 @@ import { FlatList, StyleSheet, ViewStyle } from "react-native";
 // custom components
 import RouteCard from "@/src/components/RouteCard";
 
+// expo router
+import { router } from "expo-router";
+
 // types
 import { Route } from "@/src/types/bus";
 
@@ -17,6 +20,14 @@ export default function RouteListView({
   style,
   onPressRemoveFavoriteRoute,
 }: RouteListViewProps) {
+  console.log(data);
+  
+  const onPressRouteCard = (routeId: string) => {
+    router.push({
+      pathname: "/(drawer)/(home)/routeDetail/[id]",
+      params: { id: routeId },
+    });
+  };
   return (
     <FlatList
       data={data}
@@ -27,7 +38,7 @@ export default function RouteListView({
           routeDescription={item.description}
           color={"#" + item.color}
           isYps={item.isYps}
-          onPress={() => {}}
+          onPress={() => onPressRouteCard(item.id)}
           onPressRemoveFavoriteRoute={() => {
             if (!onPressRemoveFavoriteRoute) return;
             onPressRemoveFavoriteRoute(Number(item.id));

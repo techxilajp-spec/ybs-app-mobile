@@ -1,8 +1,8 @@
 // react native
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 // react
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 
 // expo router
 import { useLocalSearchParams } from "expo-router";
@@ -10,52 +10,89 @@ import { useLocalSearchParams } from "expo-router";
 // custom component
 import AppHeader from "@/src/components/AppHeader";
 import AppScreenLayout from "@/src/components/AppScreenLayout";
+import AppText from "@/src/components/AppText";
+import RouteSkeletonCard from "@/src/components/RouteSkeletonCard";
+import StopInformationSkeleton from "@/src/components/StopInformationSkeleton";
 import AvailableRoutes from "@/src/components/stopSearchResult/AvailableRoutes";
 import StopInformation from "@/src/components/stopSearchResult/StopInformation";
 
 // hooks
 import { useGetStopDetail } from "@/src/hooks/bus-stop";
 
-// type
-import { Route } from "@/src/types/bus";
+// message
+import { Message } from "@/src/constants/message";
+
+// utils
+import { showErrorToast } from "@/src/utils/toast";
+
+// constants
+import { Colors } from "@/src/constants/color";
 
 export default function StopSearchResults() {
+  const { error : errorMessage } = Message;
   const { stopId } = useLocalSearchParams<{ stopId: string }>();
-  const { data, isLoading, error } = useGetStopDetail(String(stopId ?? ""));
+  const {
+    data: stopData,
+    isLoading: isStopLoading,
+    isError: isStopError,
+    error: stopError,
+  } = useGetStopDetail(String(stopId ?? ""));
+  const availableRoutes = useMemo(() => {
+    if (!stopData) return [];
+    return stopData.routes.map((route) => ({
+      id: route.routeId.toString(),
+      no: route.routeNumberEn ?? route.routeNumberMm ?? "",
+      name: route.routeName,
+      description: "",
+      color: route.color,
+      isYps: route.isYps,
+    }));
+  }, [stopData]);
 
-  const [availableRoutes, setAvailableRoutes] = useState<Route[]>([]);
+  const parsedName = (mm?: string, en?: string) => mm ?? en ?? "";
+  const stopName = parsedName(stopData?.nameMm, stopData?.nameEn);
+  const roadName = parsedName(stopData?.roadMm, stopData?.roadEn);
+  const townshipName = parsedName(stopData?.townshipMm, stopData?.townshipEn);
 
   useEffect(() => {
-    if (!data) return;
-
-    const routes = (data.routes || []).map((r: any) => ({
-      id: String(r.routeId),
-      no: r.routeNumberEn ?? r.routeNumberMm ?? "",
-      name: r.routeName ?? "",
-      description: "",
-      color: r.color ?? "#000",
-      isYps: !!r.isYps,
-    }));
-
-    setAvailableRoutes(routes);
-  }, [data]);
-
-  const stopName = data?.nameMm ?? data?.nameEn ?? "";
-  const roadName = data?.roadMm ?? data?.roadEn ?? "";
-  const townshipName = data?.townshipMm ?? data?.townshipEn ?? "";
+    if(isStopError && stopError) {
+      showErrorToast(errorMessage.something_wrong, errorMessage.stop_not_found)
+    }
+  }, [isStopError, stopError])
 
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
       <AppHeader title="ရှာဖွေမှုရလဒ်" />
-      <StopInformation
-        stopName={stopName}
-        roadName={roadName}
-        townshipName={townshipName}
-        lat={16.80528}
-        lng={96.15611}
-        style={styles.stopInformation}
-      />
-      <AvailableRoutes style={styles.routeListContainer} routes={availableRoutes} />
+      {isStopLoading ? (
+        // skeletons
+        <View style={{ flex: 1 }}>
+          <StopInformationSkeleton style={styles.stopInformation} />
+          <View style={styles.routeListContainer}>
+            {new Array(4).fill(0).map((_, index) => (
+              <RouteSkeletonCard key={index} />
+            ))}
+          </View>
+        </View>
+      ) : isStopError ? (
+        <View style={styles.errorContainer}>
+          <AppText size={14} style={styles.errorMessage}>{errorMessage.stop_not_found}</AppText>
+        </View>
+      ) : (
+        <>
+          <StopInformation
+            stopName={stopName}
+            roadName={roadName}
+            townshipName={townshipName}
+            lat={16.80528}
+            lng={96.15611}
+            style={styles.stopInformation}
+          />
+          <AvailableRoutes
+            style={styles.routeListContainer}
+            routes={availableRoutes}
+          />
+        </>
+      )}
     </AppScreenLayout>
   );
 }
@@ -65,9 +102,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   stopInformation: {
-    marginTop: 30
+    marginTop: 30,
   },
   routeListContainer: {
-    marginTop: 28
+    marginTop: 28,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  errorMessage: {
+    color: Colors.text.disabled,
+    fontFamily: 'MiSansMyanmar-Medium'
   }
 });
