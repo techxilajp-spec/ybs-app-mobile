@@ -21,6 +21,7 @@ export type Stop = {
   };
   township_id: number;
   bus_numbers: string[];
+  direction_text?: string;
 };
 
 export type AreasGroupResponse = {

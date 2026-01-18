@@ -10,6 +10,8 @@ import {
 
 // react
 import { useEffect, useMemo, useState } from "react";
+// use-debounce
+import { useDebounce } from "use-debounce";
 
 // expo icons
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -55,6 +57,9 @@ export default function StopFilterModal({
   const [isAutoFetchingPages, setIsAutoFetchingPages] =
     useState<boolean>(false);
 
+  const [searchText, setSearchText] = useState<string>("");
+  const [debouncedSearchText] = useDebounce(searchText, 500);
+
   const {
     data: stopDatas,
     isLoading: isStopsLoading,
@@ -62,7 +67,7 @@ export default function StopFilterModal({
     fetchNextPage: fextNextStops,
     hasNextPage: hasNextStops,
     isFetchingNextPage: isFetchingNextStops,
-  } = useGetStops(selectedTownshipId);
+  } = useGetStops(selectedTownshipId, debouncedSearchText);
 
   const { data: areasData } = useGetAreas();
 
@@ -76,7 +81,6 @@ export default function StopFilterModal({
 
   const areas = areasData;
 
-  const [searchText, setSearchText] = useState<string>("");
   const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
     [],
   );
@@ -249,6 +253,11 @@ export default function StopFilterModal({
                   placeholder={title}
                   placeholderTextColor="#667085"
                 />
+                {searchText.length > 0 && (
+                  <Pressable onPress={() => setSearchText("")}>
+                    <MaterialIcons name="close" size={20} color="#667085" />
+                  </Pressable>
+                )}
               </View>
               <Pressable style={styles.filterButton} onPress={showFilters}>
                 {selectedFilterOptions.length > 0 && (
@@ -333,10 +342,9 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     backgroundColor: "#F2F4F7",
-    paddingVertical: 5,
     paddingHorizontal: 15,
     borderRadius: 8,
-
+    height: 40,
     flexDirection: "row",
     alignItems: "center",
   },

@@ -13,17 +13,17 @@ import { ScrollView } from "react-native-gesture-handler";
 type ListViewProps = {
   data: Stop[];
   onPress?: (item: any) => void;
-  hasNextStops : boolean;
-  isFetchingNextStops : boolean;
-  isStopsLoading : boolean;
+  hasNextStops: boolean;
+  isFetchingNextStops: boolean;
+  isStopsLoading: boolean;
   fetchNextPage: () => void;
-  isStopsError : boolean;
+  isStopsError: boolean;
 };
 
-export default function ListView({ data, onPress, hasNextStops, isFetchingNextStops, fetchNextPage, isStopsLoading, isStopsError}: ListViewProps) {
+export default function ListView({ data, onPress, hasNextStops, isFetchingNextStops, fetchNextPage, isStopsLoading, isStopsError }: ListViewProps) {
   return (
     <>
-    {isStopsLoading ? (
+      {isStopsLoading ? (
         // skeleton view
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -41,39 +41,40 @@ export default function ListView({ data, onPress, hasNextStops, isFetchingNextSt
         <View></View>
       ) : (
         <View style={styles.container}>
-        {data.length > 0 ? (
-          <FlatList
-            style={styles.container}
-            data={data}
-            renderItem={({ item }) => (
-              <StopCard
-                id={item.id}
-                title_mm={item.name_mm}
-                title_en={item.name_en}
-                road_mm={item.road_mm} // TODO' select road name
-                lat={item.lat}
-                lng={item.lng}
-                onPress={() => onPress && onPress(item)}
-                busNumbers={item.bus_numbers}
-              />
-            )}
-            keyExtractor={(item, index) => index + item.name_en}
-            showsVerticalScrollIndicator={false}
-            onEndReached={() => { 
-              if(hasNextStops && !isFetchingNextStops) {
-                fetchNextPage();
-              }
-            }}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={isFetchingNextStops ? <SkeletonCard/> : null}
-          />
-      ) : (
-        <View style={[styles.container, styles.noDataContainer]}>
-          <AppText size={16} style={styles.noDataText}>မှတ်တိုင်ရှာမတွေ့ပါ</AppText>
+          {data.length > 0 ? (
+            <FlatList
+              style={styles.container}
+              data={data}
+              renderItem={({ item }) => (
+                <StopCard
+                  id={item.id}
+                  title_mm={item.name_mm}
+                  title_en={item.name_en}
+                  road_mm={item.road_mm}
+                  lat={item.lat}
+                  lng={item.lng}
+                  onPress={() => onPress && onPress(item)}
+                  busNumbers={item.bus_numbers}
+                  direction_text={item.direction_text}
+                />
+              )}
+              keyExtractor={(item, index) => index + item.name_en}
+              showsVerticalScrollIndicator={false}
+              onEndReached={() => {
+                if (hasNextStops && !isFetchingNextStops) {
+                  fetchNextPage();
+                }
+              }}
+              onEndReachedThreshold={0.5}
+              ListFooterComponent={isFetchingNextStops ? <SkeletonCard /> : null}
+            />
+          ) : (
+            <View style={[styles.container, styles.noDataContainer]}>
+              <AppText size={16} style={styles.noDataText}>မှတ်တိုင်ရှာမတွေ့ပါ</AppText>
+            </View>
+          )}
         </View>
       )}
-    </View>
-    )}
 
     </>
   );

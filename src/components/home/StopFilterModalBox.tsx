@@ -1,11 +1,11 @@
 // react native
 import {
-  Image,
-  Modal,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
+    Image,
+    Modal,
+    Pressable,
+    StyleSheet,
+    TextInput,
+    View,
 } from "react-native";
 
 // react
@@ -15,13 +15,13 @@ import { useDebounce } from "use-debounce";
 
 // expo icons
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+
 // custom components
 import NavigationTabs from "@/src/components/AppNavigationTabs";
 import AppText from "@/src/components/AppText";
 import FilterView from "@/src/components/home/FilterView";
-import AppliedFilterSummary from "@/src/components/home/routeFilterModal/AppliedFilterSummary";
-import ListView from "@/src/components/home/routeFilterModal/ListView";
-
+import AppliedFilterSummary from "@/src/components/home/stopFilterModal/AppliedFilterSummary";
+import ListView from "@/src/components/home/stopFilterModal/ListView";
 // safe area
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -29,10 +29,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Accordian, Option } from "@/src/types/accordian";
 
 // data
-import { Colors } from "@/src/constants/color";
 import { useGetAreas, useGetStops } from "@/src/hooks/bus-stop";
+import { useGetRecentStops } from "@/src/hooks/recent";
 
-type RouteFilterModalProps = {
+type StopFilterModalProps = {
   visible: boolean;
   title: string;
   showCurrentLocation?: boolean;
@@ -42,35 +42,48 @@ type RouteFilterModalProps = {
 
 const TABS = ["လတ်တလော", "နှစ်သက်မှု"];
 
-export default function RouteFilterModal({
+export default function StopFilterModalBox({
   visible,
   showCurrentLocation = false,
   title,
   onClose,
   onSelect,
-}: RouteFilterModalProps) {
+}: StopFilterModalProps) {
   const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
   const [stopsList, setStopsList] = useState<any[]>([]);
-  const [selectedTownshipId, setSelectedTownshipId] = useState<number | undefined>(undefined);
+  const [selectedTownshipId, setSelectedTownshipId] = useState<
+    number | undefined
+  >(undefined);
+  const [isAutoFetchingPages, setIsAutoFetchingPages] =
+    useState<boolean>(false);
 
   const [searchText, setSearchText] = useState<string>("");
   const [debouncedSearchText] = useDebounce(searchText, 500);
-  const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>([]);
 
   const {
     data: stopDatas,
     isLoading: isStopsLoading,
     isError: isStopsError,
-    fetchNextPage: fetchNextStops,
+    fetchNextPage: fextNextStops,
     hasNextPage: hasNextStops,
     isFetchingNextPage: isFetchingNextStops,
   } = useGetStops(selectedTownshipId, debouncedSearchText);
 
   const { data: areasData } = useGetAreas();
 
-  const stops = useMemo(() => stopDatas?.pages.flatMap((page) => page.data) ?? [], [stopDatas]);
+  const { data: recentStopsData, refetch: refetchRecentStops } =
+    useGetRecentStops();
+
+  const stops = useMemo(
+    () => stopDatas?.pages.flatMap((page) => page.data) ?? [],
+    [stopDatas],
+  );
 
   const areas = areasData;
+
+  const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
+    [],
+  );
 
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false);
@@ -101,7 +114,10 @@ export default function RouteFilterModal({
   const onOptionListSelect = (selectedOptionList: Option[]) => {
     setSelectedFilterOptions(selectedOptionList);
     // Set township_id from first selected option (if available)
-    const firstTownshipId = selectedOptionList.length > 0 ? Number(selectedOptionList[0].id) : undefined;
+    const firstTownshipId =
+      selectedOptionList.length > 0
+        ? Number(selectedOptionList[0].id)
+        : undefined;
     setSelectedTownshipId(firstTownshipId);
   };
 
@@ -125,16 +141,80 @@ export default function RouteFilterModal({
   };
 
   useEffect(() => {
-    // default view: recent shows all stops, favourite shows only favourites
-    const list = activeIndex === 0 ? stops : stops.filter((s: any) => s.is_favourite);
-    setStopsList(list);
-  }, [activeIndex, stops]);
+    if (canSearch) {
+      // perform search filtering on fetched stops
+      const searchLower = searchText.trim().toLowerCase();
 
+      const searchData = stops.filter((s: any) => {
+        // match search text
+        const nameMm = (s.name_mm || "").toLowerCase();
+        const nameEn = (s.name_en || "").toLowerCase();
+        const matchesSearch =
+          !searchLower ||
+          nameMm.includes(searchLower) ||
+          nameEn.includes(searchLower);
+
+        return matchesSearch;
+      });
+
+      setStopsList(searchData);
+
+      // Auto-fetch next pages if no results found and more pages available
+      if (
+        searchData.length === 0 &&
+        hasNextStops &&
+        !isFetchingNextStops &&
+        !isAutoFetchingPages
+      ) {
+        setIsAutoFetchingPages(true);
+        fextNextStops();
+      } else if (searchData.length > 0) {
+        // Stop auto-fetching if we found results
+        setIsAutoFetchingPages(false);
+      }
+
+      return;
+    }
+
+    // default view: recent shows recent stops, favourite shows only favourites
+    if (activeIndex === 0) {
+      // For recent tab, use the recentStopsData from query
+      setStopsList(recentStopsData ?? []);
+    } else {
+      // For favourite tab, show only favourites
+      setStopsList(stops.filter((s: any) => s.isFavourite));
+    }
+
+    // Reset auto-fetch flag when not searching
+    setIsAutoFetchingPages(false);
+  }, [
+    activeIndex,
+    canSearch,
+    searchText,
+    stops,
+    recentStopsData,
+    hasNextStops,
+    isFetchingNextStops,
+    isAutoFetchingPages,
+    fextNextStops,
+  ]);
+
+  // Refetch recent stops when modal becomes visible or when tab changes to recent
   useEffect(() => {
     if (areas && areas.length > 0) {
       setAreaFilters(areas);
     }
-  }, [areas]);
+    if (visible && activeIndex === 0) {
+      refetchRecentStops();
+    }
+  }, [visible, activeIndex, refetchRecentStops, areas]);
+
+  // Clear search text when modal closes
+  useEffect(() => {
+    if (!visible) {
+      setSearchText("");
+    }
+  }, [visible]);
 
   return (
     <Modal
@@ -234,7 +314,7 @@ export default function RouteFilterModal({
                 }}
                 hasNextStops={hasNextStops}
                 isFetchingNextStops={isFetchingNextStops}
-                fetchNextPage={fetchNextStops}
+                fetchNextPage={fextNextStops}
                 isStopsLoading={isStopsLoading}
                 isStopsError={isStopsError}
               />
@@ -287,12 +367,12 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: "MiSansMyanmar-Regular",
     backgroundColor: "#F2F4F7",
-    paddingLeft: 10
+    paddingLeft: 10,
   },
   filterButton: {
     position: "relative",
     backgroundColor: "#FFFFFF",
-    padding: 10,
+    padding: 12,
     borderRadius: 8,
     borderColor: "#D0D5DD",
     borderWidth: 1,
@@ -325,28 +405,4 @@ const styles = StyleSheet.create({
   filterSummary: {
     marginBottom: 18,
   },
-  mapSelectionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F9FAFB",
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#EAECF0",
-    marginBottom: 15,
-  },
-  mapIconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 10
-  },
-  mapSelectionText: {
-    flex: 1,
-    color: Colors.text.primary,
-    fontWeight: "600"
-  }
 });

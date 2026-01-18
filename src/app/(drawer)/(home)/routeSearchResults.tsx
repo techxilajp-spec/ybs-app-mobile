@@ -37,22 +37,31 @@ export default function RouteSearchResultScreen() {
   const flattenedRoutes = useMemo(() => {
     if (!routeData || routeData.length === 0) return [];
 
-    return routeData?.flatMap((item) =>
+    const allRoutes = routeData?.flatMap((item) =>
       item.routes.map((route) => ({
         id: String(route.id),
         no: route.no,
         name: route.name,
         description: route.description,
         color: route.color,
-        isYps: false, // TODO: implement isYps
+        isYps: route.isYps,
       }))
     );
-  }, []);
+
+    // Deduplicate by ID
+    const uniqueRoutesMap = new Map();
+    allRoutes.forEach((route) => {
+      if (!uniqueRoutesMap.has(route.id)) {
+        uniqueRoutesMap.set(route.id, route);
+      }
+    });
+
+    return Array.from(uniqueRoutesMap.values());
+  }, [routeData]);
 
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
       <AppHeader title="ရှာဖွေမှုရလဒ်" />
-
       <NavigationTabs
         tabs={TABS.map((t) => t.label)}
         activeIndex={activeTabIndex}
