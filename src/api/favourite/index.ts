@@ -23,33 +23,43 @@ const safeParse = <T>(value: string | null, fallback: T): T => {
  */
 const getFavorites = async (): Promise<number[]> => {
   const json = await AsyncStorage.getItem(FAVORITE_KEY);
-
   return safeParse<number[]>(json, []);
 };
+
+export interface Route {
+  routeId: number;
+  routeName: string;
+  routeNumberEn: string;
+  routeColor: string;
+  isYps: boolean;
+  busStopNamesMm: string;
+}
+
+export type FavouriteRouteResponse = Route[];
 
 /**
  * Retrieves the list of favorite routes from Supabase.
  * @returns The list of favorite routes.
  */
-const getFavoriteRoutes = async (): Promise<any[]> => {
+export const getFavoriteRoutes = async (): Promise<FavouriteRouteResponse> => {
   const favoriteIds = await getFavorites();
-
-  if (!favoriteIds || favoriteIds.length === 0) {
-    return [];
-  }
-
-  const { data, error } = await supabase.rpc(
-    "get_routes_by_ids",
-    {
-      route_ids: favoriteIds,
-    }
-  );
-
+  if (!favoriteIds || favoriteIds.length === 0) return [];
+  const { data, error } = await supabase
+    .from("route_list_view")
+    .select(`
+      routeId,
+      routeName,
+      routeNumberEn,
+      routeColor,
+      isYps,
+      busStopNamesMm
+    `)
+    .in("routeId", favoriteIds);
   if (error) {
-    throw error;
+    console.error("Error fetching favorite routes:", error);
+    throw new Error(error.message);
   }
-
-  return data ?? [];
+  return (data ?? []) as FavouriteRouteResponse;
 };
 
 
@@ -79,9 +89,7 @@ const addFavorite = async (routeId: number) => {
  */
 const removeFavorite = async (routeId: number) => {
   const favorites = await getFavorites();
-
   const updated = favorites.filter((fav) => fav !== routeId);
-
   await AsyncStorage.setItem(FAVORITE_KEY, JSON.stringify(updated));
   return updated;
 };
