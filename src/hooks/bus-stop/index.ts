@@ -20,11 +20,11 @@ export const useSearchBusStops = (name: string) => {
  * @param townshipId - Optional township ID to filter stops
  * @returns
  */
-export const useGetStops = (townshipId?: number) => {
+export const useGetStops = (townshipId?: number, name?: string) => {
   return useInfiniteQuery({
-    queryKey: ["stops", townshipId],
+    queryKey: ["stops", townshipId, name],
     queryFn: ({ pageParam }) =>
-      api.busStopsApi.getStops(pageParam, 50, townshipId),
+      api.busStopsApi.getStops(pageParam, 50, townshipId, name),
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 1,
   });

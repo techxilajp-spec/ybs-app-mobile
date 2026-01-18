@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 // react
-import { useEffect, useMemo, useState } from "react"; // use-debounce
+import { useEffect, useMemo, useState } from "react";
 // use-debounce
 import { useDebounce } from "use-debounce";
 
@@ -26,11 +26,11 @@ import ListView from "@/src/components/home/routeFilterModal/ListView";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // type
-import { Option } from "@/src/types/accordian";
-import { Stop } from "@/src/types/bus";
+import { Accordian, Option } from "@/src/types/accordian";
+
 // data
 import { Colors } from "@/src/constants/color";
-import { useGetStops } from "@/src/hooks/bus-stop";
+import { useGetAreas, useGetStops } from "@/src/hooks/bus-stop";
 
 type RouteFilterModalProps = {
   visible: boolean;
@@ -49,22 +49,34 @@ export default function RouteFilterModal({
   onClose,
   onSelect,
 }: RouteFilterModalProps) {
-  // const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
-  const [stopsList, setStopsList] = useState<Stop[]>([]);
-
-  const { data } = useGetStops();
-  const stops = useMemo(() => data?.pages.flatMap((page) => page.data) ?? [], [data]);
+  const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
+  const [stopsList, setStopsList] = useState<any[]>([]);
+  const [selectedTownshipId, setSelectedTownshipId] = useState<number | undefined>(undefined);
 
   const [searchText, setSearchText] = useState<string>("");
   const [debouncedSearchText] = useDebounce(searchText, 500);
-  const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
-    []
-  );
+  const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>([]);
+
+  const {
+    data: stopDatas,
+    isLoading: isStopsLoading,
+    isError: isStopsError,
+    fetchNextPage: fetchNextStops,
+    hasNextPage: hasNextStops,
+    isFetchingNextPage: isFetchingNextStops,
+  } = useGetStops(selectedTownshipId, debouncedSearchText);
+
+  const { data: areasData } = useGetAreas();
+
+  const stops = useMemo(() => stopDatas?.pages.flatMap((page) => page.data) ?? [], [stopDatas]);
+
+  const areas = areasData;
 
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false);
+
   const hasSelectedOptions = selectedFilterOptions.length > 0;
-  const isValidSearchText = debouncedSearchText.trim() !== "";
+  const isValidSearchText = searchText.trim() !== "";
   const canSearch = hasSelectedOptions || isValidSearchText;
 
   /**
@@ -88,6 +100,9 @@ export default function RouteFilterModal({
    */
   const onOptionListSelect = (selectedOptionList: Option[]) => {
     setSelectedFilterOptions(selectedOptionList);
+    // Set township_id from first selected option (if available)
+    const firstTownshipId = selectedOptionList.length > 0 ? Number(selectedOptionList[0].id) : undefined;
+    setSelectedTownshipId(firstTownshipId);
   };
 
   /**
@@ -106,52 +121,20 @@ export default function RouteFilterModal({
    */
   const clearOptions = () => {
     setSelectedFilterOptions([]);
+    setSelectedTownshipId(undefined);
   };
 
-  //   async function applyStopFavorites(stops: Stop[]) {
-  //     const favoriteIds = await getStopLocalFavorites();
-
-  //     return stops.map(stop => ({
-  //       ...stop,
-  //       isFavourite: favoriteIds.includes(stop.id.toString()),
-  //     }));
-  //   }
-
   useEffect(() => {
-    if (canSearch) {
-      // perform combined search and township filter over fetched stops
-      const searchLower = searchText.trim().toLowerCase();
-      const selectedTownshipIds = selectedFilterOptions.map((o) => String(o.id));
-
-      const searchData = stops.filter((s: any) => {
-        // match search text
-        const nameMm = (s.name_mm || "").toLowerCase();
-        const nameEn = (s.name_en || "").toLowerCase();
-        const matchesSearch =
-          !searchLower || nameMm.includes(searchLower) || nameEn.includes(searchLower);
-
-        // match township filter
-        const townshipId = s?.township?.id;
-        const matchesTownship =
-          selectedTownshipIds.length === 0 || (townshipId && selectedTownshipIds.includes(String(townshipId)));
-
-        return matchesSearch && matchesTownship;
-      });
-
-      setStopsList(searchData);
-      return;
-    }
-
     // default view: recent shows all stops, favourite shows only favourites
     const list = activeIndex === 0 ? stops : stops.filter((s: any) => s.is_favourite);
     setStopsList(list);
-  }, [activeIndex, canSearch, searchText, stops, selectedFilterOptions]);
+  }, [activeIndex, stops]);
 
-  // useEffect(() => {
-  //   if (areas && areas.length > 0) {
-  //     setAreaFilters(areas);
-  //   }
-  // }, [areas]);
+  useEffect(() => {
+    if (areas && areas.length > 0) {
+      setAreaFilters(areas);
+    }
+  }, [areas]);
 
   return (
     <Modal
@@ -165,7 +148,7 @@ export default function RouteFilterModal({
         {isFilterVisible ? (
           <FilterView
             onClose={hileFilters}
-            data={[]} // TODO: implement township filter
+            data={areaFilters}
             selectedOptions={selectedFilterOptions}
             onOptionListSelect={onOptionListSelect}
           />
@@ -207,28 +190,6 @@ export default function RouteFilterModal({
             </View>
 
             <View style={{ flex: 1 }}>
-              {/* 
-              <Pressable
-                style={styles.mapSelectionButton}
-                onPress={() => {
-                  // Navigate to map selection
-                  if (onClose) onClose();
-                  const mode = title.includes("စထွက်") ? "start" : "end";
-                  // Using router.push with relative path since we are in (home) group
-                  // Or absolute path
-                  const params = { mode };
-                  // @ts-ignore
-                  router.push({ pathname: "/mapSelection", params });
-                }}
-              >
-                <View style={styles.mapIconCircle}>
-                  <MaterialIcons name="map" size={20} color="#FFF" />
-                </View>
-                <AppText style={styles.mapSelectionText}>မြေပုံမှရွေးချယ်မည်</AppText>
-                <MaterialIcons name="chevron-right" size={24} color={Colors.text.secondary} />
-              </Pressable>
-              */}
-
               {selectedFilterOptions.length > 0 && (
                 <AppliedFilterSummary
                   filters={selectedFilterOptions}
@@ -259,12 +220,18 @@ export default function RouteFilterModal({
               )}
               <ListView
                 data={stopsList}
-                onPress={(stop) => {
-                  if (onSelect) {
-                    onSelect(stop);
-                  }
+                onPress={(item) => {
+                  // pass the selected stop back to parent
+                  onSelect?.(item);
+
+                  // close modal
                   onClose();
                 }}
+                hasNextStops={hasNextStops}
+                isFetchingNextStops={isFetchingNextStops}
+                fetchNextPage={fetchNextStops}
+                isStopsLoading={isStopsLoading}
+                isStopsError={isStopsError}
               />
             </View>
           </>

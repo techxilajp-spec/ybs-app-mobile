@@ -8,7 +8,8 @@ interface PaginatedStopsResponse {
 const getStops = async (
   page: number = 1,
   limit: number = 50,
-  townshipId?: number
+  townshipId?: number,
+  name?: string
 ): Promise<PaginatedStopsResponse> => {
   let stops: any[] = [];
   if (page < 1) return { data: [], nextPage: null };
@@ -16,29 +17,12 @@ const getStops = async (
   const from = (page - 1) * limit;
 
   const to = from + limit - 1;
-  let query = supabase
-    .from("v_stops_with_bus_numbers")
-    .select(
-      `
-      id,
-      name_mm,
-      name_en,
-      road_mm,
-      road_en,
-      lat,
-      lng,
-      township_id,
-      bus_numbers
-    `
-    )
-    .order("id", { ascending: true })
-    .range(from, to);
-
-  if (townshipId != null) {
-    query = query.eq("township_id", townshipId);
-  }
-
-  const { data, error } = await query;
+  const { data, error } = await supabase.rpc("search_stops", {
+    p_name: name || null,
+    p_township_id: townshipId || null,
+    p_page: page,
+    p_limit: limit,
+  });
 
   if (error) {
     throw new Error(error.message);
