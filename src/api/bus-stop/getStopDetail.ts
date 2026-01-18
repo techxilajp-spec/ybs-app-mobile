@@ -21,6 +21,7 @@ interface RouteResponse {
   isYps: boolean;
   coordinates: Array<[number, number]>;
   color: string;
+  busStopNamesMm: string;
 }
 
 /**
@@ -54,7 +55,7 @@ const getStopDetail = async (
         nameMm,
         nameEn, 
         lat,
-        lng, 
+        lng,
         roadMm,
         roadEn,
         townshipEn,

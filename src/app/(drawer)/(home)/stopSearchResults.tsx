@@ -45,8 +45,8 @@ export default function StopSearchResults() {
       id: route.routeId.toString(),
       no: route.routeNumberEn ?? route.routeNumberMm ?? "",
       name: route.routeName,
-      description: "",
-      color: route.color,
+      description: route.busStopNamesMm,
+      color: `#${route.color}`,
       isYps: route.isYps,
     }));
   }, [stopData]);
