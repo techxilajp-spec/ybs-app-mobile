@@ -19,14 +19,14 @@ type AvailableRoutesProps = {
   style?: ViewStyle;
 };
 
-export default function AvailableRoutes({
-  routes,
-  style,
-}: AvailableRoutesProps) {
-  const onPressRouteCard = (routeId: string) => {
+export default function AvailableRoutes({ routes, style }: AvailableRoutesProps) {
+  const onPressRouteCard = (routeId : string) => {
     router.push({
-      pathname: "/routeDetail/[id]",
+
+      pathname: "/(drawer)/(home)/routeDetail/[id]",
+
       params: { id: routeId },
+
     });
   };
   return (
@@ -42,7 +42,7 @@ export default function AvailableRoutes({
             routeDescription={item.description}
             color={item.color}
             isYps={item.isYps}
-            onPress={() => onPressRouteCard(item.id)}
+            onPress={() => onPressRouteCard(item.id.toString())}
           />
         )}
         keyExtractor={(item) => item.id}
