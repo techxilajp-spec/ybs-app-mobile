@@ -55,6 +55,7 @@ export default function ListView({ data, onPress, hasNextStops, isFetchingNextSt
                   lng={item.lng}
                   onPress={() => onPress && onPress(item)}
                   busNumbers={item.bus_numbers}
+                  direction_text={item.direction_text}
                 />
               )}
               keyExtractor={(item, index) => index + item.name_en}
