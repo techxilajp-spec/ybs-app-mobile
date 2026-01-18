@@ -26,6 +26,7 @@ interface Route {
     name: string;
     color: string;
     coordinates: string; // JSON string in DB
+    is_yps: boolean;
 }
 
 interface RouteDetail {
@@ -178,7 +179,7 @@ serve(async (req) => {
         // 4. Fetch Route Info (Name, etc) WITH COORDINATES
         const { data: routesData, error: rError } = await supabase
             .from('routes')
-            .select('id, number_mm, name, color, coordinates')
+            .select('id, number_mm, name, color, coordinates, is_yps')
             .neq('del_flg', 1)
             .in('id', relevantRouteIds);
 
@@ -484,6 +485,7 @@ serve(async (req) => {
                 name: r.name,
                 description: `${r.startStop} - ${r.endStop}`, // Use start/end as description
                 color: r.color,
+                isYps: r.is_yps,
                 coordinates: r.coordPath,
                 stops: r.stops.map((s: Stop) => ({
                     id: s.id.toString(),

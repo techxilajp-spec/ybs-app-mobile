@@ -10,6 +10,8 @@ import {
 
 // react
 import { useEffect, useMemo, useState } from "react";
+// use-debounce
+import { useDebounce } from "use-debounce";
 
 // expo icons
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -50,14 +52,17 @@ export default function StopFilterModal({
   const [stopsList, setStopsList] = useState<any[]>([]);
   const [selectedTownshipId, setSelectedTownshipId] = useState<number | undefined>(undefined);
 
-  const { 
-    data : stopDatas,
-    isLoading : isStopsLoading,
-    isError : isStopsError,
-    fetchNextPage : fextNextStops,
-    hasNextPage : hasNextStops,
-    isFetchingNextPage : isFetchingNextStops,
-   } = useGetStops(selectedTownshipId);
+  const [searchText, setSearchText] = useState<string>("");
+  const [debouncedSearchText] = useDebounce(searchText, 500);
+
+  const {
+    data: stopDatas,
+    isLoading: isStopsLoading,
+    isError: isStopsError,
+    fetchNextPage: fextNextStops,
+    hasNextPage: hasNextStops,
+    isFetchingNextPage: isFetchingNextStops,
+  } = useGetStops(selectedTownshipId, debouncedSearchText);
 
   const { data: areasData } = useGetAreas();
 
@@ -65,7 +70,6 @@ export default function StopFilterModal({
 
   const areas = areasData;
 
-  const [searchText, setSearchText] = useState<string>("");
   const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
     []
   );
@@ -102,7 +106,7 @@ export default function StopFilterModal({
     // Set township_id from first selected option (if available)
     const firstTownshipId = selectedOptionList.length > 0 ? Number(selectedOptionList[0].id) : undefined;
     setSelectedTownshipId(firstTownshipId);
-  }; 
+  };
 
   /**
    * Removes a selected option from the options list.
@@ -124,28 +128,10 @@ export default function StopFilterModal({
   };
 
   useEffect(() => {
-    if (canSearch) {
-      // perform search filtering on fetched stops
-      const searchLower = searchText.trim().toLowerCase();
-
-      const searchData = stops.filter((s: any) => {
-        // match search text
-        const nameMm = (s.name_mm || "").toLowerCase();
-        const nameEn = (s.name_en || "").toLowerCase();
-        const matchesSearch =
-          !searchLower || nameMm.includes(searchLower) || nameEn.includes(searchLower);
-
-        return matchesSearch;
-      });
-
-      setStopsList(searchData);
-      return;
-    }
-
     // default view: recent shows all stops, favourite shows only favourites
     const list = activeIndex === 0 ? stops : stops.filter((s: any) => s.isFavourite);
     setStopsList(list);
-  }, [activeIndex, canSearch, searchText, stops]);
+  }, [activeIndex, stops]);
 
   useEffect(() => {
     if (areas && areas.length > 0) {
@@ -190,6 +176,11 @@ export default function StopFilterModal({
                   placeholder={title}
                   placeholderTextColor="#667085"
                 />
+                {searchText.length > 0 && (
+                  <Pressable onPress={() => setSearchText("")}>
+                    <MaterialIcons name="close" size={20} color="#667085" />
+                  </Pressable>
+                )}
               </View>
               <Pressable style={styles.filterButton} onPress={showFilters}>
                 {selectedFilterOptions.length > 0 && (
@@ -236,19 +227,19 @@ export default function StopFilterModal({
                 />
               )}
               <ListView
-                  data={stopsList}
-                  onPress={(item) => {
-                    // pass the selected stop back to parent
-                    onSelect?.(item);
+                data={stopsList}
+                onPress={(item) => {
+                  // pass the selected stop back to parent
+                  onSelect?.(item);
 
-                    // close modal
-                    onClose();
-                  }}
-                  hasNextStops = {hasNextStops}
-                  isFetchingNextStops = {isFetchingNextStops}
-                  fetchNextPage = {fextNextStops}
-                  isStopsLoading={isStopsLoading}
-                  isStopsError={isStopsError}
+                  // close modal
+                  onClose();
+                }}
+                hasNextStops={hasNextStops}
+                isFetchingNextStops={isFetchingNextStops}
+                fetchNextPage={fextNextStops}
+                isStopsLoading={isStopsLoading}
+                isStopsError={isStopsError}
               />
             </View>
           </>
@@ -274,10 +265,9 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     backgroundColor: "#F2F4F7",
-    paddingVertical: 5,
     paddingHorizontal: 15,
     borderRadius: 8,
-
+    height: 40,
     flexDirection: "row",
     alignItems: "center",
   },
