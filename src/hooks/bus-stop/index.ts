@@ -1,6 +1,6 @@
 import api from "@/src/api";
 import { AreasGroupResponse, StopDetailResponse } from "@/src/types/bus";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 
 /**
  * Hook for searching bus stops by name.
@@ -43,4 +43,11 @@ export const useGetStopDetail = (id: string) => {
     queryKey: ["stop_detail", id],
     queryFn: () => api.busStopsApi.getStopDetail(id),
   });
+};
+
+// --- Increase Stop View ---
+export const useIncreaseStopView = () => {
+  return useMutation({
+    mutationFn: (stopId : number) => api.busStopApi.increaseStopView(stopId)
+  })
 };

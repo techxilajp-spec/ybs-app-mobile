@@ -17,7 +17,7 @@ import AvailableRoutes from "@/src/components/stopSearchResult/AvailableRoutes";
 import StopInformation from "@/src/components/stopSearchResult/StopInformation";
 
 // hooks
-import { useGetStopDetail } from "@/src/hooks/bus-stop";
+import { useGetStopDetail, useIncreaseStopView } from "@/src/hooks/bus-stop";
 
 // message
 import { Message } from "@/src/constants/message";
@@ -31,6 +31,8 @@ import { Colors } from "@/src/constants/color";
 export default function StopSearchResults() {
   const { error : errorMessage } = Message;
   const { stopId } = useLocalSearchParams<{ stopId: string }>();
+
+  // fetch stop data
   const {
     data: stopData,
     isLoading: isStopLoading,
@@ -49,6 +51,9 @@ export default function StopSearchResults() {
     }));
   }, [stopData]);
 
+  // increase stop view count
+  const { mutate: increaseStopView } = useIncreaseStopView();
+
   const parsedName = (mm?: string, en?: string) => mm ?? en ?? "";
   const stopName = parsedName(stopData?.nameMm, stopData?.nameEn);
   const roadName = parsedName(stopData?.roadMm, stopData?.roadEn);
@@ -59,6 +64,11 @@ export default function StopSearchResults() {
       showErrorToast(errorMessage.something_wrong, errorMessage.stop_not_found)
     }
   }, [isStopError, stopError])
+
+  useEffect(() => {
+    if(!stopId) return;
+    increaseStopView(Number(stopId));
+  }, [stopId])
 
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
