@@ -1,15 +1,15 @@
 import api from "@/src/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 /**
  * Get favorite routes
  * @returns
  */
 export const useGetFavoriteRoutes = () => {
-  return useMutation({
-    mutationKey: ["favorite_routes"],
-    mutationFn: () => api.favouriteApi.getFavoriteRoutes(),
-  });
+  return useQuery({
+    queryKey: ["favorite_routes"],
+    queryFn: api.favouriteApi.getFavoriteRoutes
+  })
 };
 
 /**
@@ -33,7 +33,6 @@ export const useAddFavoriteRoute = () => {
  */
 export const useRemoveFavoriteRoute = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (routeId: number) => api.favouriteApi.removeFavorite(routeId),
     onSuccess: () => {

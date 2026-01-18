@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 // react
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 // custom components
 import AppHeader from "@/src/components/AppHeader";
@@ -16,7 +16,7 @@ import {
   useRemoveFavoriteRoute,
 } from "@/src/hooks/favourite";
 import { useGetFavoriteStops, useRemoveFavoriteStop } from "@/src/hooks/favouriteStops";
-import { Route, Stop } from "@/src/types/bus";
+import { Stop } from "@/src/types/bus";
 import { useFocusEffect } from "@react-navigation/native";
 
 type TabKey = "stops" | "routes";
@@ -32,12 +32,23 @@ const TAB_CONFIG: {
 export default function FavouriteScreen() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [busStops, setBusStops] = useState<Stop[]>([]);
-  const [routes, setRoutes] = useState<Route[]>([]);
 
   const activeTab = TAB_CONFIG[activeIndex].key;
 
-  const { mutate: getFavoriteRoutes } = useGetFavoriteRoutes();
+  const { data: favouriteRouteDatas, error } = useGetFavoriteRoutes();
+  const favouriteRoutes = useMemo(() => {
+    if(!favouriteRouteDatas) return [];
+    return favouriteRouteDatas.map(route => ({
+      id: route.routeId.toString(),
+      no: route.routeNumberEn,
+      name: route.routeName,
+      description: route.busStopNamesMm,
+      color: route.routeColor,
+      isYps: route.isYps
+    }))
+  }, [favouriteRouteDatas])
   const { mutate: removeFavoriteRoute } = useRemoveFavoriteRoute();
+  
   const { mutate: getFavoriteStops } = useGetFavoriteStops();
   const { mutate: removeFavoriteStop } = useRemoveFavoriteStop();
 
@@ -82,84 +93,10 @@ export default function FavouriteScreen() {
     });
   };
 
-  // Load favorite stops when screen is focused
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     if (activeTab === "stops") {
-  //       loadFavouriteStops();
-  //     }
-  //   }, [activeTab])
-  // );
-
-  // async function loadFavouriteStops() {
-  //   try {
-  //     const data = await api.favouriteStopsApi.getFavoriteStops();
-
-  //     console.log('data',data)
-  //     const mapped: Stop[] = data.map((stop : Stop) => ({
-  //       id: stop.id,
-  //       name_mm: stop.name_mm,
-  //       name_en: stop.name_en,
-  //       road_mm: stop.road_mm,
-  //       road_en: stop.road_en,
-  //       lat: stop.lat,
-  //       lng: stop.lng,
-  //       isFavourite: true,
-  //       bus_numbers : stop.bus_numbers
-  //     }));
-
-  //     setBusStops(mapped);
-  //   } catch (error) {
-  //     console.warn("Failed to load favorite stops", error);
-  //     setBusStops([]);
-  //   }
-  // }
-
-
   const handleRemoveFavoriteRoute = (routeId: number) => {
-    removeFavoriteRoute(routeId, {
-      onSuccess: () => {
-        getFavoriteRoutes(undefined, {
-          onSuccess: (data) => {
-            setRoutes(
-              data.map((da) => ({
-                id: da.id,
-                no: da.number_en,
-                name: da.name,
-                description: da.number_mm,
-                color: da.color,
-                isYps: da.is_yps,
-              }))
-            );
-          },
-        });
-      },
-      onError: (error) => {
-        console.log("Failed to remove favorite route", error);
-      },
-    });
+    if(!routeId) return;
+    removeFavoriteRoute(routeId);
   };
-
-  useFocusEffect(
-    useCallback(() => {
-      if (activeTab === "routes") {
-        getFavoriteRoutes(undefined, {
-          onSuccess: (data) => {
-            setRoutes(
-              data.map((da) => ({
-                id: da.id,
-                no: da.number_en,
-                name: da.name,
-                description: da.number_mm,
-                color: da.color,
-                isYps: da.is_yps,
-              }))
-            );
-          },
-        });
-      }
-    }, [activeTab, getFavoriteRoutes])
-  );
 
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
@@ -186,7 +123,7 @@ export default function FavouriteScreen() {
       />}
       {activeTab === "routes" && (
         <RouteListView
-          data={routes}
+          data={favouriteRoutes}
           style={{ marginTop: 20 }}
           onPressRemoveFavoriteRoute={handleRemoveFavoriteRoute}
         />
