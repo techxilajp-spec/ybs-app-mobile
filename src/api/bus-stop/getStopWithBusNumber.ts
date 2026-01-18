@@ -5,7 +5,7 @@ interface PaginatedStopsResponse {
   data: Stop[];
   nextPage: number | null;
 }
-const getStops = async (
+const getStopsWithBusNumber = async (
   page: number = 1,
   limit: number = 500,
   townshipId?: number,
@@ -55,4 +55,4 @@ const getStops = async (
   };
 };
 
-export default getStops;
+export default getStopsWithBusNumber;
