@@ -5,7 +5,12 @@ import { useEffect, useRef, useState } from "react";
 import { Alert, Dimensions, StyleSheet, View } from "react-native";
 
 // expo map
-import MapView, { LatLng, MapMarker, PROVIDER_GOOGLE, Region } from "react-native-maps";
+import MapView, {
+  LatLng,
+  MapMarker,
+  PROVIDER_GOOGLE,
+  Region,
+} from "react-native-maps";
 
 // expo location
 import * as Location from "expo-location";
@@ -14,6 +19,7 @@ import * as Location from "expo-location";
 import { router, useLocalSearchParams } from "expo-router";
 
 // icons
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 // custom components
@@ -36,10 +42,14 @@ export default function RouteSearchDetail() {
   const { YANGON } = MAP_LOCATIONS;
 
   const [region, setRegion] = useState<Region>(YANGON);
+  const [userLocation, setUserLocation] =
+    useState<Location.LocationObject | null>(null);
+  const [isMapReady, setIsMapReady] = useState<boolean>(false);
 
   const bottomSheetHeight = useRef<number>(100);
   const mapRef = useRef<InstanceType<typeof MapView> | null>(null);
   const markersRef = useRef<Record<string, MapMarker | null>>({});
+  const hasFitted = useRef<boolean>(false);
 
   const { height: screenHeight } = Dimensions.get("screen");
   const bottomSheetMaxHeight = screenHeight * 0.65;
@@ -50,6 +60,14 @@ export default function RouteSearchDetail() {
   const searchedRoute = searchedResults.find(
     (route) => route.id.toString() === routeId
   );
+  const instructionInfo = searchedRoute
+    ? {
+        instructions: searchedRoute.instructions,
+        routeNumbers: searchedRoute.routes.flatMap((route) => Number(route.id)),
+        totalBusStops: searchedRoute.totalBusStop,
+        estimatedTime: searchedRoute.estimatedTime,
+      }
+    : null;
   const routeList = searchedRoute ? searchedRoute.routes : [];
   const stops = routeList.flatMap((route) => route.stops);
 
@@ -61,8 +79,10 @@ export default function RouteSearchDetail() {
     });
     handleSelectBusStop(stops[0]);
 
-    // ask location permission
-    async function requestPremission() {
+    let locationSubscriber: Location.LocationSubscription | null = null;
+
+    // request location permission
+    async function watchUserLocation() {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
@@ -71,10 +91,45 @@ export default function RouteSearchDetail() {
         );
         return;
       }
+
+      locationSubscriber = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          distanceInterval: 20,
+        },
+        (newLocation) => {
+          setUserLocation(newLocation);
+        }
+      );
     }
 
-    requestPremission();
+    watchUserLocation();
   }, []);
+
+  useEffect(() => {
+    if(!searchedRoute) return;
+    const coordinates = searchedRoute.routes.flatMap(route => route.coordinates);
+    mapRef?.current?.fitToCoordinates(coordinates, {
+      edgePadding: {
+        top: 80,
+        right: 40,
+        bottom: bottomSheetMaxHeight + 40,
+        left: 40
+      }
+    })
+  }, [isMapReady])
+
+  /**
+   * Animate to user location (user current coordinates)
+   */
+  const showsUserLocation = () => {
+    if (!userLocation) return;
+    const userCoordinate = {
+      latitude: userLocation.coords.latitude,
+      longitude: userLocation.coords.longitude,
+    };
+    animateToLocation(userCoordinate);
+  };
 
   /**
    * Navigates back to the previous screen
@@ -158,7 +213,8 @@ export default function RouteSearchDetail() {
           loadingIndicatorColor="#666666"
           loadingBackgroundColor="#eeeeee"
           showsUserLocation={true}
-          showsMyLocationButton={true}
+          showsMyLocationButton={false}
+          onMapReady={() => setIsMapReady(true)}
         >
           {routeList.map((route) => (
             <>
@@ -189,10 +245,22 @@ export default function RouteSearchDetail() {
           icon={<Ionicons name="arrow-back-sharp" size={20} color="#101828" />}
           onPress={onBackPress}
         />
+        <Button
+          style={styles.showUserLocationButton}
+          icon={
+            <FontAwesome6
+              name="location-crosshairs"
+              size={20}
+              color="#007AFF"
+            />
+          }
+          onPress={showsUserLocation}
+        />
         <BusRouteDetailBottomSheet
           routes={routeList}
           maxHeight={bottomSheetMaxHeight}
           snapPoints={bottomSheetSnapPoints}
+          instructionInfo={instructionInfo}
           handleSelectBusStop={handleSelectBusStop}
           onChangeIndex={onChangeRouteDetailBottomSheetIndex}
         />
@@ -211,15 +279,13 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: 8,
+    top: 15,
     left: 20,
   },
-  favouriteIcon: {
+  showUserLocationButton: {
     position: "absolute",
     top: 15,
     right: 20,
-  },
-  favouriteIconActive: {
-    backgroundColor: "red",
+    borderRadius: 0,
   },
 });

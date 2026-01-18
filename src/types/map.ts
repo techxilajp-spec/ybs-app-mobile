@@ -41,3 +41,10 @@ export type RouteSearchResult = {
   routes: Route[];
   instructions: Instruction[];
 };
+
+export type InstructionInfo = {
+  instructions: Instruction[],
+  routeNumbers: number[],
+  totalBusStops: number;
+  estimatedTime: number;
+}

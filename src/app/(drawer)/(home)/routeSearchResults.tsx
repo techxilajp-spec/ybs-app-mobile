@@ -52,7 +52,6 @@ export default function RouteSearchResultScreen() {
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
       <AppHeader title="ရှာဖွေမှုရလဒ်" />
-
       <NavigationTabs
         tabs={TABS.map((t) => t.label)}
         activeIndex={activeTabIndex}

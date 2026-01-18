@@ -11,10 +11,10 @@ import InstructionListView from "@/src/components/map/busRouteDetailSheet/Instru
 import RouteListView from "@/src/components/map/busRouteDetailSheet/RouteListView";
 
 // types
-import { Route, Stop } from "@/src/types/map";
+import { InstructionInfo, Route, Stop } from "@/src/types/map";
 
 type BusRouteDetailSheetProps = {
-  instructions?: any | null;
+  instructionInfo?: InstructionInfo | null;
   routes: Route[];
   handleSelectBusStop: (busStop: Stop) => void;
   maxHeight: number;
@@ -23,14 +23,14 @@ type BusRouteDetailSheetProps = {
 };
 
 export default function BusRouteDetailBottomSheet({
-  instructions = null,
+  instructionInfo = null,
   routes,
   handleSelectBusStop,
   snapPoints,
   maxHeight,
-  onChangeIndex = (index) => { }
+  onChangeIndex = (index) => {}
 }: BusRouteDetailSheetProps) {
-  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [activeIndex, setActiveIndex] = useState<number>(instructionInfo ? 1 : 0);
   const TAB_CONFIGS = [
     {
       label: "လမ်းကြောင်း Guide",
@@ -47,8 +47,7 @@ export default function BusRouteDetailBottomSheet({
     0
   );
   TAB_CONFIGS[1].label = `${TAB_CONFIGS[1].label} ( ${totalStops} )`;
-  const hasInstructions = !!instructions?.length;
-  const tabConfig = hasInstructions ? TAB_CONFIGS : TAB_CONFIGS.slice(1);
+  const tabConfig = instructionInfo ? TAB_CONFIGS : TAB_CONFIGS.slice(1);
 
   const isInstructionTab = tabConfig[activeIndex].key === TAB_CONFIGS[0].key;
 
@@ -78,8 +77,10 @@ export default function BusRouteDetailBottomSheet({
           navigationTabStyle={styles.navigationTab}
         />
       </View>
-      {isInstructionTab ? (
-        <InstructionListView />
+      {(isInstructionTab && instructionInfo) ? (
+        <InstructionListView 
+          instructionInfo={instructionInfo}
+        />
       ) : (
         <RouteListView
           routes={routes}
