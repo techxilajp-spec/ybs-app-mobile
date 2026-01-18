@@ -31,6 +31,9 @@ import { Accordian, Option } from "@/src/types/accordian";
 // data
 import { Colors } from "@/src/constants/color";
 import { useGetAreas, useGetStops } from "@/src/hooks/bus-stop";
+import { useGetFavoriteStops } from "@/src/hooks/favouriteStops";
+import { useGetRecentStops } from "@/src/hooks/recent";
+import { Stop } from "@/src/types/bus";
 
 type RouteFilterModalProps = {
   visible: boolean;
@@ -56,6 +59,10 @@ export default function RouteFilterModal({
   const [searchText, setSearchText] = useState<string>("");
   const [debouncedSearchText] = useDebounce(searchText, 500);
   const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>([]);
+
+  const { data: recentStopsData, refetch: refetchRecentStops } = useGetRecentStops();
+
+  const { mutate: getFavoriteStops } = useGetFavoriteStops();
 
   const {
     data: stopDatas,
@@ -124,17 +131,72 @@ export default function RouteFilterModal({
     setSelectedTownshipId(undefined);
   };
 
+  // 
   useEffect(() => {
-    // default view: recent shows all stops, favourite shows only favourites
-    const list = activeIndex === 0 ? stops : stops.filter((s: any) => s.is_favourite);
-    setStopsList(list);
-  }, [activeIndex, stops]);
+    if (canSearch) {
+      setStopsList(stops);
+      return;
+    }
 
+    // default view: recent shows recent stops, favourite shows only favourites
+    if (activeIndex === 0) {
+      // For recent tab, use the recentStopsData from query
+      setStopsList(recentStopsData ?? []);
+    } else {
+      // For favourite tab, show only favourites
+      getFavoriteStops(undefined, {
+        onSuccess: (data: Stop[]) => {
+          setStopsList(
+            data.map((stop) => ({
+              id: stop.id,
+              name_mm: stop.name_mm,
+              name_en: stop.name_en,
+              road_mm: stop.road_mm,
+              road_en: stop.road_en,
+              lat: stop.lat,
+              lng: stop.lng,
+              township_id: stop.township_id,
+              bus_numbers: stop.bus_numbers,
+              direction_text: stop.direction_text,
+              isFavourite: true,
+            })),
+          );
+        },
+        onError: () => {
+          setStopsList([]);
+        },
+      });
+    }
+  }, [
+    activeIndex,
+    canSearch,
+    searchText,
+    stops,
+    recentStopsData,
+    hasNextStops,
+    isFetchingNextStops,
+    fetchNextStops,
+    getFavoriteStops,
+  ]);
+
+  // Refetch recent stops when modal becomes visible or when tab changes to recent
   useEffect(() => {
     if (areas && areas.length > 0) {
       setAreaFilters(areas);
     }
-  }, [areas]);
+    if (visible && activeIndex === 0) {
+      refetchRecentStops();
+    }
+  }, [visible, activeIndex, refetchRecentStops, areas]);
+
+  // Clear search text when modal closes
+  useEffect(() => {
+    setActiveIndex(0);
+    clearOptions();
+    if (!visible) {
+      setSearchText("");
+    }
+  }, [visible]);
 
   return (
     <Modal

@@ -26,6 +26,7 @@ import { getPublicUrl } from "@/src/utils/supabase";
 
 // data
 import { useGetAds } from "@/src/hooks/ads";
+import { useAddRecentStop } from "@/src/hooks/recent";
 
 // utils
 import { showErrorToast } from "@/src/utils/toast";
@@ -46,6 +47,8 @@ export default function RouteSearchView() {
   const [usedHeight, setUsedHeight] = useState<number>(0);
   const [isSearching, setIsSearching] = useState(false);
   const [tripPlannerError, setTripPlannerError] = useState<unknown | null>(null);
+
+  const { mutate: addRecentStop } = useAddRecentStop();
 
   // error message
   const errorMessage = Message.error;
@@ -111,6 +114,10 @@ export default function RouteSearchView() {
     } else if (showDirectionModal.mode === "end") {
       setEndLocation(stop);
     }
+
+    if (stop?.id) {
+      addRecentStop(stop.id);
+    }
   };
 
   /**
@@ -120,7 +127,7 @@ export default function RouteSearchView() {
    */
   const searchRoutes = async () => {
     setTripPlannerError(null);
-    
+
     let errorMessage;
     if (!startStop && !endStop) {
       errorMessage = "စထွက်မည့်နေရာ နှင့် သွားရောက်လိုသည့်နေရာ အားရွေးချယ်ပါ။";
@@ -173,7 +180,7 @@ export default function RouteSearchView() {
   };
 
   useEffect(() => {
-    if(tripPlannerError) {
+    if (tripPlannerError) {
       showErrorToast(errorMessage.something_wrong, errorMessage.trip_planner);
     }
   }, [tripPlannerError])
@@ -212,14 +219,14 @@ export default function RouteSearchView() {
               subtitle={
                 startStop
                   ? `${(
-                      startStop.lat ||
-                      startStop.coordinate?.latitude ||
-                      0
-                    ).toFixed(5)}, ${(
-                      startStop.lng ||
-                      startStop.coordinate?.longitude ||
-                      0
-                    ).toFixed(5)}`
+                    startStop.lat ||
+                    startStop.coordinate?.latitude ||
+                    0
+                  ).toFixed(5)}, ${(
+                    startStop.lng ||
+                    startStop.coordinate?.longitude ||
+                    0
+                  ).toFixed(5)}`
                   : undefined
               }
               value={startStop ? startStop.name_mm : ""}
@@ -241,14 +248,14 @@ export default function RouteSearchView() {
               subtitle={
                 endStop
                   ? `${(
-                      endStop.lat ||
-                      endStop.coordinate?.latitude ||
-                      0
-                    ).toFixed(5)}, ${(
-                      endStop.lng ||
-                      endStop.coordinate?.longitude ||
-                      0
-                    ).toFixed(5)}`
+                    endStop.lat ||
+                    endStop.coordinate?.latitude ||
+                    0
+                  ).toFixed(5)}, ${(
+                    endStop.lng ||
+                    endStop.coordinate?.longitude ||
+                    0
+                  ).toFixed(5)}`
                   : undefined
               }
               value={endStop ? endStop.name_mm : ""}

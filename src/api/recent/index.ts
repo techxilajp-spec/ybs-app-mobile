@@ -39,7 +39,13 @@ const getRecentStops = async () => {
   });
 
   if (error) throw error;
-  return data ?? [];
+
+  // Sort data to match the order of stopIds (most recent first)
+  const sortedData = (data ?? []).sort((a: any, b: any) => {
+    return stopIds.indexOf(a.id) - stopIds.indexOf(b.id);
+  });
+
+  return sortedData;
 };
 
 /**
@@ -49,13 +55,15 @@ const getRecentStops = async () => {
  */
 const addRecent = async (stopId: number) => {
   const recents = await getRecents();
-  const exists = recents.some((r) => r === stopId);
-  if (!exists) {
-    const updated = [...recents, stopId];
-    await AsyncStorage.setItem(RECENT_STOP_KEY, JSON.stringify(updated));
-    return updated;
-  }
-  return recents;
+
+  // Filter out the stopId if it already exists to move it to the top
+  const filteredRecents = recents.filter((id) => id !== stopId);
+
+  // Prepend the new stopId to the beginning of the array
+  const updated = [stopId, ...filteredRecents].slice(0, 10); // Keep last 10 recents
+
+  await AsyncStorage.setItem(RECENT_STOP_KEY, JSON.stringify(updated));
+  return updated;
 };
 
 /**
