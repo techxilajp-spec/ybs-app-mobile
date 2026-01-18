@@ -51,3 +51,5 @@ export type RouteResponse = {
   coordinates: [number, number][];
   color: string;
 };
+
+export const RECENT_STOP_KEY = "recent_stops";

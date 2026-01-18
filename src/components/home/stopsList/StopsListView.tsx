@@ -2,7 +2,7 @@
 import { StyleSheet, View } from "react-native";
 
 // react
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // expo router
 import { router } from "expo-router";
@@ -12,10 +12,13 @@ import AppButton from "@/src/components/AppButton";
 import NoticeMessage from "@/src/components/home/NoticeMessage";
 import StopFilterModal from "@/src/components/home/StopFilterModal";
 import SearchInput from "@/src/components/home/stopsList/SearchInput";
+import { useAddRecentStop } from "@/src/hooks/recent";
 
 export default function StopsListView() {
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
   const [selectedStop, setSelectedStop] = useState<any | null>(null);
+
+  const { mutate: addRecentStop } = useAddRecentStop();
 
   /**
    * Opens the stop filter modal
@@ -44,6 +47,12 @@ export default function StopsListView() {
     // fallback: go to search results without specific stop
     router.push("/stopSearchResults");
   };
+
+  useEffect(() => {
+    if (selectedStop) {
+      addRecentStop(selectedStop.id);
+    }
+  });
 
   return (
     <>
@@ -77,12 +86,12 @@ export default function StopsListView() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: "relative"
+    position: "relative",
   },
   searchInput: {
     marginBottom: 15,
   },
   noticeMessage: {
     marginBottom: 20,
-  }
+  },
 });

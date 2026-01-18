@@ -28,13 +28,14 @@ import { Accordian, Option } from "@/src/types/accordian";
 
 // data
 import { useGetAreas, useGetStops } from "@/src/hooks/bus-stop";
+import { useGetRecentStops } from "@/src/hooks/recent";
 
 type StopFilterModalProps = {
   visible: boolean;
   title: string;
   showCurrentLocation?: boolean;
   onClose: () => void;
-  onSelect?: (stopId: number) => void;
+  onSelect?: (stop: any) => void;
 };
 
 const TABS = ["လတ်တလော", "နှစ်သက်မှု"];
@@ -48,26 +49,36 @@ export default function StopFilterModal({
 }: StopFilterModalProps) {
   const [areaFilters, setAreaFilters] = useState<Accordian[]>([]);
   const [stopsList, setStopsList] = useState<any[]>([]);
-  const [selectedTownshipId, setSelectedTownshipId] = useState<number | undefined>(undefined);
+  const [selectedTownshipId, setSelectedTownshipId] = useState<
+    number | undefined
+  >(undefined);
+  const [isAutoFetchingPages, setIsAutoFetchingPages] =
+    useState<boolean>(false);
 
-  const { 
-    data : stopDatas,
-    isLoading : isStopsLoading,
-    isError : isStopsError,
-    fetchNextPage : fextNextStops,
-    hasNextPage : hasNextStops,
-    isFetchingNextPage : isFetchingNextStops,
-   } = useGetStops(selectedTownshipId);
+  const {
+    data: stopDatas,
+    isLoading: isStopsLoading,
+    isError: isStopsError,
+    fetchNextPage: fextNextStops,
+    hasNextPage: hasNextStops,
+    isFetchingNextPage: isFetchingNextStops,
+  } = useGetStops(selectedTownshipId);
 
   const { data: areasData } = useGetAreas();
 
-  const stops = useMemo(() => stopDatas?.pages.flatMap((page) => page.data) ?? [], [stopDatas]);
+  const { data: recentStopsData, refetch: refetchRecentStops } =
+    useGetRecentStops();
+
+  const stops = useMemo(
+    () => stopDatas?.pages.flatMap((page) => page.data) ?? [],
+    [stopDatas],
+  );
 
   const areas = areasData;
 
   const [searchText, setSearchText] = useState<string>("");
   const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
-    []
+    [],
   );
 
   const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -76,7 +87,6 @@ export default function StopFilterModal({
   const hasSelectedOptions = selectedFilterOptions.length > 0;
   const isValidSearchText = searchText.trim() !== "";
   const canSearch = hasSelectedOptions || isValidSearchText;
-
 
   /**
    * Shows the filter panel.
@@ -100,9 +110,12 @@ export default function StopFilterModal({
   const onOptionListSelect = (selectedOptionList: Option[]) => {
     setSelectedFilterOptions(selectedOptionList);
     // Set township_id from first selected option (if available)
-    const firstTownshipId = selectedOptionList.length > 0 ? Number(selectedOptionList[0].id) : undefined;
+    const firstTownshipId =
+      selectedOptionList.length > 0
+        ? Number(selectedOptionList[0].id)
+        : undefined;
     setSelectedTownshipId(firstTownshipId);
-  }; 
+  };
 
   /**
    * Removes a selected option from the options list.
@@ -133,25 +146,71 @@ export default function StopFilterModal({
         const nameMm = (s.name_mm || "").toLowerCase();
         const nameEn = (s.name_en || "").toLowerCase();
         const matchesSearch =
-          !searchLower || nameMm.includes(searchLower) || nameEn.includes(searchLower);
+          !searchLower ||
+          nameMm.includes(searchLower) ||
+          nameEn.includes(searchLower);
 
         return matchesSearch;
       });
 
       setStopsList(searchData);
+
+      // Auto-fetch next pages if no results found and more pages available
+      if (
+        searchData.length === 0 &&
+        hasNextStops &&
+        !isFetchingNextStops &&
+        !isAutoFetchingPages
+      ) {
+        setIsAutoFetchingPages(true);
+        fextNextStops();
+      } else if (searchData.length > 0) {
+        // Stop auto-fetching if we found results
+        setIsAutoFetchingPages(false);
+      }
+
       return;
     }
 
-    // default view: recent shows all stops, favourite shows only favourites
-    const list = activeIndex === 0 ? stops : stops.filter((s: any) => s.isFavourite);
-    setStopsList(list);
-  }, [activeIndex, canSearch, searchText, stops]);
+    // default view: recent shows recent stops, favourite shows only favourites
+    if (activeIndex === 0) {
+      // For recent tab, use the recentStopsData from query
+      setStopsList(recentStopsData ?? []);
+    } else {
+      // For favourite tab, show only favourites
+      setStopsList(stops.filter((s: any) => s.isFavourite));
+    }
 
+    // Reset auto-fetch flag when not searching
+    setIsAutoFetchingPages(false);
+  }, [
+    activeIndex,
+    canSearch,
+    searchText,
+    stops,
+    recentStopsData,
+    hasNextStops,
+    isFetchingNextStops,
+    isAutoFetchingPages,
+    fextNextStops,
+  ]);
+
+  // Refetch recent stops when modal becomes visible or when tab changes to recent
   useEffect(() => {
     if (areas && areas.length > 0) {
       setAreaFilters(areas);
     }
-  }, [areas]);
+    if (visible && activeIndex === 0) {
+      refetchRecentStops();
+    }
+  }, [visible, activeIndex, refetchRecentStops, areas]);
+
+  // Clear search text when modal closes
+  useEffect(() => {
+    if (!visible) {
+      setSearchText("");
+    }
+  }, [visible]);
 
   return (
     <Modal
@@ -236,19 +295,19 @@ export default function StopFilterModal({
                 />
               )}
               <ListView
-                  data={stopsList}
-                  onPress={(item) => {
-                    // pass the selected stop back to parent
-                    onSelect?.(item);
+                data={stopsList}
+                onPress={(item) => {
+                  // pass the selected stop back to parent
+                  onSelect?.(item);
 
-                    // close modal
-                    onClose();
-                  }}
-                  hasNextStops = {hasNextStops}
-                  isFetchingNextStops = {isFetchingNextStops}
-                  fetchNextPage = {fextNextStops}
-                  isStopsLoading={isStopsLoading}
-                  isStopsError={isStopsError}
+                  // close modal
+                  onClose();
+                }}
+                hasNextStops={hasNextStops}
+                isFetchingNextStops={isFetchingNextStops}
+                fetchNextPage={fextNextStops}
+                isStopsLoading={isStopsLoading}
+                isStopsError={isStopsError}
               />
             </View>
           </>

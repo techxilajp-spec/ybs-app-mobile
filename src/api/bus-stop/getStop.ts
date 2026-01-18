@@ -7,8 +7,8 @@ interface PaginatedStopsResponse {
 }
 const getStops = async (
   page: number = 1,
-  limit: number = 50,
-  townshipId?: number
+  limit: number = 500,
+  townshipId?: number,
 ): Promise<PaginatedStopsResponse> => {
   let stops: any[] = [];
   if (page < 1) return { data: [], nextPage: null };
@@ -29,7 +29,7 @@ const getStops = async (
       lng,
       township_id,
       bus_numbers
-    `
+    `,
     )
     .order("id", { ascending: true })
     .range(from, to);

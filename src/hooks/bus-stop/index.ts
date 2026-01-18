@@ -24,7 +24,7 @@ export const useGetStops = (townshipId?: number) => {
   return useInfiniteQuery({
     queryKey: ["stops", townshipId],
     queryFn: ({ pageParam }) =>
-      api.busStopsApi.getStops(pageParam, 50, townshipId),
+      api.busStopsApi.getStops(pageParam, 500, townshipId),
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 1,
   });
