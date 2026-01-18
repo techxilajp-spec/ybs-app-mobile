@@ -15,6 +15,7 @@ export type Route = {
   color: string;
   coordinates: LatLng[];
   stops: Stop[];
+  isYps?: boolean;
 };
 
 export type WalkInstruction = {

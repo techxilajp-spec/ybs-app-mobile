@@ -14,7 +14,7 @@ import { useAddFavoriteStop, useIsFavoriteStop, useRemoveFavoriteStop } from "..
 import Button from "./routeDetail/Button";
 
 type StopCardProps = {
-  id : number;
+  id: number;
   title_mm: string;
   title_en: string;
   road_mm: string;
@@ -22,6 +22,7 @@ type StopCardProps = {
   lng: number;
   onPress?: () => void;
   busNumbers?: string[];
+  direction_text?: string;
 }
 
 export default function StopCard({
@@ -33,46 +34,47 @@ export default function StopCard({
   lng,
   onPress,
   busNumbers = [],
+  direction_text,
 }: StopCardProps) {
 
-    const { mutate: addFavoriteStop } = useAddFavoriteStop();
-    const { mutate: isFavoriteStop } = useIsFavoriteStop();
-    const { mutate: removeFavoriteStop } = useRemoveFavoriteStop();
-    const [isFavorite, setIsFavorite] = useState(false);
+  const { mutate: addFavoriteStop } = useAddFavoriteStop();
+  const { mutate: isFavoriteStop } = useIsFavoriteStop();
+  const { mutate: removeFavoriteStop } = useRemoveFavoriteStop();
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const heartIcon = isFavorite ? (
     <FontAwesome name="heart" size={20} color="red" />
   ) : (
     <Feather name="heart" size={20} color="black" />
   );
-  
-  const onAddFavourite = () => { 
-    if(id === null || id === undefined) return;
 
-    if(isFavorite) { 
-      removeFavoriteStop(id, { 
-        onSuccess : () => { 
+  const onAddFavourite = () => {
+    if (id === null || id === undefined) return;
+
+    if (isFavorite) {
+      removeFavoriteStop(id, {
+        onSuccess: () => {
           setIsFavorite(false);
         },
-        onError: () => {},
+        onError: () => { },
       });
-    } else { 
+    } else {
       addFavoriteStop(id, {
-        onSuccess : () => { 
+        onSuccess: () => {
           setIsFavorite(true);
         },
-        onError: () => {},
+        onError: () => { },
       })
     }
   }
 
-  useEffect(() => { 
-    if(id) { 
-      isFavoriteStop(Number(id), { 
-        onSuccess : (data) => { 
+  useEffect(() => {
+    if (id) {
+      isFavoriteStop(Number(id), {
+        onSuccess: (data) => {
           setIsFavorite(data);
         }
-      }); 
+      });
     }
   }, [id, isFavoriteStop])
   return (
@@ -84,14 +86,26 @@ export default function StopCard({
         />
       </View>
       <View style={styles.detailContainer}>
-        <AppText
-          size={16}
-          style={styles.title_mm}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {title_mm}
-        </AppText>
+        <View style={styles.titleRow}>
+          <AppText
+            size={16}
+            style={styles.title_mm}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {title_mm}
+          </AppText>
+          {direction_text && (
+            <View style={[
+              styles.directionBadge,
+              direction_text === 'အသွား' ? styles.inboundBadge : styles.outboundBadge
+            ]}>
+              <AppText size={10} style={styles.directionText}>
+                {direction_text}
+              </AppText>
+            </View>
+          )}
+        </View>
         <AppText
           size={14}
           style={styles.title_en}
@@ -115,31 +129,12 @@ export default function StopCard({
         )}
       </View>
       <View style={[styles.iconContainer, styles.heartIconContainer]}>
-        {/* {isFavorite ? (
-          <FontAwesome name="heart" size={24} color={Colors.primary} />
-        ) : (
-          <FontAwesome name="heart-o" size={20} color={Colors.text.disabled} />
-        )} */}
-
         <Button
           style={styles.favouriteIcon}
           icon={heartIcon}
           onPress={onAddFavourite}
-        >
-
-        </Button>
-      </View>
-      {/* <Pressable
-        onPress={onToggleFavourite}
-        hitSlop={10}
-        style={[styles.iconContainer, styles.heartIconContainer]}
-      >
-        <FontAwesome
-          name={isFavourite ? "heart" : "heart-o"}
-          size={isFavourite ? 24 : 20}
-          color={isFavourite ? Colors.primary : Colors.text.disabled}
         />
-      </Pressable> */}
+      </View>
     </Pressable>
   );
 }
@@ -179,5 +174,26 @@ const styles = StyleSheet.create({
   favouriteIcon: {
     position: "absolute",
     top: 15,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  directionBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 10,
+  },
+  inboundBadge: {
+    backgroundColor: "#E7F6EC", // Light green
+  },
+  outboundBadge: {
+    backgroundColor: "#F2F4F7", // Light gray
+  },
+  directionText: {
+    fontFamily: "MiSansMyanmar-Medium",
+    color: Colors.text.primary,
   },
 });

@@ -176,6 +176,11 @@ export default function StopFilterModal({
                   placeholder={title}
                   placeholderTextColor="#667085"
                 />
+                {searchText.length > 0 && (
+                  <Pressable onPress={() => setSearchText("")}>
+                    <MaterialIcons name="close" size={20} color="#667085" />
+                  </Pressable>
+                )}
               </View>
               <Pressable style={styles.filterButton} onPress={showFilters}>
                 {selectedFilterOptions.length > 0 && (
@@ -260,10 +265,9 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     backgroundColor: "#F2F4F7",
-    paddingVertical: 5,
     paddingHorizontal: 15,
     borderRadius: 8,
-
+    height: 40,
     flexDirection: "row",
     alignItems: "center",
   },

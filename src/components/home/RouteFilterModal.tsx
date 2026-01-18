@@ -173,6 +173,11 @@ export default function RouteFilterModal({
                   placeholder={title}
                   placeholderTextColor="#667085"
                 />
+                {searchText.length > 0 && (
+                  <Pressable onPress={() => setSearchText("")}>
+                    <MaterialIcons name="close" size={20} color="#667085" />
+                  </Pressable>
+                )}
               </View>
               <Pressable style={styles.filterButton} onPress={showFilters}>
                 {selectedFilterOptions.length > 0 && (
