@@ -7,7 +7,7 @@ interface PaginatedStopsResponse {
 }
 const getStops = async (
   page: number = 1,
-  limit: number = 50,
+  limit: number = 500,
   townshipId?: number,
   name?: string,
 ): Promise<PaginatedStopsResponse> => {

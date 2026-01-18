@@ -24,7 +24,7 @@ export const useGetStops = (townshipId?: number, name?: string) => {
   return useInfiniteQuery({
     queryKey: ["stops", townshipId, name],
     queryFn: ({ pageParam }) =>
-      api.busStopsApi.getStops(pageParam, 50, townshipId, name),
+      api.busStopsApi.getStops(pageParam, 500, townshipId, name),
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 1,
   });
@@ -61,6 +61,6 @@ export const useGetStopDetail = (id: string) => {
 // --- Increase Stop View ---
 export const useIncreaseStopView = () => {
   return useMutation({
-    mutationFn: (stopId : number) => api.busStopApi.increaseStopView(stopId)
-  })
+    mutationFn: (stopId: number) => api.busStopApi.increaseStopView(stopId),
+  });
 };

@@ -22,7 +22,7 @@ export default function StopsListView() {
   const [selectedStop, setSelectedStop] = useState<any | null>(null);
 
   const { mutate: addRecentStop } = useAddRecentStop();
-  const { error : errorMessage } = Message;
+  const { error: errorMessage } = Message;
 
   /**
    * Opens the stop filter modal
@@ -44,7 +44,7 @@ export default function StopsListView() {
   const searchBusStops = () => {
     const stopId = selectedStop?.id;
     const hasSelectedStop = selectedStop && stopId;
-    if(!hasSelectedStop) {
+    if (!hasSelectedStop) {
       Alert.alert("Invalid Input", errorMessage.empty_stop_name);
       return;
     }
@@ -52,16 +52,16 @@ export default function StopsListView() {
     router.push({
       pathname: "/stopSearchResults",
       params: {
-        stopId: encodeURIComponent(stopId)
-      }
-    })
+        stopId: encodeURIComponent(stopId),
+      },
+    });
   };
 
   useEffect(() => {
     if (selectedStop) {
       addRecentStop(selectedStop.id);
     }
-  });
+  }, [selectedStop, addRecentStop]);
 
   return (
     <>
