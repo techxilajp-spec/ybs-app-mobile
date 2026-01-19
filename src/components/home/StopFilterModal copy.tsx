@@ -1,11 +1,11 @@
 // react native
 import {
-    Image,
-    Modal,
-    Pressable,
-    StyleSheet,
-    TextInput,
-    View,
+  Image,
+  Modal,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
 } from "react-native";
 
 // react
@@ -30,7 +30,9 @@ import { Accordian, Option } from "@/src/types/accordian";
 
 // data
 import { useGetAreas, useGetStops } from "@/src/hooks/bus-stop";
+import { useGetFavoriteStops } from "@/src/hooks/favouriteStops";
 import { useGetRecentStops } from "@/src/hooks/recent";
+import { Stop } from "@/src/types/bus";
 
 type StopFilterModalProps = {
   visible: boolean;
@@ -42,7 +44,7 @@ type StopFilterModalProps = {
 
 const TABS = ["လတ်တလော", "နှစ်သက်မှု"];
 
-export default function StopFilterModalBox({
+export default function StopFilterModal({
   visible,
   showCurrentLocation = false,
   title,
@@ -73,6 +75,8 @@ export default function StopFilterModalBox({
 
   const { data: recentStopsData, refetch: refetchRecentStops } =
     useGetRecentStops();
+
+  const { mutate: getFavoriteStops } = useGetFavoriteStops();
 
   const stops = useMemo(
     () => stopDatas?.pages.flatMap((page) => page.data) ?? [],
@@ -182,7 +186,29 @@ export default function StopFilterModalBox({
       setStopsList(recentStopsData ?? []);
     } else {
       // For favourite tab, show only favourites
-      setStopsList(stops.filter((s: any) => s.isFavourite));
+      // setStopsList(stops.filter((s: any) => s.isFavourite));
+      getFavoriteStops(undefined, {
+        onSuccess: (data: Stop[]) => {
+          setStopsList(
+            data.map((stop) => ({
+              id: stop.id,
+              name_mm: stop.name_mm,
+              name_en: stop.name_en,
+              road_mm: stop.road_mm,
+              road_en: stop.road_en,
+              lat: stop.lat,
+              lng: stop.lng,
+              township_id: stop.township_id,
+              bus_numbers: stop.bus_numbers,
+              direction_text: stop.direction_text,
+              isFavourite: true,
+            })),
+          );
+        },
+        onError: () => {
+          setStopsList([]);
+        },
+      });
     }
 
     // Reset auto-fetch flag when not searching
@@ -197,6 +223,7 @@ export default function StopFilterModalBox({
     isFetchingNextStops,
     isAutoFetchingPages,
     fextNextStops,
+    getFavoriteStops,
   ]);
 
   // Refetch recent stops when modal becomes visible or when tab changes to recent
@@ -211,6 +238,8 @@ export default function StopFilterModalBox({
 
   // Clear search text when modal closes
   useEffect(() => {
+    setActiveIndex(0);
+    clearOptions();
     if (!visible) {
       setSearchText("");
     }

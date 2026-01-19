@@ -20,7 +20,7 @@ export type Stop = {
     longitude: number;
   };
   township_id: number;
-  bus_numbers: string[];
+  bus_numbers?: string[];
   direction_text?: string;
 };
 

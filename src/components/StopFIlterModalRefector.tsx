@@ -108,8 +108,6 @@ export default function StopFilterModal({
     isRecentStopsError,
   ]);
 
-  console.log(listConfig);
-
   // area filter related methods
 
   /**
@@ -171,7 +169,7 @@ export default function StopFilterModal({
             onOptionListSelect={onOptionListSelect}
           />
         ) : (
-          <View style={styles.flex1}>
+          <View>
             <Header
               searchText={searchText}
               searchPlaceholder={title}
@@ -180,13 +178,21 @@ export default function StopFilterModal({
               onFilterPress={showFilter}
               appliedFilterCount={appliedFilterCount}
             />
-            {hasAppliedFilters && (
-              <AppliedFilterSummary
-                filters={selectedFilterOptions}
-                onRemoveFilter={removeOption}
-                onClearAll={clearOptions}
-                style={styles.filterSummary}
-              />
+            {isSearchActive ? (
+              // Search Results
+              <View>
+                {hasAppliedFilters && (
+                  <AppliedFilterSummary
+                    filters={selectedFilterOptions}
+                    onRemoveFilter={removeOption}
+                    onClearAll={clearOptions}
+                    style={styles.filterSummary}
+                  />
+                )}
+              </View>
+            ) : (
+              // Recent && Favourite
+              <View></View>
             )}
             <ListView
               data={listConfig.data}

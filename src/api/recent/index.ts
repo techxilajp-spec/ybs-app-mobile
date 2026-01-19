@@ -2,6 +2,8 @@ import { RECENT_STOP_KEY } from "@/src/types/bus";
 import { supabase } from "@/src/utils/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { Stop } from "@/src/types/bus";
+
 /**
  * Safely parses a JSON string into a TypeScript object.
  * @param value The JSON string to parse.
@@ -30,7 +32,8 @@ const getRecents = async (): Promise<number[]> => {
  * Retrives the list of the recent stops from supabase
  * @returns the list of recent stops
  */
-const getRecentStops = async () => {
+const getRecentStops = async () : Promise<Stop[]> => {
+  // retreive id from async storage
   const stopIds = await getRecents();
   if (stopIds.length === 0) return [];
 
