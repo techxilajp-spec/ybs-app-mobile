@@ -46,7 +46,9 @@ export default function RouteSearchView() {
   const [availableHeight, setAvailableHeight] = useState<number>(0);
   const [usedHeight, setUsedHeight] = useState<number>(0);
   const [isSearching, setIsSearching] = useState(false);
-  const [tripPlannerError, setTripPlannerError] = useState<unknown | null>(null);
+  const [tripPlannerError, setTripPlannerError] = useState<unknown | null>(
+    null
+  );
 
   const { mutate: addRecentStop } = useAddRecentStop();
 
@@ -57,7 +59,10 @@ export default function RouteSearchView() {
   const remainingHeight = availableHeight - usedHeight;
   const dynamicAdHeight = Math.min(
     AD_HEIGHT.max,
-    Math.max(AD_HEIGHT.min, remainingHeight - AD_HEIGHT.buffer)
+    Math.max(
+      AD_HEIGHT.min,
+      remainingHeight - AD_HEIGHT.buffer + remainingHeight
+    )
   );
 
   // fetch ads
@@ -183,7 +188,8 @@ export default function RouteSearchView() {
     if (tripPlannerError) {
       showErrorToast(errorMessage.something_wrong, errorMessage.trip_planner);
     }
-  }, [tripPlannerError])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tripPlannerError]);
 
   return (
     <>
@@ -219,14 +225,14 @@ export default function RouteSearchView() {
               subtitle={
                 startStop
                   ? `${(
-                    startStop.lat ||
-                    startStop.coordinate?.latitude ||
-                    0
-                  ).toFixed(5)}, ${(
-                    startStop.lng ||
-                    startStop.coordinate?.longitude ||
-                    0
-                  ).toFixed(5)}`
+                      startStop.lat ||
+                      startStop.coordinate?.latitude ||
+                      0
+                    ).toFixed(5)}, ${(
+                      startStop.lng ||
+                      startStop.coordinate?.longitude ||
+                      0
+                    ).toFixed(5)}`
                   : undefined
               }
               value={startStop ? startStop.name_mm : ""}
@@ -248,14 +254,14 @@ export default function RouteSearchView() {
               subtitle={
                 endStop
                   ? `${(
-                    endStop.lat ||
-                    endStop.coordinate?.latitude ||
-                    0
-                  ).toFixed(5)}, ${(
-                    endStop.lng ||
-                    endStop.coordinate?.longitude ||
-                    0
-                  ).toFixed(5)}`
+                      endStop.lat ||
+                      endStop.coordinate?.latitude ||
+                      0
+                    ).toFixed(5)}, ${(
+                      endStop.lng ||
+                      endStop.coordinate?.longitude ||
+                      0
+                    ).toFixed(5)}`
                   : undefined
               }
               value={endStop ? endStop.name_mm : ""}
@@ -277,9 +283,9 @@ export default function RouteSearchView() {
           style={{
             width: "100%",
             height: dynamicAdHeight,
-            position: "absolute",
             bottom: 20,
-            marginTop: 40,
+            position: "absolute",
+            marginTop: 20,
           }}
         />
       </View>

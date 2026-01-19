@@ -49,7 +49,7 @@ import { Stop } from "@/src/types/map";
 export default function RouteDetail() {
   const { YANGON } = MAP_LOCATIONS;
 
-  const [region, setRegion] = useState<Region>(YANGON);
+  const [region] = useState<Region>(YANGON);
   const [userLocation, setUserLocation] =
     useState<Location.LocationObject | null>(null);
 
@@ -60,7 +60,7 @@ export default function RouteDetail() {
   // const userMarkerRef = useRef<MapMarker | null>(null);
 
   const { height: screenHeight } = Dimensions.get("screen");
-  const bottomSheetMaxHeight = screenHeight * 0.65;
+  const bottomSheetMaxHeight = screenHeight * 0.55;
   const bottomSheetSnapPoints = [100, bottomSheetMaxHeight];
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -112,6 +112,7 @@ export default function RouteDetail() {
       }
     })
     hasFitted.current = true;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeData, isRouteDataSuccess])
 
   useEffect(() => {
@@ -152,6 +153,7 @@ export default function RouteDetail() {
     if(!routeId) return;
     // increase route view
     increaseRoute(Number(routeId));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeId])
 
   /**
