@@ -42,17 +42,17 @@ export default function RouteSearchDetail() {
   const { YANGON } = MAP_LOCATIONS;
 
   const [region, setRegion] = useState<Region>(YANGON);
-  const [userLocation, setUserLocation] =
+  const [userLocation] =
     useState<Location.LocationObject | null>(null);
   const [isMapReady, setIsMapReady] = useState<boolean>(false);
 
   const bottomSheetHeight = useRef<number>(100);
   const mapRef = useRef<InstanceType<typeof MapView> | null>(null);
   const markersRef = useRef<Record<string, MapMarker | null>>({});
-  const hasFitted = useRef<boolean>(false);
+  // const hasFitted = useRef<boolean>(false);
 
   const { height: screenHeight } = Dimensions.get("screen");
-  const bottomSheetMaxHeight = screenHeight * 0.65;
+  const bottomSheetMaxHeight = screenHeight * 0.55;
   const bottomSheetSnapPoints = [100, bottomSheetMaxHeight];
 
   const { id: routeId } = useLocalSearchParams<{ id: string }>();
@@ -79,7 +79,7 @@ export default function RouteSearchDetail() {
     });
     handleSelectBusStop(stops[0]);
 
-    let locationSubscriber: Location.LocationSubscription | null = null;
+    // let locationSubscriber: Location.LocationSubscription | null = null;
 
     // request location permission
     async function watchUserLocation() {
@@ -92,18 +92,19 @@ export default function RouteSearchDetail() {
         return;
       }
 
-      locationSubscriber = await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          distanceInterval: 20,
-        },
-        (newLocation) => {
-          setUserLocation(newLocation);
-        }
-      );
+      // locationSubscriber = await Location.watchPositionAsync(
+      //   {
+      //     accuracy: Location.Accuracy.High,
+      //     distanceInterval: 20,
+      //   },
+      //   (newLocation) => {
+      //     setUserLocation(newLocation);
+      //   }
+      // );
     }
 
     watchUserLocation();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -117,7 +118,7 @@ export default function RouteSearchDetail() {
         left: 40
       }
     })
-  }, [isMapReady])
+  }, [isMapReady, bottomSheetMaxHeight, searchedRoute])
 
   /**
    * Animate to user location (user current coordinates)
