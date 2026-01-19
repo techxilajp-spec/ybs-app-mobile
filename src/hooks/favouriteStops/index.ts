@@ -1,14 +1,14 @@
 import api from "@/src/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 /**
  * Get favorite stops
  * @returns
  */
 export const useGetFavoriteStops = () => {
-  return useMutation({
-    mutationKey: ["favorite_stops"],
-    mutationFn: () => api.favouriteStopsApi.getFavoriteStops(),
+  return useQuery({
+    queryKey: ["favorite_stops"],
+    queryFn: () => api.favouriteStopsApi.getFavoriteStops(),
   });
 };
 

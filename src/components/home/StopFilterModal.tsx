@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Modal, StyleSheet, View } from "react-native";
 
 // custom components
+import NavigationTabs from "@/src/components/AppNavigationTabs";
 import FilterView from "@/src/components/home/FilterView";
 import AppliedFilterSummary from "@/src/components/home/stopFilterModal/AppliedFilterSummary";
 import Header from "@/src/components/home/stopFilterModal/Header";
@@ -15,10 +16,13 @@ import { useDebounce } from "use-debounce";
 
 // data
 import { useGetAreas, useGetStops } from "@/src/hooks/bus-stop";
+import { useGetFavoriteStops } from "@/src/hooks/favouriteStops";
 import { useGetRecentStops } from "@/src/hooks/recent";
 
 // type
 import { Option } from "@/src/types/accordian";
+
+const TABS = ["လတ်တလော", "နှစ်သက်မှု"];
 
 type StopFilterModalProps = {
   visible: boolean;
@@ -35,6 +39,7 @@ export default function StopFilterModal({
   onSelect,
   showCurrentLocation,
 }: StopFilterModalProps) {
+  const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false);
   const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
     []
@@ -65,12 +70,21 @@ export default function StopFilterModal({
     [stopDatas]
   );
 
+  // retrieve recent stops
   const {
     data: recentStopDatas,
     isLoading: isRecentStopsLoading,
     isError: isRecentStopsError,
   } = useGetRecentStops();
   const recentStops = recentStopDatas ?? [];
+
+  // retreive favourite stops
+  const {
+    data: favouriteStopDatas,
+    isLoading: isFavouriteStopsLoading,
+    isError: isFavouriteStopsError,
+  } = useGetFavoriteStops();
+  const favouriteStops = favouriteStopDatas ?? [];
 
   const listConfig = useMemo(() => {
     let config;
@@ -87,17 +101,30 @@ export default function StopFilterModal({
         },
       };
     } else {
-      config = {
-        data: recentStops,
-        isLoading: isRecentStopsLoading,
-        isError: isRecentStopsError,
-        isFetchingNext: false,
-        onEndReached: undefined,
-      };
+      const isRecentActive = activeIndex === 0;
+      if (isRecentActive) {
+        config = {
+          data: recentStops,
+          isLoading: isRecentStopsLoading,
+          isError: isRecentStopsError,
+          isFetchingNext: false,
+          onEndReached: undefined,
+        };
+      } else {
+        config = {
+          data: favouriteStops,
+          isLoading: isFavouriteStopsLoading,
+          isError: isFavouriteStopsError,
+          isFetchingNext: false,
+          onEndReached: undefined,
+        };
+      }
     }
 
     return config;
   }, [
+    activeIndex,
+    isSearchActive,
     stops,
     isStopsLoading,
     isStopsError,
@@ -106,6 +133,9 @@ export default function StopFilterModal({
     recentStops,
     isRecentStopsLoading,
     isRecentStopsError,
+    favouriteStops,
+    isFavouriteStopsLoading,
+    isFavouriteStopsError
   ]);
 
   console.log(listConfig);
@@ -180,12 +210,35 @@ export default function StopFilterModal({
               onFilterPress={showFilter}
               appliedFilterCount={appliedFilterCount}
             />
-            {hasAppliedFilters && (
-              <AppliedFilterSummary
-                filters={selectedFilterOptions}
-                onRemoveFilter={removeOption}
-                onClearAll={clearOptions}
-                style={styles.filterSummary}
+            {isSearchActive ? (
+              <View>
+                {hasAppliedFilters && (
+                  <AppliedFilterSummary
+                    filters={selectedFilterOptions}
+                    onRemoveFilter={removeOption}
+                    onClearAll={clearOptions}
+                    style={styles.filterSummary}
+                  />
+                )}
+              </View>
+            ) : (
+              <NavigationTabs
+                tabs={TABS}
+                activeIndex={activeIndex}
+                activeStates={{
+                  backgroundColor: "#F9F9F9",
+                  color: "#1F2937",
+                  borderColor: "#EEEEEE",
+                }}
+                inactiveStates={{
+                  backgroundColor: "#FFF",
+                  color: "#2F2F2F",
+                  borderColor: "#EEEEEE",
+                }}
+                onNavigationTabPress={setActiveIndex}
+                navigationTabStyle={{
+                  marginBottom: 18,
+                }}
               />
             )}
             <ListView

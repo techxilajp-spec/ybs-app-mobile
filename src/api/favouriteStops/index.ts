@@ -2,6 +2,8 @@ import { FAVORITE_STOP_KEY } from "@/src/types/favourite";
 import { supabase } from "@/src/utils/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { Stop } from "@/src/types/bus";
+
 /**
  * Safely parses a JSON string into a TypeScript object.
  * @param value The JSON string to parse.
@@ -30,14 +32,12 @@ const getFavorites = async (): Promise<number[]> => {
  * Retrieves the list of favorite stops from Supabase.
  * @returns The list of favorite stops.
  */
-const getFavoriteStops = async () => {
+const getFavoriteStops = async () : Promise<Stop[]> => {
   const stopIds = await getFavorites();
   if (stopIds.length === 0) return [];
-
   const { data, error } = await supabase.rpc("get_stops_by_ids", {
     stop_ids: stopIds,
   });
-
   if (error) throw error;
   return data ?? [];
 };
