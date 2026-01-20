@@ -283,8 +283,6 @@ export default function RouteSearchView() {
           style={{
             width: "100%",
             height: dynamicAdHeight,
-            bottom: 20,
-            position: "absolute",
             marginTop: 20,
           }}
         />
@@ -324,5 +322,5 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontFamily: "MiSansMyanmar-Medium",
-  },
+  }
 });
