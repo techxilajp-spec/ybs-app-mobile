@@ -19,9 +19,7 @@ export default function RouteListView({
   data,
   style,
   onPressRemoveFavoriteRoute,
-}: RouteListViewProps) {
-  console.log(data);
-  
+}: RouteListViewProps) {  
   const onPressRouteCard = (routeId: string) => {
     router.push({
       pathname: "/(drawer)/(home)/routeDetail/[id]",

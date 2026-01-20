@@ -11,7 +11,6 @@ import Feather from "@expo/vector-icons/Feather";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useEffect, useState } from "react";
 import { useAddFavoriteStop, useIsFavoriteStop, useRemoveFavoriteStop } from "../hooks/favouriteStops";
-import Button from "./routeDetail/Button";
 
 type StopCardProps = {
   id: number;
@@ -50,7 +49,6 @@ export default function StopCard({
 
   const onAddFavourite = () => {
     if (id === null || id === undefined) return;
-
     if (isFavorite) {
       removeFavoriteStop(id, {
         onSuccess: () => {
@@ -128,12 +126,8 @@ export default function StopCard({
           </AppText>
         )}
       </View>
-      <View style={[styles.iconContainer, styles.heartIconContainer]}>
-        <Button
-          style={styles.favouriteIcon}
-          icon={heartIcon}
-          onPress={onAddFavourite}
-        />
+      <View style={[styles.iconContainer, { alignItems: "flex-end"}]}>
+        <Pressable onPress={onAddFavourite}>{heartIcon}</Pressable>
       </View>
     </Pressable>
   );
@@ -148,9 +142,6 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     width: 40
-  },
-  heartIconContainer: {
-    alignItems: "flex-end"
   },
   detailContainer: {
     flex: 1
@@ -171,13 +162,9 @@ const styles = StyleSheet.create({
   description: {
     color: Colors.text.primary
   },
-  favouriteIcon: {
-    position: "absolute",
-    top: 15,
-  },
   titleRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: 8,
   },
   directionBadge: {

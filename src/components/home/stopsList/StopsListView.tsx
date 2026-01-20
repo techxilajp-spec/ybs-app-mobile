@@ -2,7 +2,7 @@
 import { Alert, StyleSheet, View } from "react-native";
 
 // react
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 // expo router
 import { router } from "expo-router";
@@ -17,9 +17,12 @@ import { useAddRecentStop } from "@/src/hooks/recent";
 // message
 import { Message } from "@/src/constants/message";
 
+// type
+import { Stop } from "@/src/types/bus";
+
 export default function StopsListView() {
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
-  const [selectedStop, setSelectedStop] = useState<any | null>(null);
+  const [selectedStop, setSelectedStop] = useState<Stop | null>(null);
 
   const { mutate: addRecentStop } = useAddRecentStop();
   const { error: errorMessage } = Message;
@@ -57,11 +60,11 @@ export default function StopsListView() {
     });
   };
 
-  useEffect(() => {
-    if (selectedStop) {
-      addRecentStop(selectedStop.id);
-    }
-  }, [selectedStop, addRecentStop]);
+  const onSelectStop = (stop : Stop) => {
+    if(!stop) return;
+    setSelectedStop(stop);
+    addRecentStop(stop.id);
+  }
 
   return (
     <>
@@ -69,9 +72,7 @@ export default function StopsListView() {
         visible={showFilterModal}
         title=""
         onClose={closeStopFilterModal}
-        onSelect={(stop) => {
-          setSelectedStop(stop);
-        }}
+        onSelect={onSelectStop}
       />
       <View style={styles.container}>
         <View>

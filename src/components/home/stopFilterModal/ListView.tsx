@@ -9,6 +9,8 @@ import StopCard from "@/src/components/StopCard";
 import SkeletonCard from "@/src/components/StopSkeletonCard";
 import { Stop } from "@/src/types/bus";
 
+// utils
+
 type ListViewProps = {
   data: Stop[];
   onPress?: (item: any) => void;
@@ -28,12 +30,10 @@ export default function ListView({
 }: ListViewProps) {
 
   if (isError) {
-    console.log("Has Error");
     return <View style={styles.container} />;
   }
 
   if (isLoading) {
-    console.log("Is Loading");
     return (
       <View style={styles.container}>
         {Array.from({ length: 4 }).map((_, index) => (
@@ -43,7 +43,6 @@ export default function ListView({
     );
   }
 
-  console.log("Show Data");
   return (
     <View style={styles.container}>
       <FlatList

@@ -1,16 +1,22 @@
 import { StyleSheet } from "react-native";
 
 // react
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 // custom components
 import AppHeader from "@/src/components/AppHeader";
 import AppNavigationTabs from "@/src/components/AppNavigationTabs";
 import AppScreenLayout from "@/src/components/AppScreenLayout";
+import RouteListView from "@/src/components/favourite/RouteListView";
 import StopsListView from "@/src/components/favourite/StopsListView";
 
-// types
-import RouteListView from "@/src/components/favourite/RouteListView";
+// constants
+import { Message } from "@/src/constants/message";
+
+// utils
+import { showErrorToast } from "@/src/utils/toast";
+
+// data
 import {
   useGetFavoriteRoutes,
   useRemoveFavoriteRoute,
@@ -34,7 +40,9 @@ export default function FavouriteScreen() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const activeTab = TAB_CONFIG[activeIndex].key;
 
-  const { data: favouriteRouteDatas, error } = useGetFavoriteRoutes();
+  // favourite routes
+  const { data: favouriteRouteDatas, isError: isFavouriteRouteError } =
+    useGetFavoriteRoutes();
   const favouriteRoutes = useMemo(() => {
     if (!favouriteRouteDatas) return [];
     return favouriteRouteDatas.map((route) => ({
@@ -48,7 +56,9 @@ export default function FavouriteScreen() {
   }, [favouriteRouteDatas]);
   const { mutate: removeFavoriteRoute } = useRemoveFavoriteRoute();
 
-  const { data: favouriteStopDatas } = useGetFavoriteStops();
+  // favourite stops
+  const { data: favouriteStopDatas, isError: isFavouriteStopError } =
+    useGetFavoriteStops();
   const favouriteStops = useMemo(() => {
     if (!favouriteStopDatas) return [];
     return favouriteStopDatas.map((stop) => ({
@@ -67,7 +77,7 @@ export default function FavouriteScreen() {
   const { mutate: removeFavoriteStop } = useRemoveFavoriteStop();
 
   const handleToggleFavoriteStop = (stopId: number) => {
-    if(!stopId) return;
+    if (!stopId) return;
     removeFavoriteStop(stopId);
   };
 
@@ -75,6 +85,17 @@ export default function FavouriteScreen() {
     if (!routeId) return;
     removeFavoriteRoute(routeId);
   };
+
+  useEffect(() => {
+    if (isFavouriteRouteError || isFavouriteStopError) {
+      console.log("Face error");
+      const title = Message.error.something_wrong;
+      const message = isFavouriteRouteError
+        ? Message.error.route_list
+        : Message.error.stop_not_found;
+      showErrorToast(title, message);
+    }
+  }, [isFavouriteStopError, isFavouriteRouteError]);
 
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Modal, StyleSheet, View } from "react-native";
 
 // custom components
@@ -44,6 +44,9 @@ export default function StopFilterModal({
   const [selectedFilterOptions, setSelectedFilterOptions] = useState<Option[]>(
     []
   );
+  const selectedOptionIds = selectedFilterOptions
+    .map(option => Number(option.id));
+
   const [searchText, setSearchText] = useState<string>("");
   const [debouncedSearchText] = useDebounce(searchText, 500);
 
@@ -64,7 +67,7 @@ export default function StopFilterModal({
     fetchNextPage: fextNextStops,
     hasNextPage: hasNextStops,
     isFetchingNextPage: isFetchingNextStops,
-  } = useGetStops(undefined, debouncedSearchText);
+  } = useGetStops(selectedOptionIds, debouncedSearchText);
   const stops = useMemo(
     () => stopDatas?.pages.flatMap((page) => page.data) ?? [],
     [stopDatas]
@@ -138,7 +141,11 @@ export default function StopFilterModal({
     isFavouriteStopsError
   ]);
 
-  console.log(listConfig);
+  useEffect(() => {
+    if(visible) {
+      setSearchText("");
+    }
+  }, [visible])
 
   // area filter related methods
 

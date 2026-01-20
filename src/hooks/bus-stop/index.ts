@@ -17,14 +17,15 @@ export const useSearchBusStops = (name: string) => {
 
 /**
  * --- Get Bus Stops ---
- * @param townshipId - Optional township ID to filter stops
+ * @param townshipIds - Optional township ID to filter stops
  * @returns
  */
-export const useGetStops = (townshipId?: number, name?: string) => {
+export const useGetStops = (townshipIds?: number[], name?: string) => {
+  const ids = townshipIds && townshipIds.sort((a, b) => a - b);
   return useInfiniteQuery({
-    queryKey: ["stops", townshipId, name],
+    queryKey: ["stops", ids, name],
     queryFn: ({ pageParam }) =>
-      api.busStopApi.getStops(pageParam, 50, townshipId, name),
+      api.busStopApi.getStops(pageParam, 50, ids, name),
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 1,
   });

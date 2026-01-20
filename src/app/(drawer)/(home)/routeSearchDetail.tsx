@@ -42,7 +42,7 @@ export default function RouteSearchDetail() {
   const { YANGON } = MAP_LOCATIONS;
 
   const [region, setRegion] = useState<Region>(YANGON);
-  const [userLocation] =
+  const [userLocation, setUserLocation] =
     useState<Location.LocationObject | null>(null);
   const [isMapReady, setIsMapReady] = useState<boolean>(false);
 
@@ -79,7 +79,7 @@ export default function RouteSearchDetail() {
     });
     handleSelectBusStop(stops[0]);
 
-    // let locationSubscriber: Location.LocationSubscription | null = null;
+    let locationSubscriber: Location.LocationSubscription | null = null;
 
     // request location permission
     async function watchUserLocation() {
@@ -92,18 +92,24 @@ export default function RouteSearchDetail() {
         return;
       }
 
-      // locationSubscriber = await Location.watchPositionAsync(
-      //   {
-      //     accuracy: Location.Accuracy.High,
-      //     distanceInterval: 20,
-      //   },
-      //   (newLocation) => {
-      //     setUserLocation(newLocation);
-      //   }
-      // );
+      locationSubscriber = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          distanceInterval: 20,
+        },
+        (newLocation) => {
+          setUserLocation(newLocation);
+        }
+      );
     }
 
     watchUserLocation();
+
+    return () => {
+      if (locationSubscriber) {
+        locationSubscriber.remove();
+      }
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
