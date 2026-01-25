@@ -76,6 +76,7 @@ export default function RouteSearchView() {
     return {
       id: ad.id,
       image: adImageUrl,
+      url: ad.link
     };
   });
 

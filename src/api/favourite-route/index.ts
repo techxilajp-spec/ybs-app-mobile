@@ -1,4 +1,4 @@
-import { FAVORITE_KEY } from "@/src/types/favourite";
+import { FAVORITE_KEY, FavouriteRouteResponse } from "@/src/types/favourite";
 import { supabase } from "@/src/utils/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -21,28 +21,17 @@ const safeParse = <T>(value: string | null, fallback: T): T => {
  * Retrieves the list of favorite routes from AsyncStorage.
  * @returns The list of favorite routes.
  */
-const getFavorites = async (): Promise<number[]> => {
+const getFavoriteIds = async (): Promise<number[]> => {
   const json = await AsyncStorage.getItem(FAVORITE_KEY);
   return safeParse<number[]>(json, []);
 };
-
-export interface Route {
-  routeId: number;
-  routeName: string;
-  routeNumberEn: string;
-  routeColor: string;
-  isYps: boolean;
-  busStopNamesMm: string;
-}
-
-export type FavouriteRouteResponse = Route[];
 
 /**
  * Retrieves the list of favorite routes from Supabase.
  * @returns The list of favorite routes.
  */
 export const getFavoriteRoutes = async (): Promise<FavouriteRouteResponse> => {
-  const favoriteIds = await getFavorites();
+  const favoriteIds = await getFavoriteIds();
   if (!favoriteIds || favoriteIds.length === 0) return [];
   const { data, error } = await supabase
     .from("route_list_view")
@@ -69,8 +58,7 @@ export const getFavoriteRoutes = async (): Promise<FavouriteRouteResponse> => {
  * @returns The updated list of favorite routes.
  */
 const addFavorite = async (routeId: number) => {
-  const favorites = await getFavorites();
-
+  const favorites = await getFavoriteIds();
   const exists = favorites.some((fav) => fav === routeId);
 
   if (!exists) {
@@ -88,7 +76,7 @@ const addFavorite = async (routeId: number) => {
  * @returns The updated list of favorite routes.
  */
 const removeFavorite = async (routeId: number) => {
-  const favorites = await getFavorites();
+  const favorites = await getFavoriteIds();
   const updated = favorites.filter((fav) => fav !== routeId);
   await AsyncStorage.setItem(FAVORITE_KEY, JSON.stringify(updated));
   return updated;
@@ -100,7 +88,7 @@ const removeFavorite = async (routeId: number) => {
  * @returns A promise that resolves to a boolean indicating whether the route is favorited.
  */
 const isFavorite = async (routeId: number): Promise<boolean> => {
-  const favorites = await getFavorites();
+  const favorites = await getFavoriteIds();
   return favorites.some((fav) => fav.toString() === routeId.toString());
 };
 
@@ -114,7 +102,7 @@ const clearFavorites = async () => {
 };
 
 export default {
-  getFavorites,
+  getFavoriteIds,
   addFavorite,
   removeFavorite,
   isFavorite,

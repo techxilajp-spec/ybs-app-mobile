@@ -43,7 +43,7 @@ import {
   useAddFavoriteRoute,
   useIsFavoriteRoute,
   useRemoveFavoriteRoute,
-} from "@/src/hooks/favourite";
+} from "@/src/hooks/favourite-route";
 import { Stop } from "@/src/types/map";
 
 export default function RouteDetail() {
@@ -62,12 +62,12 @@ export default function RouteDetail() {
   const { height: screenHeight } = Dimensions.get("screen");
   const bottomSheetMaxHeight = screenHeight * 0.55;
   const bottomSheetSnapPoints = [100, bottomSheetMaxHeight];
-  const [isFavorite, setIsFavorite] = useState(false);
 
   const { id: routeId } = useLocalSearchParams<{ id: string }>();
 
+  const { data: isFavouriteRoute, isError : isFavouriteRouteError, error: favoriteRouteError } = useIsFavoriteRoute(Number(routeId));
+
   const { mutate: addFavoriteRoute } = useAddFavoriteRoute();
-  const { mutate: isFavoriteRoute } = useIsFavoriteRoute();
   const { mutate: removeFavoriteRoute } = useRemoveFavoriteRoute();
 
   const { mutate : increaseRoute } = useIncreaseRouteView();
@@ -163,31 +163,14 @@ export default function RouteDetail() {
     router.back();
   };
 
-  const onAddFavourite = () => {
+  const toggleFavourite = () => {
     if (!route) return;
-
-    if (isFavorite) {
-      removeFavoriteRoute(route.id, {
-        onSuccess: () => {
-          setIsFavorite(false);
-        },
-        onError: () => {},
-      });
+    if (isFavouriteRoute) {
+      removeFavoriteRoute(route.id);
     } else {
-      addFavoriteRoute(route.id, {
-        onSuccess: () => {
-          setIsFavorite(true);
-        },
-        onError: () => {},
-      });
+      addFavoriteRoute(route.id);
     }
   };
-
-  const heartIcon = isFavorite ? (
-    <FontAwesome name="heart" size={20} color="red" />
-  ) : (
-    <Feather name="heart" size={20} color="black" />
-  );
 
   /**
    * Updates the bottom sheet height based on its current index.
@@ -251,19 +234,6 @@ export default function RouteDetail() {
     animateToLocation(userCoordinate);
   };
 
-  /**
-   * Checks if a route is favorited
-   */
-  useEffect(() => {
-    if (routeId) {
-      isFavoriteRoute(Number(routeId), {
-        onSuccess: (data) => {
-          setIsFavorite(data);
-        },
-      });
-    }
-  }, [routeId, isFavoriteRoute]);
-
   return (
     <AppScreenLayout>
       <View style={styles.container}>
@@ -326,8 +296,12 @@ export default function RouteDetail() {
         />
         <Button
           style={styles.favouriteIcon}
-          icon={heartIcon}
-          onPress={onAddFavourite}
+          icon={isFavouriteRoute ? (
+            <FontAwesome name="heart" size={20} color="red" />
+            ) : (
+            <Feather name="heart" size={20} color="black" />
+          )}
+          onPress={toggleFavourite}
         />
         <Button
           style={styles.showUserLocationButton}

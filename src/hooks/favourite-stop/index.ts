@@ -8,7 +8,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export const useGetFavoriteStops = () => {
   return useQuery({
     queryKey: ["favorite_stops"],
-    queryFn: () => api.favouriteStopsApi.getFavoriteStops(),
+    queryFn: api.favouriteStopsApi.getFavoriteStops,
   });
 };
 
@@ -20,7 +20,8 @@ export const useAddFavoriteStop = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (stopId: number) => api.favouriteStopsApi.addFavorite(stopId),
-    onSuccess: () => {
+    onSuccess: (_data, stopId) => {
+      queryClient.setQueryData(["is_favourite_stop", stopId], true);
       queryClient.invalidateQueries({ queryKey: ["favorite_stops"] });
     },
   });
@@ -35,7 +36,8 @@ export const useRemoveFavoriteStop = () => {
   return useMutation({
     mutationFn: (stopId: number) =>
       api.favouriteStopsApi.removeFavorite(stopId),
-    onSuccess: () => {
+    onSuccess: (_data, stopId) => {
+      queryClient.setQueryData(["is_favourite_stop", stopId], false);
       queryClient.invalidateQueries({ queryKey: ["favorite_stops"] });
     },
   });
@@ -45,10 +47,11 @@ export const useRemoveFavoriteStop = () => {
  * Check if a stop is favorite
  * @returns
  */
-export const useIsFavoriteStop = () => {
-  return useMutation({
-    mutationFn: (stopId: number) => api.favouriteStopsApi.isFavorite(stopId),
-  });
+export const useIsFavoriteStop = (stopId: number) => {
+  return useQuery({
+    queryKey: ["is_favourite_stop", stopId],
+    queryFn: () => api.favouriteStopsApi.isFavorite(stopId)
+  })
 };
 
 /**
@@ -56,7 +59,12 @@ export const useIsFavoriteStop = () => {
  * @returns
  */
 export const useCleanFavouriteStops = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => api.favouriteStopsApi.clearFavorites(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["favorite_stops"] });
+      queryClient.invalidateQueries({ queryKey: ["is_favourite_stop"] });
+    }
   });
 };

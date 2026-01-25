@@ -9,8 +9,7 @@ import AppText from "@/src/components/AppText";
 // icons
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useEffect, useState } from "react";
-import { useAddFavoriteStop, useIsFavoriteStop, useRemoveFavoriteStop } from "../hooks/favouriteStops";
+import { useAddFavoriteStop, useIsFavoriteStop, useRemoveFavoriteStop } from "../hooks/favourite-stop";
 
 type StopCardProps = {
   id: number;
@@ -37,11 +36,10 @@ export default function StopCard({
 }: StopCardProps) {
 
   const { mutate: addFavoriteStop } = useAddFavoriteStop();
-  const { mutate: isFavoriteStop } = useIsFavoriteStop();
+  const { data: isFavoriteStop } = useIsFavoriteStop(id);
   const { mutate: removeFavoriteStop } = useRemoveFavoriteStop();
-  const [isFavorite, setIsFavorite] = useState(false);
 
-  const heartIcon = isFavorite ? (
+  const heartIcon = isFavoriteStop ? (
     <FontAwesome name="heart" size={20} color="red" />
   ) : (
     <Feather name="heart" size={20} color="black" />
@@ -49,32 +47,13 @@ export default function StopCard({
 
   const onAddFavourite = () => {
     if (id === null || id === undefined) return;
-    if (isFavorite) {
-      removeFavoriteStop(id, {
-        onSuccess: () => {
-          setIsFavorite(false);
-        },
-        onError: () => { },
-      });
+    if (isFavoriteStop) {
+      removeFavoriteStop(id);
     } else {
-      addFavoriteStop(id, {
-        onSuccess: () => {
-          setIsFavorite(true);
-        },
-        onError: () => { },
-      })
+      addFavoriteStop(id)
     }
   }
-
-  useEffect(() => {
-    if (id) {
-      isFavoriteStop(Number(id), {
-        onSuccess: (data) => {
-          setIsFavorite(data);
-        }
-      });
-    }
-  }, [id, isFavoriteStop])
+  
   return (
     <Pressable style={styles.container} onPress={onPress}>
       <View style={styles.iconContainer}>

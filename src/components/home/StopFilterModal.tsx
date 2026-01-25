@@ -16,7 +16,7 @@ import { useDebounce } from "use-debounce";
 
 // data
 import { useGetAreas, useGetStops } from "@/src/hooks/bus-stop";
-import { useGetFavoriteStops } from "@/src/hooks/favouriteStops";
+import { useGetFavoriteStops } from "@/src/hooks/favourite-stop";
 import { useGetRecentStops } from "@/src/hooks/recent";
 
 // type

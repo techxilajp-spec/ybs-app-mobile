@@ -20,11 +20,11 @@ import { showErrorToast } from "@/src/utils/toast";
 import {
   useGetFavoriteRoutes,
   useRemoveFavoriteRoute,
-} from "@/src/hooks/favourite";
+} from "@/src/hooks/favourite-route";
 import {
   useGetFavoriteStops,
   useRemoveFavoriteStop,
-} from "@/src/hooks/favouriteStops";
+} from "@/src/hooks/favourite-stop";
 
 type TabKey = "stops" | "routes";
 
@@ -88,7 +88,6 @@ export default function FavouriteScreen() {
 
   useEffect(() => {
     if (isFavouriteRouteError || isFavouriteStopError) {
-      console.log("Face error");
       const title = Message.error.something_wrong;
       const message = isFavouriteRouteError
         ? Message.error.route_list

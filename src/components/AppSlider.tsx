@@ -5,11 +5,13 @@ import {
   Dimensions,
   FlatList,
   ImageBackground,
+  Linking,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Pressable,
   StyleSheet,
   View,
-  ViewStyle,
+  ViewStyle
 } from "react-native";
 
 const { width } = Dimensions.get("window");
@@ -17,6 +19,7 @@ const { width } = Dimensions.get("window");
 type SliderItem = {
   id: number | string;
   image: string;
+  url?: string;
 };
 
 type Props = {
@@ -70,6 +73,13 @@ export default function ({
     isUserScrolling.current = false;
   };
 
+  const openUrl = async (url: string = "") => {
+    const supported = await Linking.canOpenURL(url);
+    if(supported) {
+      await Linking.openURL(url);
+    }
+  }
+
   if (data.length === 0) {
     return null;
   }
@@ -93,7 +103,7 @@ export default function ({
         )}
         renderItem={({ item }) => (
           <ImageBackground style={{ flex: 1 }} source={{ uri: item.image }}>
-            <View style={styles.slide} />
+            <Pressable style={styles.slide} onPress={() => openUrl(item.url)} />
           </ImageBackground>
         )}
       />
