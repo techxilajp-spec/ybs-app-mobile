@@ -22,9 +22,7 @@ type AvailableRoutesProps = {
 export default function AvailableRoutes({ routes, style }: AvailableRoutesProps) {
   const onPressRouteCard = (routeId : string) => {
     router.push({
-
       pathname: "/(drawer)/(home)/routeDetail/[id]",
-
       params: { id: routeId },
 
     });
@@ -37,6 +35,7 @@ export default function AvailableRoutes({ routes, style }: AvailableRoutesProps)
         data={routes}
         renderItem={({ item }) => (
           <RouteCard
+            routeId={Number(item.id)}
             routeNo={item.no}
             routeTitle={item.name}
             routeDescription={item.description}

@@ -2,6 +2,16 @@ import api from "@/src/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 /**
+ * Fetch all favorite stop IDs.
+ */
+export const useGetFavoriteStopIds = () => {
+  return useQuery({
+    queryKey: ["favorite_stop_ids"],
+    queryFn: api.favouriteStopsApi.getFavorites
+  })
+}
+
+/**
  * Get favorite stops
  * @returns
  */
@@ -21,8 +31,11 @@ export const useAddFavoriteStop = () => {
   return useMutation({
     mutationFn: (stopId: number) => api.favouriteStopsApi.addFavorite(stopId),
     onSuccess: (_data, stopId) => {
-      queryClient.setQueryData(["is_favourite_stop", stopId], true);
       queryClient.invalidateQueries({ queryKey: ["favorite_stops"] });
+      queryClient.setQueryData<number[]>(
+        ["favorite_stop_ids"],
+        (old = []) => [...old, stopId]
+      );
     },
   });
 };
@@ -37,21 +50,13 @@ export const useRemoveFavoriteStop = () => {
     mutationFn: (stopId: number) =>
       api.favouriteStopsApi.removeFavorite(stopId),
     onSuccess: (_data, stopId) => {
-      queryClient.setQueryData(["is_favourite_stop", stopId], false);
       queryClient.invalidateQueries({ queryKey: ["favorite_stops"] });
+      queryClient.setQueryData<number[]>(
+        ["favorite_stop_ids"],
+        (old = []) => old.filter((id) => id !== stopId)
+      );
     },
   });
-};
-
-/**
- * Check if a stop is favorite
- * @returns
- */
-export const useIsFavoriteStop = (stopId: number) => {
-  return useQuery({
-    queryKey: ["is_favourite_stop", stopId],
-    queryFn: () => api.favouriteStopsApi.isFavorite(stopId)
-  })
 };
 
 /**
@@ -64,7 +69,7 @@ export const useCleanFavouriteStops = () => {
     mutationFn: () => api.favouriteStopsApi.clearFavorites(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorite_stops"] });
-      queryClient.invalidateQueries({ queryKey: ["is_favourite_stop"] });
+      queryClient.setQueryData(["favorite_stop_ids"], []);
     }
   });
 };

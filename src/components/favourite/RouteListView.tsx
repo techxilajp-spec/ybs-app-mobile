@@ -12,13 +12,11 @@ import { Route } from "@/src/types/bus";
 type RouteListViewProps = {
   data: Route[];
   style?: ViewStyle;
-  onPressRemoveFavoriteRoute?: (routeId: number) => void;
 };
 
 export default function RouteListView({
   data,
-  style,
-  onPressRemoveFavoriteRoute,
+  style
 }: RouteListViewProps) {  
   const onPressRouteCard = (routeId: string) => {
     router.push({
@@ -31,16 +29,14 @@ export default function RouteListView({
       data={data}
       renderItem={({ item }) => (
         <RouteCard
+          routeId={Number(item.id)}
           routeNo={item.no}
           routeTitle={item.name}
           routeDescription={item.description}
           color={"#" + item.color}
           isYps={item.isYps}
           onPress={() => onPressRouteCard(item.id)}
-          onPressRemoveFavoriteRoute={() => {
-            if (!onPressRemoveFavoriteRoute) return;
-            onPressRemoveFavoriteRoute(Number(item.id));
-          }}
+          favouriteMode="toggle"
         />
       )}
       keyExtractor={(item) => `${item.id}`}

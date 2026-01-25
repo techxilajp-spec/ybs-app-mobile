@@ -2,8 +2,17 @@ import api from "@/src/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 /**
- * Get favorite routes
- * @returns
+ * Fetch all favorite route IDs.
+ */
+export const useGetFavoriteRouteIds = () => {
+  return useQuery({
+    queryKey: ["favorite_route_ids"],
+    queryFn: api.favouriteRouteApi.getFavoriteIds,
+  });
+};
+
+/**
+ * Fetch full favorite route objects.
  */
 export const useGetFavoriteRoutes = () => {
   return useQuery({
@@ -14,22 +23,23 @@ export const useGetFavoriteRoutes = () => {
 
 /**
  * Add favorite route
- * @returns
  */
 export const useAddFavoriteRoute = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (routeId: number) => api.favouriteRouteApi.addFavorite(routeId),
     onSuccess: (_data, routeId) => {
-      queryClient.setQueryData(["is_favourite_route", routeId], true);
       queryClient.invalidateQueries({ queryKey: ["favorite_routes"] });
+      queryClient.setQueryData<number[]>(
+        ["favorite_route_ids"],
+        (old = []) => [...old, routeId]
+      );
     },
   });
 };
 
 /**
  * Remove favorite route
- * @returns
  */
 export const useRemoveFavoriteRoute = () => {
   const queryClient = useQueryClient();
@@ -37,26 +47,17 @@ export const useRemoveFavoriteRoute = () => {
     mutationFn: (routeId: number) =>
       api.favouriteRouteApi.removeFavorite(routeId),
     onSuccess: (_data, routeId) => {
-      queryClient.setQueryData(["is_favourite_route", routeId], false);
       queryClient.invalidateQueries({ queryKey: ["favorite_routes"] });
+      queryClient.setQueryData<number[]>(
+        ["favorite_route_ids"],
+        (old = []) => old.filter((id) => id !== routeId)
+      );
     },
   });
 };
 
 /**
- * Check if a route is favorite
- * @returns
- */
-export const useIsFavoriteRoute = (routeId: number) => {
-  return useQuery({
-    queryKey: ["is_favourite_route", routeId],
-    queryFn: () => api.favouriteRouteApi.isFavorite(routeId),
-  });
-};
-
-/**
  * Clear all favorite routes
- * @returns
  */
 export const useCleanFavouriteRoutes = () => {
   const queryClient = useQueryClient();
@@ -66,9 +67,7 @@ export const useCleanFavouriteRoutes = () => {
       queryClient.invalidateQueries({
         queryKey: ["favorite_routes"],
       });
-      queryClient.invalidateQueries({
-        queryKey: ["is_favourite_route"],
-      });
+      queryClient.setQueryData(["favorite_route_ids"], []);
     },
   });
 };

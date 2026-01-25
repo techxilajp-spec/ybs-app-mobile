@@ -18,6 +18,7 @@ import StopInformation from "@/src/components/stopSearchResult/StopInformation";
 
 // hooks
 import { useGetStopDetail, useIncreaseStopView } from "@/src/hooks/bus-stop";
+import { useAddFavoriteStop, useGetFavoriteStopIds, useRemoveFavoriteStop } from "../../../hooks/favourite-stop";
 
 // message
 import { Message } from "@/src/constants/message";
@@ -51,6 +52,13 @@ export default function StopSearchResults() {
     }));
   }, [stopData]);
 
+  const { data: favouriteIds = [] } = useGetFavoriteStopIds();
+  const favouriteIdSet = useMemo(() => new Set(favouriteIds), [favouriteIds]);
+  const isFavoriteStop = favouriteIdSet.has(Number(stopId));
+
+  const { mutate: addFavoriteStop } = useAddFavoriteStop();
+  const { mutate: removeFavoriteStop } = useRemoveFavoriteStop();
+
   // increase stop view count
   const { mutate: increaseStopView } = useIncreaseStopView();
 
@@ -69,6 +77,16 @@ export default function StopSearchResults() {
     if(!stopId) return;
     increaseStopView(Number(stopId));
   }, [stopId])
+
+  const onToggleFavourite = () => {
+    const id = Number(stopId);
+    if(!id) return;
+    if(isFavoriteStop) {
+      removeFavoriteStop(id)
+    } else {
+      addFavoriteStop(id);
+    }
+  }
 
   return (
     <AppScreenLayout contentStyle={styles.container} backgroundColor="#FFFFFF">
@@ -96,6 +114,8 @@ export default function StopSearchResults() {
             lat={16.80528}
             lng={96.15611}
             style={styles.stopInformation}
+            isFavourite={isFavoriteStop}
+            onToggleFavourite={onToggleFavourite}
           />
           <AvailableRoutes
             style={styles.routeListContainer}

@@ -9,13 +9,11 @@ import { Stop } from "@/src/types/bus";
 type StopsListViewProps = {
   style?: ViewStyle,
   data: Stop[];
-  onToggleFavourite: (stopId: number) => void;
 }
 
 export default function StopsListView({
   style,
-  data,
-  onToggleFavourite
+  data
 }: StopsListViewProps) {
   return (
     <FlatList

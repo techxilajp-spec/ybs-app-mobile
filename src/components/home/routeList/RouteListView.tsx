@@ -130,6 +130,7 @@ export default function RouteListView() {
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => (
               <RouteCard
+                routeId={item.routeId}
                 routeNo={item.routeNumberEn}
                 routeTitle={item.routeName}
                 routeDescription={item.busStopNamesMm}

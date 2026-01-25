@@ -19,11 +19,9 @@ import { showErrorToast } from "@/src/utils/toast";
 // data
 import {
   useGetFavoriteRoutes,
-  useRemoveFavoriteRoute,
 } from "@/src/hooks/favourite-route";
 import {
-  useGetFavoriteStops,
-  useRemoveFavoriteStop,
+  useGetFavoriteStops
 } from "@/src/hooks/favourite-stop";
 
 type TabKey = "stops" | "routes";
@@ -54,7 +52,6 @@ export default function FavouriteScreen() {
       isYps: route.isYps,
     }));
   }, [favouriteRouteDatas]);
-  const { mutate: removeFavoriteRoute } = useRemoveFavoriteRoute();
 
   // favourite stops
   const { data: favouriteStopDatas, isError: isFavouriteStopError } =
@@ -74,17 +71,6 @@ export default function FavouriteScreen() {
       isFavourite: true,
     }));
   }, [favouriteStopDatas]);
-  const { mutate: removeFavoriteStop } = useRemoveFavoriteStop();
-
-  const handleToggleFavoriteStop = (stopId: number) => {
-    if (!stopId) return;
-    removeFavoriteStop(stopId);
-  };
-
-  const handleRemoveFavoriteRoute = (routeId: number) => {
-    if (!routeId) return;
-    removeFavoriteRoute(routeId);
-  };
 
   useEffect(() => {
     if (isFavouriteRouteError || isFavouriteStopError) {
@@ -118,14 +104,12 @@ export default function FavouriteScreen() {
       {activeTab === "stops" && (
         <StopsListView
           data={favouriteStops}
-          onToggleFavourite={handleToggleFavoriteStop}
         />
       )}
       {activeTab === "routes" && (
         <RouteListView
           data={favouriteRoutes}
           style={{ marginTop: 20 }}
-          onPressRemoveFavoriteRoute={handleRemoveFavoriteRoute}
         />
       )}
     </AppScreenLayout>

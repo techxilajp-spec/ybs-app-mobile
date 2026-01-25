@@ -23,6 +23,7 @@ export default function AvailableLinesView({ lines }: AvailableLinesViewProps) {
                 data={lines}
                 renderItem={({ item }) => (
                     <RouteCard
+                        routeId={Number(item.id)}
                         routeNo={item.no}
                         routeTitle={item.name}
                         routeDescription={item.description}

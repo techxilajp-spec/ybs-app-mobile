@@ -1,31 +1,66 @@
+// react
+import { useMemo } from "react";
+
+// react native
 import { Image, Pressable, StyleSheet, View } from "react-native";
 
 // custom component
 import AppText from "@/src/components/AppText";
 
-// constants
+// icons
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+
+// constants
 import { Colors } from "../constants/color";
 
+// datas
+import {
+  useAddFavoriteRoute,
+  useGetFavoriteRouteIds,
+  useRemoveFavoriteRoute,
+} from "@/src/hooks/favourite-route";
+
+// types
+type FavouriteMode = "toggle" | "readonly" | "hidden";
+
 type RouteCardProps = {
+  routeId: number;
   routeNo: string | number;
   routeTitle: string;
   routeDescription: string;
   color: string;
   onPress: () => void;
-  onPressRemoveFavoriteRoute?: () => void;
   isYps: boolean;
+  favouriteMode?: FavouriteMode;
 };
 
 export default function RouteCard({
+  routeId,
   routeNo,
   routeTitle,
   routeDescription,
   color,
   onPress,
-  onPressRemoveFavoriteRoute,
   isYps,
+  favouriteMode = "hidden",
 }: RouteCardProps) {
+  const { data: favouriteIds = [] } = useGetFavoriteRouteIds();
+  const favouriteIdSet = useMemo(() => new Set(favouriteIds), [favouriteIds]);
+  const isFavouriteRoute = favouriteIdSet.has(Number(routeId));
+
+  const { mutate: addFavouriteRoute } = useAddFavoriteRoute();
+  const { mutate: removeFavouriteRoute } = useRemoveFavoriteRoute();
+
+  const onToggleFavourite = () => {
+    if (favouriteMode === "toggle" && routeId) {
+      if (isFavouriteRoute) {
+        addFavouriteRoute(routeId);
+      } else {
+        removeFavouriteRoute(routeId);
+      }
+    }
+  };
+
   return (
     <View
       style={{
@@ -39,10 +74,12 @@ export default function RouteCard({
           </AppText>
         </View>
         <View style={styles.routeDetailContainer}>
-          {!onPressRemoveFavoriteRoute && <Image
-            source={require("@/assets/icons/bus.png")}
-            style={styles.busIcon}
-          />}
+          {favouriteMode === "hidden" && (
+            <Image
+              source={require("@/assets/icons/bus.png")}
+              style={styles.busIcon}
+            />
+          )}
           {isYps && (
             <View style={styles.ypsBadge}>
               <AppText size={10} style={{ fontWeight: "bold" }}>
@@ -68,14 +105,14 @@ export default function RouteCard({
           </AppText>
         </View>
       </Pressable>
-
-      {
-        onPressRemoveFavoriteRoute && (
-          <Pressable style={styles.removeFavoriteContainer} onPress={onPressRemoveFavoriteRoute}>
-            <FontAwesome name="heart" size={20} color="red" />
-          </Pressable>
-        )
-      }
+      {(favouriteMode === "toggle" || favouriteMode === "readonly") && (
+        <Pressable
+          style={styles.removeFavoriteContainer}
+          onPress={onToggleFavourite}
+        >
+          <FontAwesome name="heart" size={20} color="red" />
+        </Pressable>
+      )}
     </View>
   );
 }

@@ -37,13 +37,13 @@ import { MAP_DELTA, MAP_LOCATIONS } from "@/src/constants/map";
 
 // data
 import { useGetRouteDetail, useIncreaseRouteView } from "@/src/hooks/bus-route";
-
-// types
 import {
   useAddFavoriteRoute,
-  useIsFavoriteRoute,
+  useGetFavoriteRouteIds,
   useRemoveFavoriteRoute,
 } from "@/src/hooks/favourite-route";
+
+// types
 import { Stop } from "@/src/types/map";
 
 export default function RouteDetail() {
@@ -65,14 +65,15 @@ export default function RouteDetail() {
 
   const { id: routeId } = useLocalSearchParams<{ id: string }>();
 
-  const { data: isFavouriteRoute, isError : isFavouriteRouteError, error: favoriteRouteError } = useIsFavoriteRoute(Number(routeId));
+  const { data: favouriteIds = [] } = useGetFavoriteRouteIds();
+  const favouriteIdSet = useMemo(() => new Set(favouriteIds), [favouriteIds]);
+  const isFavouriteRoute = favouriteIdSet.has(Number(routeId));
 
   const { mutate: addFavoriteRoute } = useAddFavoriteRoute();
   const { mutate: removeFavoriteRoute } = useRemoveFavoriteRoute();
-
-  const { mutate : increaseRoute } = useIncreaseRouteView();
-
-  const { data: routeData, isSuccess : isRouteDataSuccess } = useGetRouteDetail(routeId);
+  const { mutate: increaseRoute } = useIncreaseRouteView();
+  const { data: routeData, isSuccess: isRouteDataSuccess } =
+    useGetRouteDetail(routeId);
   // parsed data
   const route = useMemo(() => {
     if (!routeData) return null;
@@ -100,20 +101,20 @@ export default function RouteDetail() {
   }, [routeData]);
 
   useEffect(() => {
-    if(!isRouteDataSuccess) return;
-    if(hasFitted.current) return;
-    if(!route?.coordinates?.length) return;
+    if (!isRouteDataSuccess) return;
+    if (hasFitted.current) return;
+    if (!route?.coordinates?.length) return;
     mapRef?.current?.fitToCoordinates(route.coordinates, {
       edgePadding: {
         top: 80,
         right: 40,
         bottom: bottomSheetMaxHeight + 40,
-        left: 40
-      }
-    })
+        left: 40,
+      },
+    });
     hasFitted.current = true;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [routeData, isRouteDataSuccess])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeData, isRouteDataSuccess]);
 
   useEffect(() => {
     let locationSubscriber: Location.LocationSubscription | null = null;
@@ -150,11 +151,11 @@ export default function RouteDetail() {
   }, []);
 
   useEffect(() => {
-    if(!routeId) return;
+    if (!routeId) return;
     // increase route view
     increaseRoute(Number(routeId));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [routeId])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeId]);
 
   /**
    * Navigates back to the previous screen
@@ -188,8 +189,7 @@ export default function RouteDetail() {
   const animateToLocation = (coordinates: LatLng) => {
     const { latitude, longitude } = coordinates;
     const offsetRatio = bottomSheetHeight.current / screenHeight;
-    const adjustedLatitude =
-      latitude - offsetRatio * MAP_DELTA.CLOSE.LATITUDE;
+    const adjustedLatitude = latitude - offsetRatio * MAP_DELTA.CLOSE.LATITUDE;
 
     mapRef.current?.animateToRegion(
       {
@@ -252,9 +252,7 @@ export default function RouteDetail() {
           loadingBackgroundColor="#eeeeee"
           showsUserLocation={true}
           showsMyLocationButton={false}
-          onMapReady={() => {
-
-          }}
+          onMapReady={() => {}}
         >
           {/* {userLocation && (
             <UserLocationPin
@@ -296,11 +294,13 @@ export default function RouteDetail() {
         />
         <Button
           style={styles.favouriteIcon}
-          icon={isFavouriteRoute ? (
-            <FontAwesome name="heart" size={20} color="red" />
+          icon={
+            isFavouriteRoute ? (
+              <FontAwesome name="heart" size={20} color="red" />
             ) : (
-            <Feather name="heart" size={20} color="black" />
-          )}
+              <Feather name="heart" size={20} color="black" />
+            )
+          }
           onPress={toggleFavourite}
         />
         <Button

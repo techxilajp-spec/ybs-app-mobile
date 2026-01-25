@@ -1,3 +1,7 @@
+// react
+import { useMemo } from "react";
+
+// react native
 import { Image, Pressable, StyleSheet, View } from "react-native";
 
 // constants
@@ -9,7 +13,9 @@ import AppText from "@/src/components/AppText";
 // icons
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useAddFavoriteStop, useIsFavoriteStop, useRemoveFavoriteStop } from "../hooks/favourite-stop";
+
+// data
+import { useAddFavoriteStop, useGetFavoriteStopIds, useRemoveFavoriteStop } from "../hooks/favourite-stop";
 
 type StopCardProps = {
   id: number;
@@ -34,9 +40,11 @@ export default function StopCard({
   busNumbers = [],
   direction_text,
 }: StopCardProps) {
+  const { data: favouriteIds = [] } = useGetFavoriteStopIds();
+  const favouriteIdSet = useMemo(() => new Set(favouriteIds), [favouriteIds]);
+  const isFavoriteStop = favouriteIdSet.has(Number(id));
 
   const { mutate: addFavoriteStop } = useAddFavoriteStop();
-  const { data: isFavoriteStop } = useIsFavoriteStop(id);
   const { mutate: removeFavoriteStop } = useRemoveFavoriteStop();
 
   const heartIcon = isFavoriteStop ? (
